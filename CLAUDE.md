@@ -113,8 +113,10 @@ the end of each session — but be stringent; trim before it bloats.
       full-limitation) — DONE + gated on the free deterministic "Compare a patent" path.
       Live BigQuery search wired + dry-run validated (~135 GB ≈ $0.82/search). Enhancement:
       semantic candidate ranking via Voyage.
-- [ ] Phases 3–6, 8–9 — stage detection, validators (feature 1 error-checking), rule
-      surfacing, export, polish.
+- [~] Phase 4 — validator Tier 1 (feature 1 error-checking): `lib/validators/*` deterministic
+      structural checks -> findings (severity colors, actionable vs informational fee), review
+      UI (`/review`) opening the pinned MPEP rule. migration 0005. DONE + gated.
+- [ ] Phases 3, 5, 6, 8, 9 — stage detection, validator Tiers 2/3, rule surfacing, export, polish.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

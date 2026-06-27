@@ -146,6 +146,12 @@ export function Workspace({
             {statusLabel(activeStatus)}
           </span>
           <Link
+            href={`/projects/${project.id}/review`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Review
+          </Link>
+          <Link
             href={`/projects/${project.id}/versions`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
