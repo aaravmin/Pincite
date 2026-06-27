@@ -35,6 +35,12 @@ export default async function DashboardPage() {
           Pincite
         </span>
         <div className="flex items-center gap-4">
+          <Link
+            href="/ask"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Ask the MPEP
+          </Link>
           <span className="text-sm text-muted-foreground">{user.email}</span>
           <form action="/auth/signout" method="post">
             <Button type="submit" variant="outline" size="sm">

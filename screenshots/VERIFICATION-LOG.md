@@ -21,3 +21,6 @@ the §2.1 color discipline.
 | 2026-06-27 | phase-1 restore into new save | PASS | phase-1-restore.png | Restore opens a snapshot into a new save; history intact; clean. |
 | 2026-06-27 | phase-1 RLS + append-only (DB) | PASS | (scripts/verify-phase1.mjs) | Cross-user reads/writes blocked; version update/delete blocked; project-ownership insert check (42501). |
 | 2026-06-27 | phase-1 e2e gate | PASS | (e2e/projects.spec.ts) | create -> autosave -> 2 versions -> restore; audit has project_created/section_edited/version_saved/version_restored; zero console/page/network errors. |
+| 2026-06-27 | phase-2 evidence pane (Ask) | PASS | phase-2-evidence-pane.png | Ask "2111.03 ..." loads full MPEP 2111.03 in the half-screen evidence pane with the responsive passage highlighted yellow; neutral elsewhere; clean. |
+| 2026-06-27 | phase-2 citation-validate (drop fake) | PASS | phase-2-fake-cite-dropped.png | "MPEP 2111.99" reported as not in the corpus and dropped; no fabricated text shown; clean. |
+| 2026-06-27 | phase-7 prior-art pinpoint overlaps | PASS | phase-7-prior-art-overlaps.png | Deterministic compare: claim limitations underlined, patent passages tagged, red full-limitation markers, decomposable score, standing not-FTO disclaimer; clean. Live BigQuery wired + dry-run validated (~135 GB/search). |

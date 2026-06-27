@@ -151,6 +151,12 @@ export function Workspace({
           >
             Version history
           </Link>
+          <Link
+            href={`/projects/${project.id}/prior-art`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Similar patents
+          </Link>
           <Dialog open={versionOpen} onOpenChange={setVersionOpen}>
             <DialogTrigger asChild>
               <Button size="sm">Save version</Button>

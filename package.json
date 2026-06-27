@@ -10,6 +10,7 @@
     "verify": "playwright test"
   },
   "dependencies": {
+    "@google-cloud/bigquery": "^8.3.1",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "class-variance-authority": "^0.7.1",
@@ -31,6 +32,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^15.1.6",
+    "node-html-parser": "^8.0.3",
     "pg": "^8.22.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.2.4",

@@ -82,6 +82,14 @@ the end of each session — but be stringent; trim before it bloats.
   <file>` using `SUPABASE_DB_URL` (+ optional raw `SUPABASE_DB_PASSWORD`) in `.env.local`.
   After DDL, PostgREST serves a stale cache — run `notify pgrst, 'reload schema'` or the API
   reports "table not in schema cache". Service-role key does DML/RLS tests, not DDL.
+- **Voyage free-tier throttle.** No payment method on the Voyage account = 3 RPM / 10K TPM,
+  so bulk embedding 429s. Add a card at dashboard.voyageai.com (the 200M free tokens still
+  cover the MPEP). Corpus TEXT ingests without Voyage; embeddings are a separate resumable
+  pass (`scripts/embed-mpep.mjs`) used for semantic locate.
+- **BigQuery prior-art cost.** A live keyword search scans ~135 GB (~$0.82); free tier is
+  1 TiB/mo (~12 searches). `maximumBytesBilled` cap is 160 GB. The "Compare a patent" path
+  is free (no BigQuery). Service-account key lives at `~/.config/pincite/bq.json` (outside
+  the repo), referenced by `GOOGLE_APPLICATION_CREDENTIALS` in `.env.local`.
 
 ## Skills
 - `verify-feature` — the §7 gate as a documented, reusable procedure. Built Phase 0.
@@ -96,8 +104,17 @@ the end of each session — but be stringent; trim before it bloats.
 - [x] Phase 1 — DONE: projects + structured intake (plain-text editors), debounced autosave,
       append-only versioning (save/restore/branch), audit; migration 0002 applied; e2e gate +
       RLS/append-only DB check PASS.
-- [ ] Phase 2 — MPEP corpus, locate→load→highlight, evidence pane.
-- [ ] Phases 3–9 — stage detection, validators, rule surfacing, prior art, export, polish.
+- [~] Phase 2 — corpus ingested (1908 sections, all 29 chapters, text; migration 0003,
+      pgvector). Evidence pane + Ask (`/ask`), locate (keyword/number), `lib/mpep/*`
+      (load/locate/citation/highlight), citation-validate drop — DONE + gated. Embeddings
+      DONE (2902 chunks). Enhancements not yet wired: semantic locate into `/ask`, Grok answer.
+- [~] Phase 7 — prior art (feature 3): schema 0004, `lib/patents/*` (extract + pinpoint
+      match + transparent score), results UI + overlap evidence pane (yellow overlap / red
+      full-limitation) — DONE + gated on the free deterministic "Compare a patent" path.
+      Live BigQuery search wired + dry-run validated (~135 GB ≈ $0.82/search). Enhancement:
+      semantic candidate ranking via Voyage.
+- [ ] Phases 3–6, 8–9 — stage detection, validators (feature 1 error-checking), rule
+      surfacing, export, polish.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
