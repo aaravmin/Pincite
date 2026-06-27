@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit";
 import { getSectionContent } from "@/lib/projects/queries";
 import { runTier1 } from "@/lib/validators/tier1";
+import { runTier2 } from "@/lib/validators/tier2";
 import { validateCitations } from "@/lib/mpep/citation";
 import { loadSection, type MpepSection } from "@/lib/mpep/load";
 
@@ -30,7 +31,7 @@ export async function runValidators(
 ): Promise<{ ok: true; count: number; dropped: number } | { error: string }> {
   const { supabase, user } = await requireUser();
   const sections = await getSectionContent(projectId);
-  const findings = runTier1(sections);
+  const findings = [...runTier1(sections), ...runTier2(sections)];
 
   // Validate MPEP pins against the corpus; drop any that don't resolve.
   const pins = findings
