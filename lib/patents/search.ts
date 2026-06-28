@@ -16,6 +16,7 @@ import { logAudit } from "@/lib/audit";
 import { getSectionContent } from "@/lib/projects/queries";
 import { extractLimitations, claimKeywords } from "@/lib/patents/extract";
 import { matchCandidate } from "@/lib/patents/match";
+import { semanticScores } from "@/lib/patents/semantic";
 import { searchCandidates } from "@/lib/patents/bigquery";
 import type { SpanMatch } from "@/lib/patents/match";
 
@@ -90,16 +91,23 @@ export async function runPriorArtSearch(
   try {
     const res = await searchCandidates({ keywords, limit: 15 });
     bytesProcessed = res.bytesProcessed;
+    const candTexts = res.candidates.map((c) =>
+      [c.title, c.abstract].filter(Boolean).join(". "),
+    );
+    // Semantic ranking layered on the lexical pinpoint score; [] if Voyage is unavailable.
+    const sem = await semanticScores(claims, candTexts);
     matches = res.candidates
-      .map((c) => {
-        const text = [c.title, c.abstract].filter(Boolean).join(". ");
-        const m = matchCandidate(limitations, text);
+      .map((c, idx) => {
+        const m = matchCandidate(limitations, candTexts[idx]);
+        const overall = sem.length
+          ? Number((0.7 * m.overallScore + 0.3 * (sem[idx] ?? 0)).toFixed(2))
+          : m.overallScore;
         return {
           patent_number: c.publication_number,
           title: c.title,
           source: "google_patents" as const,
           source_url: c.source_url,
-          overall_score: m.overallScore,
+          overall_score: overall,
           spans: m.spans,
         };
       })

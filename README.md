@@ -71,8 +71,8 @@ flowchart LR
   C -->|Live search| E[Google BigQuery public patents]
   D --> F[Per limitation term overlap match]
   E --> F
-  F --> G[Spans plus a transparent decomposed score]
-  G --> H[Evidence pane shows your text beside the patent passage]
+  F --> G[Spans plus a transparent score, candidates reranked by Voyage similarity]
+  G --> H[Evidence pane shows your text beside the patent passage, with a link to the patent]
 ```
 
 Error checking
@@ -98,7 +98,7 @@ MPEP locate
 flowchart LR
   A[Question or finding] --> B{Names a section number}
   B -->|yes| C[Load that exact section]
-  B -->|no| D[Full text search over titles and bodies]
+  B -->|no| D[Semantic search over the embedded chunks, keyword fallback]
   C --> E[Highlight the responsive passage and scroll to it]
   D --> E
 ```
@@ -252,4 +252,4 @@ docs/                    architecture, style guide, business context, api refere
 
 ## Disclaimer
 
-Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Not built yet are the semantic MPEP locate wired into Ask, Voyage semantic ranking for prior art, and any analysis of the drawings themselves.
+Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Not built yet is any analysis of the drawings themselves, which needs a vision model and is gated on confidentiality.

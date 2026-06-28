@@ -2,10 +2,12 @@
 
 import { type ReactNode, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { runPriorArtSearch, compareAgainstCandidate } from "@/lib/patents/search";
+import { patentUrl } from "@/lib/patents/url";
 import type { ResultMatch, ResultSpan } from "@/lib/patents/results";
 
 export function PriorArtClient({
@@ -103,35 +105,53 @@ export function PriorArtClient({
         <div className="flex min-h-0 flex-1">
           <aside className="w-2/5 shrink-0 overflow-auto border-r border-border">
             <ul className="divide-y divide-border">
-              {matches.map((m, i) => (
-                <li key={m.id}>
-                  <button
-                    type="button"
-                    onClick={() => setSelected(i)}
+              {matches.map((m, i) => {
+                const url = patentUrl(m.patent_number, m.source_url);
+                return (
+                  <li
+                    key={m.id}
                     className={
-                      "w-full px-5 py-3 text-left " +
+                      "flex items-stretch " +
                       (i === selected ? "bg-accent" : "hover:bg-accent/50")
                     }
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium text-foreground">
-                        {m.patent_number}
-                      </span>
-                      <span className="shrink-0 text-xs text-muted-foreground">
-                        score {m.overall_score?.toFixed(2) ?? "—"}
-                      </span>
-                    </div>
-                    {m.title && (
-                      <p className="truncate text-xs text-muted-foreground">
-                        {m.title}
+                    <button
+                      type="button"
+                      onClick={() => setSelected(i)}
+                      className="min-w-0 flex-1 px-5 py-3 text-left"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm font-medium text-foreground">
+                          {m.patent_number}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          score {m.overall_score?.toFixed(2) ?? "—"}
+                        </span>
+                      </div>
+                      {m.title && (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {m.title}
+                        </p>
+                      )}
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {m.spans.length} pinpoint overlap(s)
                       </p>
+                    </button>
+                    {url && (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Open the patent page"
+                        aria-label={`Open ${m.patent_number} on the web`}
+                        className="flex shrink-0 items-center px-3 text-muted-foreground hover:text-foreground"
+                      >
+                        <ExternalLink className="size-4" aria-hidden />
+                      </a>
                     )}
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {m.spans.length} pinpoint overlap(s)
-                    </p>
-                  </button>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </aside>
           <section
@@ -148,24 +168,25 @@ export function PriorArtClient({
 
 function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) {
   const [showClaims, setShowClaims] = useState(false);
+  const url = patentUrl(match.patent_number, match.source_url);
   return (
     <div className="space-y-5">
       <div>
-        <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-foreground">
-            {match.patent_number}
-          </h2>
-          {match.source_url && (
+        <h2 className="text-sm font-semibold text-foreground">
+          {url ? (
             <a
-              href={match.source_url}
+              href={url}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+              className="inline-flex items-center gap-1 underline-offset-2 hover:underline"
             >
-              source
+              {match.patent_number}
+              <ExternalLink className="size-3.5" aria-hidden />
             </a>
+          ) : (
+            match.patent_number
           )}
-        </div>
+        </h2>
         <p className="mt-0.5 text-xs text-muted-foreground">
           Score {match.overall_score?.toFixed(2) ?? "—"} from {match.spans.length}{" "}
           overlap(s). The score summarizes the overlaps below; it is not a verdict.

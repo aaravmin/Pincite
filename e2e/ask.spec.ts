@@ -24,6 +24,14 @@ test("phase-2: Ask opens the evidence pane with the right section highlighted; f
   await expect(page.locator("#evidence-highlight")).toBeVisible();
   await screenshot(page, "phase-2-evidence-pane");
 
+  // A question with no section number still locates the right section (semantic, with a
+  // keyword fallback) and loads it into the evidence pane.
+  await page
+    .getByTestId("ask-input")
+    .fill("which transitional phrase makes a claim open ended");
+  await page.getByRole("button", { name: "Ask" }).click();
+  await expect(page.getByTestId("evidence")).toContainText("2111.03");
+
   // A section number not in the corpus is dropped, not fabricated.
   await page.getByTestId("ask-input").fill("MPEP 2111.99 imaginary subsection");
   await page.getByRole("button", { name: "Ask" }).click();
