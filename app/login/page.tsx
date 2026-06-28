@@ -18,15 +18,18 @@ export default async function LoginPage() {
         <Link href="/" className="block">
           <Logo className="mx-auto h-9 w-auto" />
         </Link>
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          Sign in to open your patent review workspace.
+        <h1 className="mt-6 text-center text-xl font-semibold tracking-tight text-foreground">
+          Sign in
+        </h1>
+        <p className="mt-1 text-center text-sm text-muted-foreground">
+          Open your patent review workspace.
         </p>
-        <div className="mt-8">
-          <Suspense fallback={<div className="h-11" />}>
+        <div className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <Suspense fallback={<div className="h-64" />}>
             <LoginForm />
           </Suspense>
         </div>
-        <p className="mt-8 text-center text-xs text-muted-foreground">
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           A legal research aid, not legal advice. You are responsible for the
           confidentiality of anything you enter.
         </p>
