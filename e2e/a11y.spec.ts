@@ -35,6 +35,10 @@ test("phase-9: key screens have no serious or critical accessibility violations"
     `/projects/${id}/review`,
     `/projects/${id}/rules`,
     `/projects/${id}/stage`,
+    `/projects/${id}/disclosure`,
+    `/projects/${id}/inventors`,
+    `/projects/${id}/uploads`,
+    `/projects/${id}/sign`,
     `/projects/${id}/report`,
     `/projects/${id}/audit`,
   ];

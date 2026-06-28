@@ -50,7 +50,11 @@ export default async function globalSetup() {
   }
 
   // Reset state so the consent screen reliably appears and audit asserts are precise.
-  await admin.from("profiles").update({ consented_at: null }).eq("id", user.id);
+  // Default role = inventor so consent flows straight to the dashboard (roles spec overrides).
+  await admin
+    .from("profiles")
+    .update({ consented_at: null, role: "inventor" })
+    .eq("id", user.id);
   await admin.from("audit_log").delete().eq("user_id", user.id);
   // Phase 1: clear the test user's projects (cascades sections + versions) so the
   // dashboard starts empty and version/audit assertions are deterministic. No-op if

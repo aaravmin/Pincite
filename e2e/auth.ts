@@ -18,7 +18,12 @@ async function resetTestUser(): Promise<void> {
   const { data } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const user = data.users.find((u) => u.email === email);
   if (!user) return;
-  await admin.from("profiles").update({ consented_at: null }).eq("id", user.id);
+  // Clear consent (so the consent screen reappears) and default the role to inventor so
+  // consent flows straight through to the dashboard. The roles spec overrides this.
+  await admin
+    .from("profiles")
+    .update({ consented_at: null, role: "inventor" })
+    .eq("id", user.id);
   await admin.from("audit_log").delete().eq("user_id", user.id);
   await admin.from("projects").delete().eq("user_id", user.id);
 }

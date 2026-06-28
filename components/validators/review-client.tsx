@@ -58,6 +58,7 @@ export function ReviewClient({
 
   const violations = findings.filter((f) => f.severity === "violation");
   const attention = findings.filter((f) => f.severity === "attention");
+  const ordered = [...violations, ...attention];
 
   return (
     <div className="flex h-full flex-col">
@@ -87,67 +88,29 @@ export function ReviewClient({
               No findings yet. Run a check.
             </p>
           ) : (
-            <ul className="space-y-3">
-              {[...violations, ...attention].map((f) => (
-                <li
-                  key={f.id}
-                  data-severity={f.severity}
-                  className="rounded-md border border-border p-3"
-                >
-                  <div className="flex flex-wrap items-center gap-2">
-                    {f.severity === "violation" ? (
-                      <span
-                        className="inline-block size-2 rounded-full bg-violation"
-                        aria-hidden
-                      />
-                    ) : (
-                      <span
-                        className="inline-block size-2 rounded-full border border-attention"
-                        aria-hidden
-                      />
-                    )}
-                    <span
-                      className={
-                        "text-xs font-medium " +
-                        (f.severity === "violation"
-                          ? "text-violation"
-                          : "text-attention-foreground")
-                      }
-                    >
-                      {f.severity === "violation" ? "Violation" : "Attention"}
-                    </span>
-                    <span className="rounded-full border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                      {f.actionable ? "Fixable" : "Informational"}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm font-medium text-foreground">{f.title}</p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {f.explanation}
-                  </p>
-                  {sections[f.section_key] && f.span_end > f.span_start && (
-                    <p className="mt-1 truncate text-xs text-muted-foreground">
-                      in {f.section_key}: “
-                      {sections[f.section_key]
-                        .slice(f.span_start, f.span_end)
-                        .slice(0, 80)}
-                      ”
+            <div className="space-y-5">
+              {AREAS.map((area) => {
+                const items = ordered.filter((f) => areaOf(f) === area);
+                if (items.length === 0) return null;
+                return (
+                  <div key={area}>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {area} ({items.length})
                     </p>
-                  )}
-                  <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    {f.cfr_ref && <span>{f.cfr_ref}</span>}
-                    {f.mpep_section && (
-                      <button
-                        type="button"
-                        onClick={() => openRule(f.mpep_section!)}
-                        className="underline-offset-2 hover:underline"
-                      >
-                        Open MPEP {f.mpep_section}
-                      </button>
-                    )}
+                    <ul className="space-y-3">
+                      {items.map((f) => (
+                        <FindingItem
+                          key={f.id}
+                          f={f}
+                          sections={sections}
+                          onOpenRule={openRule}
+                        />
+                      ))}
+                    </ul>
                   </div>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
           )}
         </div>
 
@@ -211,5 +174,76 @@ function EligibilityPanel({
         </div>
       ))}
     </div>
+  );
+}
+
+// Process areas so the user can see WHERE an error sits, not just a flat list.
+const AREAS = ["Claims", "Specification"] as const;
+function areaOf(f: FindingRow): string {
+  return f.section_key === "claims" ? "Claims" : "Specification";
+}
+
+function FindingItem({
+  f,
+  sections,
+  onOpenRule,
+}: {
+  f: FindingRow;
+  sections: Record<string, string>;
+  onOpenRule: (n: string) => void;
+}) {
+  return (
+    <li
+      data-severity={f.severity}
+      className="rounded-md border border-border p-3"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        {f.severity === "violation" ? (
+          <span
+            className="inline-block size-2 rounded-full bg-violation"
+            aria-hidden
+          />
+        ) : (
+          <span
+            className="inline-block size-2 rounded-full border border-attention"
+            aria-hidden
+          />
+        )}
+        <span
+          className={
+            "text-xs font-medium " +
+            (f.severity === "violation"
+              ? "text-violation"
+              : "text-attention-foreground")
+          }
+        >
+          {f.severity === "violation" ? "Violation" : "Attention"}
+        </span>
+        <span className="rounded-full border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+          {f.actionable ? "Fixable" : "Informational"}
+        </span>
+      </div>
+      <p className="mt-1 text-sm font-medium text-foreground">{f.title}</p>
+      <p className="mt-0.5 text-sm text-muted-foreground">{f.explanation}</p>
+      {sections[f.section_key] && f.span_end > f.span_start && (
+        <p className="mt-1 truncate text-xs text-muted-foreground">
+          in {f.section_key}: “
+          {sections[f.section_key].slice(f.span_start, f.span_end).slice(0, 80)}
+          ”
+        </p>
+      )}
+      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+        {f.cfr_ref && <span>{f.cfr_ref}</span>}
+        {f.mpep_section && (
+          <button
+            type="button"
+            onClick={() => onOpenRule(f.mpep_section!)}
+            className="underline-offset-2 hover:underline"
+          >
+            Open MPEP {f.mpep_section}
+          </button>
+        )}
+      </div>
+    </li>
   );
 }

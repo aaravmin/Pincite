@@ -40,9 +40,10 @@ export default async function ConsentPage() {
             conclusions about validity, patentability, or freedom to operate.
           </p>
           <p className="rounded-md border border-attention bg-attention-bg px-4 py-3 text-attention-foreground">
-            This build is for evaluation with non-confidential, synthetic patent
-            text only. Do not enter real unfiled invention text until the
-            confidentiality controls are confirmed.
+            Use non-confidential or synthetic text for now. Infrastructure is US-region with
+            encryption at rest and in transit and per-user isolation, and uploads are stored
+            encrypted in the US, but zero-data-retention on the generation vendor is not yet
+            active, so do not enter real unfiled invention text until it is confirmed.
           </p>
         </div>
 

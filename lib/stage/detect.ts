@@ -20,7 +20,7 @@ export type StageInput = {
 
 export type StageResult = { label: string; signals: string[]; missing: string[] };
 
-const REQUIRED: SectionKey[] = [
+const REQUIRED_UTILITY: SectionKey[] = [
   "title",
   "background",
   "summary",
@@ -28,10 +28,18 @@ const REQUIRED: SectionKey[] = [
   "claims",
   "abstract",
 ];
+// Design (37 CFR 1.154): figure descriptions + the single claim; drawings are the disclosure.
+const REQUIRED_DESIGN: SectionKey[] = [
+  "title",
+  "brief_description_drawings",
+  "claims",
+];
 
 export function detectStage(input: StageInput): StageResult {
   const f = new Set(input.filled);
   const has = (k: string) => f.has(k);
+  const REQUIRED =
+    input.patent_type === "design" ? REQUIRED_DESIGN : REQUIRED_UTILITY;
   const missingRequired = REQUIRED.filter((k) => !has(k));
   const labelList = (ks: SectionKey[]) => ks.map((k) => `Add the ${SECTION_LABELS[k]}.`);
 
@@ -94,6 +102,21 @@ export function detectStage(input: StageInput): StageResult {
         "Start with the title and background, then the detailed description and claims.",
       ],
     };
+  }
+  if (input.patent_type === "design") {
+    return missingRequired.length === 0
+      ? {
+          label: "Pre-filing review",
+          signals: ["Title, figure descriptions, and the single claim are present."],
+          missing: [
+            "Upload the drawings (they are the disclosure), run the issue check, then consider filing.",
+          ],
+        }
+      : {
+          label: "Design drafting",
+          signals: ["Design application; some required parts remain."],
+          missing: labelList(missingRequired),
+        };
   }
   if (missingRequired.length === 0) {
     return {

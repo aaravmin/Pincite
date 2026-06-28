@@ -4,9 +4,10 @@
  * SERVER ONLY — reads XAI_API_KEY / GEMINI_API_KEY. Never import into a client
  * component.
  *
- * CONFIDENTIALITY: any model that sees invention text inherits the Phase 0
- * zero-retention / US-region terms. Until those are confirmed for xAI and Google
- * (see docs/business-context.md), only synthetic patent text may be sent here.
+ * CONFIDENTIALITY: real invention text requires zero-data-retention on every vendor. xAI
+ * exposes ZDR via the `x-zero-data-retention` RESPONSE header; do NOT send it as a request
+ * header (xAI 400s unless the team has ZDR enabled). It currently reads "false", so use
+ * synthetic / non-confidential text until ZDR is on. See docs/business-context.md.
  */
 
 export type GenerateParams = {
@@ -54,6 +55,11 @@ async function generateWithGrok(
   });
   if (!res.ok) {
     throw new Error(`Grok ${res.status}: ${await res.text()}`);
+  }
+  if (res.headers.get("x-zero-data-retention") !== "true") {
+    console.warn(
+      "[llm] Grok zero-data-retention is NOT active for this team — use synthetic text only",
+    );
   }
   const json = await res.json();
   return json.choices?.[0]?.message?.content ?? "";

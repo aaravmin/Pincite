@@ -7,6 +7,7 @@
  * (they want model assist).
  */
 import { parseClaims } from "@/lib/patent/claims";
+import type { PatentType } from "@/lib/projects/sections";
 import type { Finding } from "@/lib/validators/types";
 
 const NONCE = [
@@ -41,8 +42,13 @@ function head(term: string): string {
   return parts[parts.length - 1] ?? term;
 }
 
-export function runTier2(sections: Record<string, string>): Finding[] {
+export function runTier2(
+  sections: Record<string, string>,
+  patentType: PatentType = "utility",
+): Finding[] {
   const out: Finding[] = [];
+  // Design claims are a single formal sentence with no elements — no antecedent/MPF check.
+  if (patentType === "design") return out;
   const claimsText = sections["claims"] ?? "";
   if (!claimsText.trim()) return out;
 

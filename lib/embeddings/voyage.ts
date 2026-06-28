@@ -1,9 +1,8 @@
 /**
  * Voyage embeddings client — voyage-law-2 (legal-tuned, 1024-dim, 16K-token input).
- * SERVER ONLY (reads VOYAGE_API_KEY). Used for the MPEP locate step and (Phase 7)
- * patent text. CONFIDENTIALITY: any text sent here inherits the Phase 0 zero-retention
- * terms; MPEP/patent text is public, but invention text must honor the pre-production
- * checklist in docs/business-context.md before it is embedded.
+ * SERVER ONLY (reads VOYAGE_API_KEY). CONFIDENTIALITY: Voyage ZDR is an account-level
+ * opt-out (no per-request signal); verify it in the dashboard. Until ZDR is confirmed
+ * across vendors, embed only synthetic / non-confidential text. See docs/business-context.md.
  */
 
 const VOYAGE_URL = "https://api.voyageai.com/v1/embeddings";

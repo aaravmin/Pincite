@@ -24,5 +24,5 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.redirect(`${origin}/dashboard`, { status: 303 });
+  return NextResponse.redirect(`${origin}/role`, { status: 303 });
 }

@@ -152,24 +152,6 @@ export function Workspace({
             Stage
           </Link>
           <Link
-            href={`/projects/${project.id}/review`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Review
-          </Link>
-          <Link
-            href={`/projects/${project.id}/rules`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Rules
-          </Link>
-          <Link
-            href={`/projects/${project.id}/report`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Export
-          </Link>
-          <Link
             href={`/projects/${project.id}/versions`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
@@ -180,12 +162,6 @@ export function Workspace({
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             Audit log
-          </Link>
-          <Link
-            href={`/projects/${project.id}/prior-art`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Similar patents
           </Link>
           <Dialog open={versionOpen} onOpenChange={setVersionOpen}>
             <DialogTrigger asChild>

@@ -14,7 +14,14 @@ export type AuditAction =
   | "findings_run"
   | "prior_art_searched"
   | "rule_surfaced"
-  | "export_generated";
+  | "export_generated"
+  | "role_selected"
+  | "applicant_saved"
+  | "inventors_saved"
+  | "declaration_signed"
+  | "attachment_uploaded"
+  | "attachment_deleted"
+  | "disclosure_saved";
 
 export async function logAudit(
   supabase: SupabaseClient,

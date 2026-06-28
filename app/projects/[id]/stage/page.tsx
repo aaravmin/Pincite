@@ -3,7 +3,9 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { detectStage } from "@/lib/stage/detect";
+import { lifecycleActions, resolveActionPins } from "@/lib/lifecycle/actions";
 import { StageClient } from "@/components/stage/stage-client";
+import { NextActions } from "@/components/lifecycle/next-actions";
 
 export default async function StagePage({
   params,
@@ -37,6 +39,9 @@ export default async function StagePage({
     filing_date: project.filing_date,
     patent_type: project.patent_type,
   });
+  const actions = await resolveActionPins(
+    lifecycleActions(project.declared_status, project.patent_type),
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -61,6 +66,7 @@ export default async function StagePage({
           applicationNumber={project.application_number}
           filingDate={project.filing_date}
         />
+        <NextActions actions={actions} />
       </main>
     </div>
   );

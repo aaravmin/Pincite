@@ -19,7 +19,9 @@ test("phase-0: consent then dashboard render, and actions are audited", async ({
   // Accept -> redirected to the dashboard shell.
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
-  await expect(page.getByRole("heading", { name: /^projects$/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /your patents/i }),
+  ).toBeVisible();
   await expect(page.getByText(/no projects yet/i)).toBeVisible();
   await screenshot(page, "phase-0-dashboard");
 

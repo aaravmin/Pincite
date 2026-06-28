@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
+import { PortfolioTable } from "@/components/projects/portfolio-table";
 import { getDashboardProjects } from "@/lib/projects/queries";
 import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
 import { fmtDate } from "@/lib/format";
@@ -18,10 +19,12 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("consented_at")
+    .select("consented_at, role")
     .eq("id", user.id)
     .maybeSingle();
   if (!profile?.consented_at) redirect("/consent");
+  if (!profile?.role) redirect("/role");
+  const isAttorney = profile.role === "attorney";
 
   const projects = await getDashboardProjects();
 
@@ -47,18 +50,24 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
+      <main
+        className={
+          "mx-auto w-full flex-1 px-6 py-10 " +
+          (isAttorney ? "max-w-6xl" : "max-w-5xl")
+        }
+      >
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Projects
+              {isAttorney ? "Portfolio" : "Your patents"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Each project is one in-progress patent, saved as versioned,
-              audited sessions.
+              {isAttorney
+                ? "Every matter across your clients, with stage and open findings."
+                : "Each project is one patent. Pincite guides you step by step and checks your filing before you submit."}
             </p>
           </div>
-          <NewProjectDialog />
+          <NewProjectDialog isAttorney={isAttorney} />
         </div>
 
         {projects.length === 0 ? (
@@ -69,6 +78,8 @@ export default async function DashboardPage() {
               workspace is ready and your session is secure.
             </p>
           </div>
+        ) : isAttorney ? (
+          <PortfolioTable projects={projects} />
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (

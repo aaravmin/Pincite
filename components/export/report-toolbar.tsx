@@ -15,17 +15,41 @@ export function ReportToolbar({ projectId }: { projectId: string }) {
   }
 
   return (
-    <div className="flex items-center gap-2 border-b border-border px-6 py-3 print:hidden">
+    <div className="flex flex-wrap items-center gap-2 border-b border-border px-6 py-3 print:hidden">
+      <Button asChild size="sm">
+        <a
+          href={`/api/projects/${projectId}/export?format=package`}
+          download
+          data-testid="download-package"
+        >
+          Download filing package (.zip)
+        </a>
+      </Button>
+      <Button asChild size="sm" variant="outline">
+        <a
+          href={`/api/projects/${projectId}/export?format=docx`}
+          download
+          data-testid="download-docx"
+        >
+          Specification (.docx)
+        </a>
+      </Button>
       <Button asChild size="sm" variant="outline">
         <a
           href={`/api/projects/${projectId}/export?format=txt`}
           download
           data-testid="download-txt"
         >
-          Download TXT
+          Review report (.txt)
         </a>
       </Button>
-      <Button size="sm" onClick={printPdf} disabled={pending} data-testid="print-pdf">
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={printPdf}
+        disabled={pending}
+        data-testid="print-pdf"
+      >
         {pending ? "Preparing…" : "Print to PDF"}
       </Button>
     </div>

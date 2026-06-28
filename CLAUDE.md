@@ -46,7 +46,9 @@ the end of each session — but be stringent; trim before it bloats.
   dep-auditor, researcher, reviewer). Bulk reading/scraping → Haiku/Sonnet; scoped code →
   Sonnet; architecture/correctness/review → Opus. All report back. In-session bulk → Claude
   Code subagents; scheduled/recurring (e.g. weekly patent monitoring) → Hermes.
-- **Synthetic data only** until vendor zero-retention is confirmed (see business-context).
+- **Synthetic / non-confidential text only** until xAI ZDR is actually on — its API reports
+  ZDR OFF now (`x-zero-data-retention` response = "false"; setting it on the request 400s).
+  Voyage opt-out unverified. Uploads stored encrypted US-region. See business-context.
 
 ## Conventions
 - Strict color system (roadmap §2.1), enforced in review + the verify gate:
@@ -92,6 +94,15 @@ the end of each session — but be stringent; trim before it bloats.
   1 TiB/mo (~12 searches). `maximumBytesBilled` cap is 160 GB. The "Compare a patent" path
   is free (no BigQuery). Service-account key lives at `~/.config/pincite/bq.json` (outside
   the repo), referenced by `GOOGLE_APPLICATION_CREDENTIALS` in `.env.local`.
+- **Storage needs the admin client.** The cookie-based SSR client does NOT carry the user
+  JWT to Supabase Storage, so Storage RLS rejects writes ("new row violates RLS"). Verify
+  ownership with the user client, then upload/sign/remove via `lib/supabase/admin.ts`
+  (service role). Bucket `project-files` is private; objects namespaced by `{projectId}/`.
+- **xAI ZDR header.** Don't send `x-zero-data-retention: true` on Grok requests unless the
+  team has enterprise ZDR (xAI 400s: "team does not have zero data retention enabled"). Read
+  the response header for ZDR status; it currently reads "false".
+- **exports.format CHECK.** `exports.format` is constrained; new formats need a migration
+  (0008 added 'docx','package'). A silently-swallowed export insert = the CHECK rejected it.
 
 ## Skills
 - `verify-feature` — the §7 gate as a documented, reusable procedure. Built Phase 0.
@@ -132,6 +143,32 @@ the end of each session — but be stringent; trim before it bloats.
       accessibility axe pass (8 screens, 0 serious/critical; `--pass` darkened for AA text).
 - ROADMAP COMPLETE (phases 0-9); 13/13 e2e gates green. Optional enhancements not built:
   semantic MPEP locate + Grok cited answer in `/ask` (corpus embedded, ready to wire).
+- [x] v3 — USPTO FILING ALIGNMENT (migrations 0007/0008): two roles (attorney portfolio vs
+      pro-se guided; self-select after consent, `lib/profile.ts`); inventor + applicant ADS
+      intake (PTO/AIA/14 data card, `lib/filing/*`, `/projects/[id]/inventors`); secure
+      drawing/doc uploads (private US `project-files` Storage bucket, per-owner RLS,
+      `/uploads`); inventor's declaration signing (37 CFR 1.63 / PTO-AIA-01, append-only) +
+      a filing-readiness validator tier (`lib/validators/filing.ts`, CFR + corpus-validated
+      MPEP) on `/sign` + a `/review` banner; USPTO-aligned export (spec DOCX in 37 CFR 1.77
+      order, `lib/export/docx.ts`; filing-package ZIP, `?format=docx|package`); left step-rail
+      UI (`components/workspace/step-rail.tsx` + `app/projects/[id]/layout.tsx`). 17/17 e2e
+      green + a11y. NOTE: prior art stays decomposed — no single "novelty score" (anti-over-
+      trust discipline), despite the reference image. ZDR still OFF (synthetic text only).
+- [x] v3.1 — FILING DEPTH: validators are patent_type-aware (threaded through tiers 1-3 +
+      detectStage). Utility claim suite (`lib/validators/tier1.ts`) now adds non-existent +
+      forward refs, multiple-dependent must-be-alternative + multiple-on-multiple, claim-1
+      independent (37 CFR 1.75/1.16; MPEP 608.01(n)); design path = single claim + prescribed
+      "ornamental design for [article] as shown" wording (37 CFR 1.153 / MPEP 1503.03), utility
+      claim checks skipped. Lifecycle "what to do now" by declared_status (`lib/lifecycle/
+      actions.ts`, `/stage`): office-action reply (3->6 mo, abandonment, after-final RCE/appeal),
+      issue fee (non-extendable), maintenance fees, publication — CFR + corpus-validated MPEP.
+      Invention-disclosure intake (`/disclosure`, `lib/disclosure/*`, table `project_disclosure`,
+      migration 0009) separate from the 1.77 spec; cross-reference checks (`lib/validators/
+      crossref.ts`) flag a disclosed component not claimed/described + a problem not in the
+      Background. Ownership/inventorship checks in the filing tier (company-cannot-be-inventor
+      35 USC 100(f)/MPEP 2109; record-assignment 37 CFR 3.81/MPEP 302). `/review` groups
+      findings by process area (Claims vs Specification) + filing-readiness + consistency
+      banners. 20/20 e2e green + a11y. Design figure/IMAGE analysis intentionally deferred.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

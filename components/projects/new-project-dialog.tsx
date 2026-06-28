@@ -28,24 +28,32 @@ import {
   type PatentType,
 } from "@/lib/projects/sections";
 
-export function NewProjectDialog() {
+export function NewProjectDialog({ isAttorney = false }: { isAttorney?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [patentType, setPatentType] = useState<PatentType>("utility");
+  const [clientName, setClientName] = useState("");
+  const [matterNo, setMatterNo] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   function submit() {
     setError(null);
     start(async () => {
-      const res = await createProject({ name, patentType });
+      const res = await createProject({
+        name,
+        patentType,
+        ...(isAttorney ? { clientName, matterNo } : {}),
+      });
       if ("error" in res) {
         setError(res.error);
         return;
       }
       setOpen(false);
       setName("");
+      setClientName("");
+      setMatterNo("");
       router.push(`/projects/${res.id}`);
     });
   }
@@ -92,6 +100,28 @@ export function NewProjectDialog() {
               </SelectContent>
             </Select>
           </div>
+          {isAttorney && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="client-name">Client</Label>
+                <Input
+                  id="client-name"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  placeholder="e.g. Acme Corp"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="matter-no">Matter no.</Label>
+                <Input
+                  id="matter-no"
+                  value={matterNo}
+                  onChange={(e) => setMatterNo(e.target.value)}
+                  placeholder="e.g. ACM-0042"
+                />
+              </div>
+            </div>
+          )}
           {error && (
             <p className="rounded-md bg-muted px-3 py-2 text-sm text-foreground">
               {error}

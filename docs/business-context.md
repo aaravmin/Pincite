@@ -34,14 +34,15 @@ RLS isolation; standing consent/warning on intake.
   confidentiality.
 
 ### Current decision (locked with user)
-- **Build & test on SYNTHETIC patent data now.** Consent screen present from day one.
+- **Synthetic / non-confidential text only for now.** xAI's API reports the team does NOT
+  have zero-data-retention (the `x-zero-data-retention` response header is "false"; setting
+  it on the request 400s: "team does not have zero data retention enabled"). So real
+  invention text is NOT yet permitted, despite the intent to enable ZDR. Surfaced to the user.
 - **Pre-production checklist (before ANY real invention text):**
-  - [ ] xAI Grok API zero-retention + US-region confirmed in writing (Grok is primary
-        generation; its ZDR/US posture is less publicly confirmable than Anthropic's was
-        in the roadmap's reference stack — verify before go-live).
-  - [ ] Voyage AI (voyage-law-2) retention/training/US-region confirmed.
-  - [ ] Supabase project confirmed US-region; encryption at rest verified.
-  - [ ] If any vendor can't meet the bar, swap it (e.g. Claude under ZDR) before launch.
+  - [ ] xAI Grok enterprise ZDR enabled on the team (response header reads "true"). CURRENTLY OFF.
+  - [ ] Voyage account zero-retention opt-out confirmed (no per-request signal; verify in dashboard).
+  - [x] Supabase US-region + encryption at rest + per-user RLS.
+  - Uploads: stored encrypted in a US-region Supabase Storage bucket (per-user RLS), never to a non-ZDR vendor.
 
 ## Risks to keep in mind (roadmap §11)
 Hallucinated citations (mitigated by corpus-validated cites), over-trust of the

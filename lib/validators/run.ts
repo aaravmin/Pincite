@@ -10,7 +10,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit";
-import { getSectionContent } from "@/lib/projects/queries";
+import { getSectionContent, getProject } from "@/lib/projects/queries";
 import { runTier1 } from "@/lib/validators/tier1";
 import { runTier2 } from "@/lib/validators/tier2";
 import { runTier3 } from "@/lib/validators/tier3";
@@ -33,11 +33,15 @@ export async function runValidators(
   projectId: string,
 ): Promise<{ ok: true; count: number; dropped: number } | { error: string }> {
   const { supabase, user } = await requireUser();
-  const sections = await getSectionContent(projectId);
+  const [sections, project] = await Promise.all([
+    getSectionContent(projectId),
+    getProject(projectId),
+  ]);
+  const patentType = project?.patent_type ?? "utility";
   const findings = [
-    ...runTier1(sections),
-    ...runTier2(sections),
-    ...runTier3(sections),
+    ...runTier1(sections, patentType),
+    ...runTier2(sections, patentType),
+    ...runTier3(sections, patentType),
   ];
 
   const pins = findings

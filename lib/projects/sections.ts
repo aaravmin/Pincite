@@ -54,6 +54,15 @@ export const ADVANCED_SECTION_KEYS: ReadonlySet<SectionKey> = new Set(["office_a
 
 export const ABSTRACT_WORD_LIMIT = 150;
 
+/** Entity status for fee/certification purposes (37 CFR 1.27 / 1.29). */
+export const ENTITY_STATUSES = ["large", "small", "micro"] as const;
+export type EntityStatus = (typeof ENTITY_STATUSES)[number];
+export const ENTITY_STATUS_LABELS: Record<EntityStatus, string> = {
+  large: "Large entity",
+  small: "Small entity (37 CFR 1.27)",
+  micro: "Micro entity (37 CFR 1.29)",
+};
+
 export const PATENT_TYPES = ["utility", "design", "plant"] as const;
 export type PatentType = (typeof PATENT_TYPES)[number];
 

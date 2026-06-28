@@ -35,17 +35,27 @@ type SupabaseFromRequireUser = Awaited<ReturnType<typeof requireUser>>["supabase
 export async function createProject(input: {
   name: string;
   patentType: PatentType;
+  clientName?: string;
+  matterNo?: string;
 }): Promise<{ id: string } | { error: string }> {
   const name = input.name?.trim();
   if (!name) return { error: "Name is required." };
   const patentType = PATENT_TYPES.includes(input.patentType)
     ? input.patentType
     : "utility";
+  const clientName = input.clientName?.trim() || null;
+  const matterNo = input.matterNo?.trim() || null;
 
   const { supabase, user } = await requireUser();
   const { data, error } = await supabase
     .from("projects")
-    .insert({ user_id: user.id, name, patent_type: patentType })
+    .insert({
+      user_id: user.id,
+      name,
+      patent_type: patentType,
+      client_name: clientName,
+      matter_no: matterNo,
+    })
     .select("id")
     .single();
   if (error || !data) {
@@ -56,7 +66,7 @@ export async function createProject(input: {
     userId: user.id,
     action: "project_created",
     projectId: data.id,
-    detail: { name, patent_type: patentType },
+    detail: { name, patent_type: patentType, client_name: clientName, matter_no: matterNo },
   });
   revalidatePath("/dashboard");
   return { id: data.id };
