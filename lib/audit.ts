@@ -6,6 +6,7 @@ export type AuditAction =
   | "logout"
   | "consent_granted"
   | "project_created"
+  | "project_status_changed"
   | "section_edited"
   | "version_saved"
   | "version_restored"

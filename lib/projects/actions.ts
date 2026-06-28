@@ -13,9 +13,11 @@ import { logAudit } from "@/lib/audit";
 import {
   SECTION_KEYS,
   PATENT_TYPES,
+  PROJECT_STATUSES,
   wordCount,
   type SectionKey,
   type PatentType,
+  type ProjectStatus,
 } from "@/lib/projects/sections";
 import type { VersionSnapshot } from "@/lib/projects/types";
 
@@ -58,6 +60,43 @@ export async function createProject(input: {
   });
   revalidatePath("/dashboard");
   return { id: data.id };
+}
+
+export async function updateProjectStatus(input: {
+  projectId: string;
+  declared_status: ProjectStatus;
+  application_number?: string;
+  filing_date?: string | null;
+}): Promise<{ ok: true } | { error: string }> {
+  if (!PROJECT_STATUSES.includes(input.declared_status)) {
+    return { error: "Unknown status." };
+  }
+  const { supabase, user } = await requireUser();
+  const patch: Record<string, unknown> = {
+    declared_status: input.declared_status,
+  };
+  if (input.application_number !== undefined) {
+    patch.application_number = input.application_number.trim() || null;
+  }
+  if (input.filing_date !== undefined) {
+    patch.filing_date = input.filing_date || null;
+  }
+
+  const { error } = await supabase
+    .from("projects")
+    .update(patch)
+    .eq("id", input.projectId);
+  if (error) return { error: error.message };
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "project_status_changed",
+    projectId: input.projectId,
+    detail: patch,
+  });
+  revalidatePath(`/projects/${input.projectId}/stage`);
+  revalidatePath("/dashboard");
+  return { ok: true };
 }
 
 export async function saveSection(input: {

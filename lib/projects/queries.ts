@@ -9,10 +9,13 @@ import {
   type SectionKey,
 } from "@/lib/projects/sections";
 import type { Project, ProjectVersion } from "@/lib/projects/types";
+import { detectStage } from "@/lib/stage/detect";
 
 export type DashboardProject = Project & {
   completeness: number;
   versionCount: number;
+  stage: string;
+  openReds: number;
 };
 
 export async function getDashboardProjects(): Promise<DashboardProject[]> {
@@ -25,16 +28,15 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
   if (!projects || projects.length === 0) return [];
 
   const ids = projects.map((p) => p.id);
-  const [{ data: sections }, { data: versions }] = await Promise.all([
-    supabase
-      .from("project_sections")
-      .select("project_id, section_key, word_count")
-      .in("project_id", ids),
-    supabase
-      .from("project_versions")
-      .select("project_id")
-      .in("project_id", ids),
-  ]);
+  const [{ data: sections }, { data: versions }, { data: findingsRows }] =
+    await Promise.all([
+      supabase
+        .from("project_sections")
+        .select("project_id, section_key, word_count")
+        .in("project_id", ids),
+      supabase.from("project_versions").select("project_id").in("project_id", ids),
+      supabase.from("findings").select("project_id, severity").in("project_id", ids),
+    ]);
 
   const requiredCount = SECTION_KEYS.filter(
     (k) => !ADVANCED_SECTION_KEYS.has(k),
@@ -52,14 +54,30 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
   for (const v of versions ?? []) {
     versionCount.set(v.project_id, (versionCount.get(v.project_id) ?? 0) + 1);
   }
+  const reds = new Map<string, number>();
+  for (const r of findingsRows ?? []) {
+    if (r.severity === "violation")
+      reds.set(r.project_id, (reds.get(r.project_id) ?? 0) + 1);
+  }
 
-  return projects.map((p) => ({
-    ...(p as Project),
-    completeness: Math.round(
-      ((filled.get(p.id)?.size ?? 0) / requiredCount) * 100,
-    ),
-    versionCount: versionCount.get(p.id) ?? 0,
-  }));
+  return projects.map((p) => {
+    const proj = p as Project;
+    return {
+      ...proj,
+      completeness: Math.round(
+        ((filled.get(p.id)?.size ?? 0) / requiredCount) * 100,
+      ),
+      versionCount: versionCount.get(p.id) ?? 0,
+      openReds: reds.get(p.id) ?? 0,
+      stage: detectStage({
+        filled: [...(filled.get(p.id) ?? new Set<string>())],
+        declared_status: proj.declared_status,
+        application_number: proj.application_number,
+        filing_date: proj.filing_date,
+        patent_type: proj.patent_type,
+      }).label,
+    };
+  });
 }
 
 export async function getProject(id: string): Promise<Project | null> {

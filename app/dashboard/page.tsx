@@ -6,10 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { getDashboardProjects } from "@/lib/projects/queries";
-import {
-  PATENT_TYPE_LABELS,
-  PROJECT_STATUS_LABELS,
-} from "@/lib/projects/sections";
+import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
 import { fmtDate } from "@/lib/format";
 
 export default async function DashboardPage() {
@@ -87,9 +84,7 @@ export default async function DashboardPage() {
                       <Badge variant="secondary">
                         {PATENT_TYPE_LABELS[p.patent_type]}
                       </Badge>
-                      <Badge variant="outline">
-                        {PROJECT_STATUS_LABELS[p.declared_status]}
-                      </Badge>
+                      <Badge variant="outline">{p.stage}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground">
@@ -99,7 +94,14 @@ export default async function DashboardPage() {
                         {p.completeness}%
                       </dd>
                       <dt>Open findings</dt>
-                      <dd className="text-right text-foreground">0</dd>
+                      <dd
+                        className={
+                          "text-right " +
+                          (p.openReds > 0 ? "text-violation" : "text-foreground")
+                        }
+                      >
+                        {p.openReds}
+                      </dd>
                       <dt>Versions</dt>
                       <dd className="text-right text-foreground">
                         {p.versionCount}

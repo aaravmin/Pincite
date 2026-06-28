@@ -75,7 +75,9 @@ the end of each session — but be stringent; trim before it bloats.
 - **E2E auth without Google.** Protected screens are tested via a dev-only `/api/dev-login`
   (gated by `NODE_ENV==='development'` + `DEV_LOGIN_SECRET`) that signs in a test user with
   email/password; Playwright `page.request.post` shares cookies with the page. Test user +
-  consent/audit reset live in `e2e/global-setup.ts`. Never enabled in production builds.
+  consent/audit reset live in `e2e/global-setup.ts`; `loginAsTestUser` also resets the test
+  user (consent, audit, projects) per spec so the full suite is order-independent. Never
+  enabled in production builds.
 - **Supabase project.** Dedicated project `cvmmdcebgegegpkqyzfq` (the old shared one was
   Jarvis's). Region: user-selected US (definitive confirm needs the Management API).
 - **Migrations apply path.** Apply SQL with `node --env-file=.env.local scripts/db-apply.mjs
@@ -117,7 +119,10 @@ the end of each session — but be stringent; trim before it bloats.
       Tier 2 consistency (MPF 2181, antecedent 2173.05(e)), Tier 3 relative terms 2173.05(b)
       + §101 Alice/Mayo walkthrough (Grok, MPEP 2106, neutral/verify) in `lib/validators/*`;
       `/review` findings (color + actionable/informational) open the pinned rule. migration 0005.
-- [ ] Phases 3, 6, 8, 9 — stage detection, rule surfacing, export, polish.
+- [x] Phase 3 — stage detection: transparent engine (`lib/stage/detect.ts`), `/stage` view
+      (why + what's missing) + declared-status form; detected stage + open-red-findings count
+      on the dashboard. DONE + gated; full e2e suite 9/9 green.
+- [ ] Phases 6, 8, 9 — rule surfacing, export, polish.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
