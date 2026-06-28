@@ -125,7 +125,10 @@ the end of each session — but be stringent; trim before it bloats.
 - [x] Phase 6 — rule surfacing: `lib/rules/surface.ts` applies-now (green) + conditional
       (yellow, with trigger + "now applies" when met) keyed to stage/type/draft; `/rules`,
       pins corpus-validated + openable in the evidence pane. DONE + gated.
-- [ ] Phases 8, 9 — export, polish.
+- [x] Phase 8 — export: `lib/export/report.ts` (TXT serializer + report view), `/report`
+      print-to-PDF (grayscale-legible: labels + filled/outline markers) and
+      `/api/projects/[id]/export?format=txt`; logged to `exports` + audit. migration 0006.
+- [ ] Phase 9 — polish: version-history/audit-log viewers, accessibility (axe), perf.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

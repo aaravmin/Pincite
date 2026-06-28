@@ -164,6 +164,12 @@ export function Workspace({
             Rules
           </Link>
           <Link
+            href={`/projects/${project.id}/report`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Export
+          </Link>
+          <Link
             href={`/projects/${project.id}/versions`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
