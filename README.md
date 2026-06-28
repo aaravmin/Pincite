@@ -164,7 +164,7 @@ The export is a real document set rather than a generic PDF. The specification c
 | Security | Row level security on every table, append only versioning, and an audit log |
 | Auth | Supabase Auth with Google OAuth, plus a development only login used by the tests |
 | Storage | A private US region Supabase Storage bucket for drawings, written through an ownership checked service role client |
-| Generation model | xAI Grok `grok-4.3` for the §101 walkthrough with a Gemini fallback |
+| Generation model | xAI Grok `grok-4.3` for the §101 walkthrough |
 | Embeddings | Voyage `voyage-law-2`, a legal tuned 1024 dimension model, over the MPEP corpus |
 | Prior art | Google BigQuery `patents-public-data` through a service account, with PatentsView as a key free fallback |
 | Export | `docx` for the specification and `jszip` for the filing package |
