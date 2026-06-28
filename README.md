@@ -1,4 +1,4 @@
-<p align="center"><img src="public/pincite-logo.svg" alt="Pincite" width="300" /></p>
+<p align="center"><img src="public/pincite-logo.png" alt="Pincite" width="320" /></p>
 
 <p align="center">
   <strong>An active patent review workbench.</strong><br />
