@@ -4,9 +4,17 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { EvidencePane } from "@/components/mpep/evidence-pane";
-import { runValidators, getRuleSection } from "@/lib/validators/run";
+import { runValidators, getRuleSection, analyzeEligibility } from "@/lib/validators/run";
 import type { MpepSection } from "@/lib/mpep/load";
 import type { FindingRow } from "@/lib/validators/results";
+import type { EligibilityAnalysis } from "@/lib/validators/types";
+
+type Eligibility = {
+  claimNumber: number;
+  claimText: string;
+  analysis: EligibilityAnalysis;
+  mpep: string | null;
+};
 
 export function ReviewClient({
   projectId,
@@ -21,6 +29,7 @@ export function ReviewClient({
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
   const [rule, setRule] = useState<MpepSection | null>(null);
+  const [elig, setElig] = useState<Eligibility | null>(null);
 
   function check() {
     setMsg(null);
@@ -33,7 +42,18 @@ export function ReviewClient({
   }
 
   function openRule(num: string) {
+    setElig(null);
     start(async () => setRule(await getRuleSection(num)));
+  }
+
+  function analyze101() {
+    setMsg(null);
+    start(async () => {
+      const r = await analyzeEligibility(projectId);
+      if ("error" in r) return setMsg(r.error);
+      setRule(null);
+      setElig(r);
+    });
   }
 
   const violations = findings.filter((f) => f.severity === "violation");
@@ -44,6 +64,15 @@ export function ReviewClient({
       <div className="flex items-center gap-3 border-b border-border px-6 py-3">
         <Button size="sm" onClick={check} disabled={pending} data-testid="run-check">
           {pending ? "Checking…" : "Check for issues"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={analyze101}
+          disabled={pending}
+          data-testid="analyze-101"
+        >
+          Analyze §101
         </Button>
         {msg && <span className="text-xs text-muted-foreground">{msg}</span>}
         <span className="ml-auto text-xs text-muted-foreground">
@@ -122,16 +151,65 @@ export function ReviewClient({
           )}
         </div>
 
-        <div className="min-w-0 flex-1" data-testid="rule-pane">
-          {rule ? (
+        <div className="min-w-0 flex-1 overflow-auto" data-testid="rule-pane">
+          {elig ? (
+            <EligibilityPanel data={elig} onOpenRule={openRule} />
+          ) : rule ? (
             <EvidencePane section={rule} span={null} />
           ) : (
             <p className="px-6 py-4 text-sm text-muted-foreground">
-              Open a finding&apos;s rule to read it here.
+              Open a finding&apos;s rule, or analyze §101 eligibility, to read it here.
             </p>
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function EligibilityPanel({
+  data,
+  onOpenRule,
+}: {
+  data: Eligibility;
+  onOpenRule: (n: string) => void;
+}) {
+  const a = data.analysis;
+  const rows: [string, string][] = [
+    ["Step 1 — statutory category", a.category],
+    ["Step 2A Prong 1 — judicial exception", a.prong_one],
+    ["Step 2A Prong 2 — practical application", a.prong_two],
+    ["Step 2B — significantly more", a.step_2b],
+    ["Summary", a.summary],
+  ];
+  return (
+    <div className="space-y-3 px-6 py-5">
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          §101 eligibility — the model&apos;s read, verify
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Claim {data.claimNumber} · framework only, not a verdict
+          {data.mpep && (
+            <>
+              {" · "}
+              <button
+                type="button"
+                onClick={() => onOpenRule(data.mpep!)}
+                className="underline-offset-2 hover:underline"
+              >
+                MPEP {data.mpep}
+              </button>
+            </>
+          )}
+        </p>
+      </div>
+      {rows.map(([label, text]) => (
+        <div key={label}>
+          <p className="text-xs font-medium text-foreground">{label}</p>
+          <p className="text-sm text-muted-foreground">{text || "—"}</p>
+        </div>
+      ))}
     </div>
   );
 }

@@ -29,7 +29,7 @@ test("phase-4: validator flags seeded issues with severity colors, the actionabl
   await page
     .getByTestId("editor-claims")
     .fill(
-      "1. A device comprising a widget\n2. The device of claim 1 or 2, wherein it includes a base.\n3. The widget of claim 1, further comprising means for adjusting the lever.",
+      "1. A device comprising a widget\n2. The device of claim 1 or 2, wherein it includes a base.\n3. The widget of claim 1, further comprising means for adjusting the lever.\n4. The device of claim 1, wherein the widget is substantially rigid.",
     );
   await expect(page.getByTestId("save-status")).toHaveText("Saved");
 
@@ -45,6 +45,7 @@ test("phase-4: validator flags seeded issues with severity colors, the actionabl
   // Tier 2 consistency checks (attention/verify).
   await expect(page.getByText(/invokes means-plus-function/i).first()).toBeVisible();
   await expect(page.getByText(/may lack antecedent basis/i).first()).toBeVisible();
+  await expect(page.getByText(/relative term "substantially"/i).first()).toBeVisible();
   await screenshot(page, "phase-4-findings");
 
   // Open the abstract rule -> evidence pane shows the pinned MPEP section.

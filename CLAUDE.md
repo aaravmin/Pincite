@@ -113,10 +113,10 @@ the end of each session — but be stringent; trim before it bloats.
       full-limitation) — DONE + gated on the free deterministic "Compare a patent" path.
       Live BigQuery search wired + dry-run validated (~135 GB ≈ $0.82/search). Enhancement:
       semantic candidate ranking via Voyage.
-- [~] Phase 4-5 — validator (feature 1 error-checking): Tier 1 structural + Tier 2 consistency
-      (means-plus-function MPEP 2181, antecedent basis 2173.05(e)) in `lib/validators/*` ->
-      findings (severity colors, actionable vs informational), `/review` opens the pinned rule.
-      migration 0005. DONE + gated. Remaining: Tier 3 substantive (§101, relative terms).
+- [x] Phase 4-5 — validator (feature 1 error-checking) DONE + gated: Tier 1 structural,
+      Tier 2 consistency (MPF 2181, antecedent 2173.05(e)), Tier 3 relative terms 2173.05(b)
+      + §101 Alice/Mayo walkthrough (Grok, MPEP 2106, neutral/verify) in `lib/validators/*`;
+      `/review` findings (color + actionable/informational) open the pinned rule. migration 0005.
 - [ ] Phases 3, 6, 8, 9 — stage detection, rule surfacing, export, polish.
 
 ## Commands

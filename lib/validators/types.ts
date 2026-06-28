@@ -19,3 +19,12 @@ export type Finding = {
   /** Display-only statute/regulation reference. */
   cfr_ref: string | null;
 };
+
+/** The §101 Alice/Mayo walkthrough (MPEP 2106) — the model's read, framed neutrally. */
+export type EligibilityAnalysis = {
+  category: string;
+  prong_one: string;
+  prong_two: string;
+  step_2b: string;
+  summary: string;
+};
