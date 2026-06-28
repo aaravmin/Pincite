@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { describeDrawing } from "@/lib/llm/vision";
 import { logAudit } from "@/lib/audit";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
 import type { InventorInput, DeclarationStatements } from "@/lib/filing/types";
@@ -161,4 +162,73 @@ export async function signDeclaration(input: {
   });
   revalidatePath(`/projects/${input.projectId}/sign`);
   return { ok: true };
+}
+
+/**
+ * Describe an uploaded figure with a vision model, then check that each disclosed
+ * component appears in it (37 CFR 1.83 requires every claimed feature to be shown in the
+ * drawings). Public or synthetic figures only until vendor ZDR is on.
+ */
+export async function analyzeDrawing(input: {
+  projectId: string;
+  attachmentId: string;
+}): Promise<
+  | { ok: true; description: string; components: { name: string; shown: boolean }[] }
+  | { error: string }
+> {
+  const { supabase, user } = await requireUser();
+
+  const { data: att } = await supabase
+    .from("project_attachments")
+    .select("storage_path, mime")
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  if (!att) return { error: "Attachment not found." };
+  if (!att.mime.startsWith("image/")) {
+    return { error: "Only image figures can be described." };
+  }
+
+  const { data: blob, error: dlErr } = await createAdminClient()
+    .storage.from("project-files")
+    .download(att.storage_path);
+  if (dlErr || !blob) {
+    return { error: dlErr?.message ?? "Could not read the file." };
+  }
+  const base64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+
+  let description: string;
+  try {
+    description = await describeDrawing(base64, att.mime);
+  } catch (e) {
+    return { error: `Vision model error: ${(e as Error).message}` };
+  }
+  if (!description) return { error: "The vision model returned nothing for this figure." };
+
+  const { data: disc } = await supabase
+    .from("project_disclosure")
+    .select("components")
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  const lower = description.toLowerCase();
+  const components = ((disc?.components as string) ?? "")
+    .split(/[\n,;]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 3)
+    .map((name) => {
+      const term = name.toLowerCase().replace(/^(a|an|the)\s+/, "");
+      const words = term.split(/\s+/);
+      const probe = words[words.length - 1];
+      const shown =
+        probe.length >= 3 && (lower.includes(probe) || lower.includes(term));
+      return { name, shown };
+    });
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "drawing_analyzed",
+    projectId: input.projectId,
+    detail: { attachmentId: input.attachmentId },
+  });
+  return { ok: true, description, components };
 }

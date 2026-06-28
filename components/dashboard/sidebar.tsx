@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LayoutDashboard, BookText, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/brand/logo";
 
 /**
  * The dashboard sidebar (the spine, per the UI brief). It holds the persistent globally
@@ -45,7 +46,7 @@ export function DashboardSidebar({
           {initial}
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-foreground">Pincite</p>
+          <Logo className="h-5 w-auto" />
           <p className="truncate text-xs text-muted-foreground" title={email}>
             {email}
           </p>

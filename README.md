@@ -1,4 +1,4 @@
-<h1 align="center">Pincite</h1>
+<p align="center"><img src="public/pincite-logo.svg" alt="Pincite" width="300" /></p>
 
 <p align="center">
   <strong>An active patent review workbench.</strong><br />
@@ -252,4 +252,4 @@ docs/                    architecture, style guide, business context, api refere
 
 ## Disclaimer
 
-Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Not built yet is any analysis of the drawings themselves, which needs a vision model and is gated on confidentiality.
+Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Drawings analysis is started too. A vision model describes a figure and checks that each disclosed component appears in it (37 CFR 1.83), restricted to public or synthetic figures until vendor zero data retention is on.

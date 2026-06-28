@@ -1,12 +1,11 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background px-6">
       <main className="w-full max-w-xl text-center">
-        <h1 className="text-4xl font-semibold tracking-tight text-foreground">
-          Pincite
-        </h1>
+        <Logo className="mx-auto h-14 w-auto" />
         <p className="mt-4 text-lg leading-8 text-muted-foreground">
           An active patent review workbench. Paste your draft, see the rules that
           apply, and verify every finding against the real MPEP text in one click.

@@ -41,6 +41,8 @@ test("phase-v3: inventors/ADS intake + secure drawing upload", async ({ page }) 
     .setInputFiles({ name: "fig1.png", mimeType: "image/png", buffer: PNG });
   await expect(page.getByText("fig1.png")).toBeVisible();
   await expect(page.getByText("Drawing", { exact: true })).toBeVisible();
+  // A drawing offers vision describe-and-check (the vision call itself is smoke-tested).
+  await expect(page.getByTestId("describe-drawing")).toBeVisible();
   await screenshot(page, "v3-uploads");
 
   assertClean(errs);

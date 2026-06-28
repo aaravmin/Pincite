@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "@/components/auth/login-form";
+import { Logo } from "@/components/brand/logo";
 
 export default async function LoginPage() {
   const supabase = await createClient();
@@ -14,11 +15,8 @@ export default async function LoginPage() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background px-6">
       <main className="w-full max-w-sm">
-        <Link
-          href="/"
-          className="block text-center text-2xl font-semibold tracking-tight text-foreground"
-        >
-          Pincite
+        <Link href="/" className="block">
+          <Logo className="mx-auto h-9 w-auto" />
         </Link>
         <p className="mt-2 text-center text-sm text-muted-foreground">
           Sign in to open your patent review workspace.

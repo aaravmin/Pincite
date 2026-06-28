@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { deleteAttachment } from "@/lib/filing/actions";
+import { DrawingAnalysis } from "@/components/uploads/drawing-analysis";
 import type { Attachment, AttachmentKind } from "@/lib/filing/types";
 
 function fmtSize(n: number): string {
@@ -96,6 +97,8 @@ export function UploadsPanel({
         />
         <p className="text-xs text-muted-foreground">
           PNG, JPEG, GIF, WEBP, or PDF, up to 25 MB. Stored encrypted in the US.
+          Describing a figure sends it to a vision model, so use public or synthetic
+          figures only for now.
         </p>
       </div>
 
@@ -110,34 +113,36 @@ export function UploadsPanel({
       ) : (
         <ul className="divide-y divide-border rounded-lg border border-border">
           {initial.map((a) => (
-            <li
-              key={a.id}
-              className="flex items-center justify-between gap-3 px-4 py-3"
-            >
-              <div className="min-w-0">
-                <a
-                  href={`/api/projects/${projectId}/attachments/${a.id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="truncate font-medium text-foreground hover:underline"
-                >
-                  {a.filename}
-                </a>
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <Badge variant="secondary">
-                    {a.kind === "drawing" ? "Drawing" : "Supporting"}
-                  </Badge>
-                  <span>{fmtSize(a.size_bytes)}</span>
+            <li key={a.id} className="px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <a
+                    href={`/api/projects/${projectId}/attachments/${a.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="truncate font-medium text-foreground hover:underline"
+                  >
+                    {a.filename}
+                  </a>
+                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="secondary">
+                      {a.kind === "drawing" ? "Drawing" : "Supporting"}
+                    </Badge>
+                    <span>{fmtSize(a.size_bytes)}</span>
+                  </div>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => remove(a.id)}
+                  disabled={pending}
+                >
+                  Remove
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => remove(a.id)}
-                disabled={pending}
-              >
-                Remove
-              </Button>
+              {a.kind === "drawing" && a.mime.startsWith("image/") && (
+                <DrawingAnalysis projectId={projectId} attachmentId={a.id} />
+              )}
             </li>
           ))}
         </ul>
