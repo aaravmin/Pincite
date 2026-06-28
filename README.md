@@ -250,6 +250,6 @@ docs/                    architecture, style guide, business context, api refere
 
 ---
 
-## Honest numbers
+## Disclaimer
 
 Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Not built yet are the semantic MPEP locate wired into Ask, Voyage semantic ranking for prior art, and any analysis of the drawings themselves.
