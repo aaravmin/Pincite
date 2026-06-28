@@ -125,9 +125,11 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   await expect(page.getByText(/must be in the alternative/i).first()).toBeVisible();
   await screenshot(page, "case-review");
 
-  // Automatic MPEP reference: open the rule pinned to a finding, in the evidence pane.
-  await page.getByRole("button", { name: /Open MPEP/i }).first().click();
-  await expect(page.getByTestId("rule-pane")).toContainText(/MPEP/i);
+  // Click the finding to land on the reasoning and its pinned rule in the evidence pane.
+  await page
+    .getByRole("button", { name: /refers to claim 6, which does not exist/i })
+    .click();
+  await expect(page.getByTestId("rule-pane")).toContainText(/608\.01/);
   await screenshot(page, "case-evidence");
 
   // Similar patents, pinpoint overlaps against a public example.
@@ -141,6 +143,7 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   await page.getByRole("button", { name: "Compare", exact: true }).click();
   await expect(page.getByText("US20090090643A1").first()).toBeVisible();
   await expect(page.getByTestId("overlap-detail")).toBeVisible();
+  await page.getByTestId("toggle-claims").click();
   await screenshot(page, "case-prior-art");
 
   assertClean(errs);

@@ -147,6 +147,7 @@ export function PriorArtClient({
 }
 
 function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) {
+  const [showClaims, setShowClaims] = useState(false);
   return (
     <div className="space-y-5">
       <div>
@@ -183,16 +184,7 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
 
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Your claims
-        </p>
-        <pre className="mt-1 whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground">
-          {renderClaims(claims, match.spans)}
-        </pre>
-      </div>
-
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Overlapping passages in {match.patent_number}
+          Pinpoint overlaps in {match.patent_number}
         </p>
         <ul className="mt-1 space-y-2">
           {match.spans.map((s, i) => (
@@ -217,6 +209,24 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
             </li>
           ))}
         </ul>
+      </div>
+
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowClaims((v) => !v)}
+          data-testid="toggle-claims"
+          className="text-xs text-foreground underline-offset-2 hover:underline"
+        >
+          {showClaims
+            ? "Hide your claims"
+            : "Show your claims with the overlaps highlighted"}
+        </button>
+        {showClaims && (
+          <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground">
+            {renderClaims(claims, match.spans)}
+          </pre>
+        )}
       </div>
     </div>
   );

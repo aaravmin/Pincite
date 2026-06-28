@@ -1,8 +1,12 @@
+"use client";
+
 /**
  * The evidence pane (roadmap §2.2): the primary source on a reading surface, with the
- * responsive portion highlighted yellow in place and the rest visible for context.
- * Reused by the Ask flow now and by findings / rules in later phases.
+ * responsive portion highlighted in place and the rest visible for context. When a passage
+ * is highlighted the pane scrolls to it, so opening a rule lands you on the relevant part
+ * rather than the top of a long section.
  */
+import { useEffect, useRef } from "react";
 import type { MpepSection } from "@/lib/mpep/load";
 
 export function EvidencePane({
@@ -15,6 +19,17 @@ export function EvidencePane({
   const text = section.full_text;
   const has =
     !!span && span.start >= 0 && span.end > span.start && span.end <= text.length;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!has) return;
+    const c = scrollRef.current;
+    const h = c?.querySelector<HTMLElement>("#evidence-highlight");
+    if (!c || !h) return;
+    const top =
+      h.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop;
+    c.scrollTop = Math.max(0, top - c.clientHeight / 2);
+  }, [section.section_number, span?.start, span?.end, has]);
 
   return (
     <div className="flex h-full flex-col">
@@ -39,7 +54,7 @@ export function EvidencePane({
         </p>
       </div>
 
-      <div className="flex-1 overflow-auto px-5 py-4">
+      <div ref={scrollRef} className="flex-1 overflow-auto px-5 py-4">
         <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground">
           {has ? (
             <>

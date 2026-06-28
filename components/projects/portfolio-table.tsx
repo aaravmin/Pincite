@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Link from "next/link";
 import type { DashboardProject } from "@/lib/projects/queries";
 import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
+import { nextStep } from "@/lib/projects/next-step";
 import { fmtDate } from "@/lib/format";
 
 /**
@@ -28,7 +29,7 @@ export function PortfolioTable({ projects }: { projects: DashboardProject[] }) {
             <th className="px-4 py-2 font-medium">Matter</th>
             <th className="px-4 py-2 font-medium">Patent</th>
             <th className="px-4 py-2 font-medium">Type</th>
-            <th className="px-4 py-2 font-medium">Stage</th>
+            <th className="px-4 py-2 font-medium">Next step</th>
             <th className="px-4 py-2 text-right font-medium">Complete</th>
             <th className="px-4 py-2 text-right font-medium">Findings</th>
             <th className="px-4 py-2 text-right font-medium">Versions</th>
@@ -65,7 +66,16 @@ export function PortfolioTable({ projects }: { projects: DashboardProject[] }) {
                   <td className="px-4 py-2 text-muted-foreground">
                     {PATENT_TYPE_LABELS[p.patent_type]}
                   </td>
-                  <td className="px-4 py-2 text-muted-foreground">{p.stage}</td>
+                  <td
+                    className={
+                      "px-4 py-2 " +
+                      (nextStep(p.declared_status).urgent
+                        ? "font-medium text-attention-foreground"
+                        : "text-muted-foreground")
+                    }
+                  >
+                    {nextStep(p.declared_status).label}
+                  </td>
                   <td className="px-4 py-2 text-right text-foreground">
                     {p.completeness}%
                   </td>

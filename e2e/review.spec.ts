@@ -48,8 +48,8 @@ test("phase-4: validator flags seeded issues with severity colors, the actionabl
   await expect(page.getByText(/relative term "substantially"/i).first()).toBeVisible();
   await screenshot(page, "phase-4-findings");
 
-  // Open the abstract rule -> evidence pane shows the pinned MPEP section.
-  await page.getByRole("button", { name: "Open MPEP 608.01(b)" }).first().click();
+  // Click the finding -> it opens the pinned MPEP section in the evidence pane.
+  await page.getByRole("button", { name: /Abstract is 160 words/ }).click();
   await expect(page.getByTestId("rule-pane")).toContainText("608.01(b)");
   await screenshot(page, "phase-4-finding-rule");
 

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EvidencePane } from "@/components/mpep/evidence-pane";
 import { runValidators, getRuleSection, analyzeEligibility } from "@/lib/validators/run";
@@ -15,6 +16,11 @@ type Eligibility = {
   analysis: EligibilityAnalysis;
   mpep: string | null;
 };
+
+// Process areas so the user sees WHERE a problem sits, not just a flat wall.
+const AREAS = ["Claims", "Specification"] as const;
+const areaOf = (f: FindingRow): string =>
+  f.section_key === "claims" ? "Claims" : "Specification";
 
 export function ReviewClient({
   projectId,
@@ -30,6 +36,7 @@ export function ReviewClient({
   const [msg, setMsg] = useState<string | null>(null);
   const [rule, setRule] = useState<MpepSection | null>(null);
   const [elig, setElig] = useState<Eligibility | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   function check() {
     setMsg(null);
@@ -44,6 +51,12 @@ export function ReviewClient({
   function openRule(num: string) {
     setElig(null);
     start(async () => setRule(await getRuleSection(num)));
+  }
+
+  // One click on a finding shows its reasoning and opens its pinned rule beside the draft.
+  function selectFinding(f: FindingRow) {
+    setSelectedId((prev) => (prev === f.id ? null : f.id));
+    if (f.mpep_section) openRule(f.mpep_section);
   }
 
   function analyze101() {
@@ -97,12 +110,14 @@ export function ReviewClient({
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       {area} ({items.length})
                     </p>
-                    <ul className="space-y-3">
+                    <ul className="space-y-2">
                       {items.map((f) => (
                         <FindingItem
                           key={f.id}
                           f={f}
                           sections={sections}
+                          selected={selectedId === f.id}
+                          onSelect={() => selectFinding(f)}
                           onOpenRule={openRule}
                         />
                       ))}
@@ -121,12 +136,102 @@ export function ReviewClient({
             <EvidencePane section={rule} span={null} />
           ) : (
             <p className="px-6 py-4 text-sm text-muted-foreground">
-              Open a finding&apos;s rule, or analyze §101 eligibility, to read it here.
+              Pick a finding to see the reasoning and its rule here, or analyze §101
+              eligibility.
             </p>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+function FindingItem({
+  f,
+  sections,
+  selected,
+  onSelect,
+  onOpenRule,
+}: {
+  f: FindingRow;
+  sections: Record<string, string>;
+  selected: boolean;
+  onSelect: () => void;
+  onOpenRule: (n: string) => void;
+}) {
+  const snippet =
+    sections[f.section_key] && f.span_end > f.span_start
+      ? sections[f.section_key].slice(f.span_start, f.span_end).slice(0, 120)
+      : null;
+  const sevColor =
+    f.severity === "violation" ? "text-violation" : "text-attention-foreground";
+
+  return (
+    <li
+      data-severity={f.severity}
+      className="overflow-hidden rounded-md border border-border"
+    >
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-expanded={selected}
+        className={
+          "flex w-full items-center gap-2 px-3 py-2 text-left " +
+          (selected ? "bg-accent/50" : "hover:bg-accent/40")
+        }
+      >
+        {f.severity === "violation" ? (
+          <span
+            className="size-2 shrink-0 rounded-full bg-violation"
+            aria-hidden
+          />
+        ) : (
+          <span
+            className="size-2 shrink-0 rounded-full border border-attention"
+            aria-hidden
+          />
+        )}
+        <span className={"shrink-0 text-xs font-medium " + sevColor}>
+          {f.severity === "violation" ? "Violation" : "Attention"}
+        </span>
+        <span className="shrink-0 rounded-full border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+          {f.actionable ? "Fixable" : "Informational"}
+        </span>
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+          {f.title}
+        </span>
+        <ChevronDown
+          className={
+            "size-4 shrink-0 text-muted-foreground transition-transform " +
+            (selected ? "rotate-180" : "")
+          }
+          aria-hidden
+        />
+      </button>
+
+      {selected && (
+        <div className="space-y-2 border-t border-border px-3 py-2.5">
+          <p className="text-sm text-muted-foreground">{f.explanation}</p>
+          {snippet && (
+            <p className="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+              in {f.section_key}: “{snippet}”
+            </p>
+          )}
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            {f.cfr_ref && <span>{f.cfr_ref}</span>}
+            {f.mpep_section && (
+              <button
+                type="button"
+                onClick={() => onOpenRule(f.mpep_section!)}
+                className="text-foreground underline-offset-2 hover:underline"
+              >
+                Open MPEP {f.mpep_section} →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </li>
   );
 }
 
@@ -174,76 +279,5 @@ function EligibilityPanel({
         </div>
       ))}
     </div>
-  );
-}
-
-// Process areas so the user can see WHERE an error sits, not just a flat list.
-const AREAS = ["Claims", "Specification"] as const;
-function areaOf(f: FindingRow): string {
-  return f.section_key === "claims" ? "Claims" : "Specification";
-}
-
-function FindingItem({
-  f,
-  sections,
-  onOpenRule,
-}: {
-  f: FindingRow;
-  sections: Record<string, string>;
-  onOpenRule: (n: string) => void;
-}) {
-  return (
-    <li
-      data-severity={f.severity}
-      className="rounded-md border border-border p-3"
-    >
-      <div className="flex flex-wrap items-center gap-2">
-        {f.severity === "violation" ? (
-          <span
-            className="inline-block size-2 rounded-full bg-violation"
-            aria-hidden
-          />
-        ) : (
-          <span
-            className="inline-block size-2 rounded-full border border-attention"
-            aria-hidden
-          />
-        )}
-        <span
-          className={
-            "text-xs font-medium " +
-            (f.severity === "violation"
-              ? "text-violation"
-              : "text-attention-foreground")
-          }
-        >
-          {f.severity === "violation" ? "Violation" : "Attention"}
-        </span>
-        <span className="rounded-full border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-          {f.actionable ? "Fixable" : "Informational"}
-        </span>
-      </div>
-      <p className="mt-1 text-sm font-medium text-foreground">{f.title}</p>
-      <p className="mt-0.5 text-sm text-muted-foreground">{f.explanation}</p>
-      {sections[f.section_key] && f.span_end > f.span_start && (
-        <p className="mt-1 truncate text-xs text-muted-foreground">
-          in {f.section_key}: “
-          {sections[f.section_key].slice(f.span_start, f.span_end).slice(0, 80)}
-          ”
-        </p>
-      )}
-      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-        {f.cfr_ref && <span>{f.cfr_ref}</span>}
-        {f.mpep_section && (
-          <button
-            type="button"
-            onClick={() => onOpenRule(f.mpep_section!)}
-            className="underline-offset-2 hover:underline"
-          >
-            Open MPEP {f.mpep_section}
-          </button>
-        )}
-      </div>
-    </li>
   );
 }

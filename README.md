@@ -19,70 +19,47 @@
 
 Pincite helps people draft a US patent. It serves both pro se inventors and patent attorneys. It is not legal advice and not a filing service. It checks what you wrote, shows you the governing rule, and produces a filing ready document set that you hand to the USPTO yourself.
 
-The screenshots use a real already filed example, Apple's molded fiber food container (US 2012/0024859 A1 by Francesco Longoni and Mark E. Doutt, assigned to Apple Inc.). The draft is shown mid review so the checks have something to catch.
+---
+
+## A case study, Apple's circular pizza box
+
+To show the whole thing in action we follow one real already filed invention from intake to review. It is Apple's molded fiber food container, US 2012/0024859 A1 by Francesco Longoni and Mark E. Doutt, the round vented box Apple designed so a pizza does not go soggy. The draft is kept mid review on purpose so the checks have something to catch. All of the text is public.
+
+### The dashboard
+
+Every application shows its status and the single next step that matters, with the deadline critical steps marked in attention. The sidebar is the spine and Dashboard is one click from anywhere.
+
+![Dashboard](screenshots/case-dashboard.png)
+
+### Invention intake
+
+You describe the invention in plain language and Pincite cross references it against your specification and claims. Here it catches a carrying handle that was disclosed but never described, so the draft and the disclosure do not drift apart.
 
 ![Invention intake](screenshots/case-disclosure.png)
 
----
+### Error handling in action
 
-## What it does
+Run the checks and the findings come back grouped by area as a scannable list. You triage at a glance instead of reading a wall of text. Two real violations sit at the top, a dependent claim that points at a claim that does not exist and a multiple dependent claim written cumulatively rather than in the alternative.
 
-### Catching errors
+![Error handling](screenshots/case-review.png)
 
-Pincite runs deterministic rule checks over your draft. They cover formatting and structure, then consistency, then substance, plus a model assisted §101 walkthrough. Each finding has a severity and a citation to the rule, and the list is grouped by where the problem sits. A finding only shows its MPEP pin when that section resolves in the ingested corpus, so it can never invent a rule.
+### Click a finding to see why
 
-![Error checking](screenshots/case-review.png)
+Click any finding and you land on the reasoning and the governing rule, side by side with your draft. Here the dependent claim that points at a non existent claim 6 opens MPEP 608.01(n) on dependent claims, scrolled to the relevant passage, with the USPTO source linked.
+
+![From a finding to the rule](screenshots/case-evidence.png)
 
 ### Finding similar patents
 
-Pincite breaks each claim into its limitations and key terms. It compares them against a patent you paste or against candidates pulled from Google BigQuery public patents data. For each limitation it finds the overlapping passage and shows a transparent score with the exact spans. It never reduces this to a single novelty number.
+Compare against a patent you paste or pull candidates from Google BigQuery public patents data. Each overlap is pinned to the patent passage and to your own claim element, with a transparent score and a source link. There is no single novelty number, because one number invites over trust.
 
 ![Similar patents](screenshots/case-prior-art.png)
-
-### Referencing the MPEP automatically
-
-When a finding cites a rule you open it in place and the section text loads beside your draft. When you ask by section number Pincite loads that exact section, and otherwise it runs a full text search over the corpus and highlights the responsive passage.
-
-![MPEP evidence pane](screenshots/case-evidence.png)
-
-### And the rest
-
-<table>
-  <tr>
-    <td width="33%" valign="top">
-      <h4>Invention intake</h4>
-      <p>A plain language disclosure (problem, mechanism, components) that Pincite cross references against your draft to catch what does not line up.</p>
-    </td>
-    <td width="33%" valign="top">
-      <h4>Two roles</h4>
-      <p>Pro se inventors sign their own oath. Attorneys get a portfolio across clients and the power of attorney path.</p>
-    </td>
-    <td width="33%" valign="top">
-      <h4>Lifecycle actions</h4>
-      <p>What to do now by status, from an office action reply to the issue fee to maintenance fees, each pinned to its rule.</p>
-    </td>
-  </tr>
-  <tr>
-    <td width="33%" valign="top">
-      <h4>USPTO export</h4>
-      <p>A 37 CFR 1.77 specification DOCX plus an ADS data card, a declaration, a transmittal, and a fee summary in one ZIP.</p>
-    </td>
-    <td width="33%" valign="top">
-      <h4>Versioning and audit</h4>
-      <p>Every save is an append only snapshot and every meaningful action is written to an audit log.</p>
-    </td>
-    <td width="33%" valign="top">
-      <h4>Confidentiality</h4>
-      <p>US region storage with row level security per user, and synthetic text only until vendor zero data retention is confirmed.</p>
-    </td>
-  </tr>
-</table>
 
 ---
 
 ## How it works
 
-The spine of the app is `validateCitations` in `lib/mpep/citation.ts`. Every MPEP number a check or the model produces gets looked up in the ingested corpus before display. Numbers that resolve are shown and openable. Numbers that do not resolve get dropped. This is also why there is no single novelty score for prior art. A single number invites over trust, so Pincite leads with the spans instead.
+The spine of the app is `validateCitations` in `lib/mpep/citation.ts`. Every MPEP number a check or the model produces gets looked up in the ingested corpus before display. Numbers that resolve are shown and openable. Numbers that do not resolve get dropped. This is the same reason there is no single novelty score for prior art. Pincite leads with the spans instead.
 
 Similar patents
 
@@ -111,7 +88,7 @@ flowchart LR
   D --> F
   E --> F
   F --> G{Does the MPEP pin resolve in the corpus}
-  G -->|yes| H[Show the finding and let the user open the rule]
+  G -->|yes| H[Show the finding and open the rule on click]
   G -->|no| I[Drop the pin and keep the finding]
 ```
 
@@ -122,15 +99,11 @@ flowchart LR
   A[Question or finding] --> B{Names a section number}
   B -->|yes| C[Load that exact section]
   B -->|no| D[Full text search over titles and bodies]
-  C --> E[Highlight the responsive passage]
+  C --> E[Highlight the responsive passage and scroll to it]
   D --> E
 ```
 
----
-
-## The filing workflow
-
-A left step rail walks the whole process. Each step turns green when it is complete, and Dashboard is one click away from any step. The draft autosaves.
+The whole filing flow lives on a left step rail. Each step turns green when it is complete.
 
 ```mermaid
 flowchart LR
@@ -140,7 +113,40 @@ flowchart LR
 
 The export is a real document set rather than a generic PDF. The specification comes out as a 37 CFR 1.77 DOCX with `[0001]` paragraph numbering and claims and abstract on their own pages, which also avoids the USPTO non DOCX surcharge. The package adds an ADS data card for the Patent Center web form, the inventor declaration, a transmittal, and a fee summary, bundled as a ZIP.
 
-![Dashboard](screenshots/case-dashboard.png)
+---
+
+## What else is in the box
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <h4>Two roles</h4>
+      <p>Pro se inventors sign their own oath. Attorneys get a portfolio across clients and the power of attorney path.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Lifecycle actions</h4>
+      <p>What to do now by status, from an office action reply to the issue fee to maintenance fees, each pinned to its rule.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Signed declaration</h4>
+      <p>The inventor declaration is recorded and checked for defects, like a name that does not match the application data sheet.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <h4>USPTO export</h4>
+      <p>A 37 CFR 1.77 specification DOCX plus an ADS data card, a declaration, a transmittal, and a fee summary in one ZIP.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Versioning and audit</h4>
+      <p>Every save is an append only snapshot and every meaningful action is written to an audit log.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Confidentiality</h4>
+      <p>US region storage with row level security per user, and synthetic text only until vendor zero data retention is confirmed.</p>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -150,7 +156,7 @@ The export is a real document set rather than a generic PDF. The specification c
 | --- | --- |
 | Framework | Next.js 15 App Router with React Server Components, Server Actions, and Route Handlers |
 | Language | TypeScript 5 |
-| UI | React 19, Tailwind CSS v4, shadcn/ui on Radix primitives, Turbopack in dev |
+| UI | React 19, Tailwind CSS v4, shadcn/ui on Radix primitives, lucide-react icons, Turbopack in dev |
 | Design system | A three signal color system where red is a violation, yellow is attention, and green is a pass, each with a shape and a label for accessibility |
 | Database | Supabase Postgres with pgvector for embeddings and a tsvector full text index for MPEP search |
 | Data access | PostgREST through `@supabase/supabase-js` with cookie based SSR sessions through `@supabase/ssr` |

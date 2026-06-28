@@ -1,14 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
-import { PortfolioTable } from "@/components/projects/portfolio-table";
+import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { DashboardProjects } from "@/components/dashboard/dashboard-projects";
 import { getDashboardProjects } from "@/lib/projects/queries";
-import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
-import { fmtDate } from "@/lib/format";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -29,105 +24,30 @@ export default async function DashboardPage() {
   const projects = await getDashboardProjects();
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-border px-6 py-3">
-        <span className="text-lg font-semibold tracking-tight text-foreground">
-          Pincite
-        </span>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/ask"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Ask the MPEP
-          </Link>
-          <span className="text-sm text-muted-foreground">{user.email}</span>
-          <form action="/auth/signout" method="post">
-            <Button type="submit" variant="outline" size="sm">
-              Sign out
-            </Button>
-          </form>
+    <div className="flex min-h-screen bg-background">
+      <DashboardSidebar email={user.email ?? ""} active="dashboard" />
+      <main className="min-w-0 flex-1">
+        <div
+          className={
+            "mx-auto w-full px-6 py-10 " +
+            (isAttorney ? "max-w-6xl" : "max-w-4xl")
+          }
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                {isAttorney ? "Portfolio" : "Your patents"}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {isAttorney
+                  ? "Every matter across your clients, with status and the next step."
+                  : "Each project is one patent. Pincite guides you step by step and checks your filing before you submit."}
+              </p>
+            </div>
+            <NewProjectDialog isAttorney={isAttorney} />
+          </div>
+          <DashboardProjects projects={projects} isAttorney={isAttorney} />
         </div>
-      </header>
-
-      <main
-        className={
-          "mx-auto w-full flex-1 px-6 py-10 " +
-          (isAttorney ? "max-w-6xl" : "max-w-5xl")
-        }
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              {isAttorney ? "Portfolio" : "Your patents"}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {isAttorney
-                ? "Every matter across your clients, with stage and open findings."
-                : "Each project is one patent. Pincite guides you step by step and checks your filing before you submit."}
-            </p>
-          </div>
-          <NewProjectDialog isAttorney={isAttorney} />
-        </div>
-
-        {projects.length === 0 ? (
-          <div className="mt-10 flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20 text-center">
-            <p className="text-sm font-medium text-foreground">No projects yet</p>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Create your first project to start the structured intake. Your
-              workspace is ready and your session is secure.
-            </p>
-          </div>
-        ) : isAttorney ? (
-          <PortfolioTable projects={projects} />
-        ) : (
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((p) => (
-              <Link
-                key={p.id}
-                href={`/projects/${p.id}`}
-                className="block rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-              >
-                <Card className="h-full transition-colors hover:bg-accent/40">
-                  <CardHeader>
-                    <CardTitle className="truncate">{p.name}</CardTitle>
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge variant="secondary">
-                        {PATENT_TYPE_LABELS[p.patent_type]}
-                      </Badge>
-                      <Badge variant="outline">{p.stage}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="text-sm text-muted-foreground">
-                    <dl className="grid grid-cols-2 gap-y-1">
-                      <dt>Completeness</dt>
-                      <dd className="text-right text-foreground">
-                        {p.completeness}%
-                      </dd>
-                      <dt>Open findings</dt>
-                      <dd
-                        className={
-                          "text-right " +
-                          (p.openReds > 0 ? "text-violation" : "text-foreground")
-                        }
-                      >
-                        {p.openReds}
-                      </dd>
-                      <dt>Versions</dt>
-                      <dd className="text-right text-foreground">
-                        {p.versionCount}
-                      </dd>
-                      <dt>Last edited</dt>
-                      <dd className="text-right text-foreground">
-                        {fmtDate(p.updated_at)}
-                      </dd>
-                    </dl>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
       </main>
     </div>
   );
