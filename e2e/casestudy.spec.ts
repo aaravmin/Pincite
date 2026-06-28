@@ -3,11 +3,20 @@ import { createClient } from "@supabase/supabase-js";
 import { captureErrors, screenshot, assertClean } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
-// Generates the README case study screenshots using a public, non-confidential example
-// (Apple's circular pizza box, design patent USD670491). Content here is synthetic.
+// Generates README screenshots from a real, already-filed example: Apple's molded fiber
+// food container, US 2012/0024859 A1 (inventors Francesco Longoni and Mark E. Doutt,
+// assigned to Apple Inc.). The draft below is in progress on purpose so the error checks
+// have real findings to show. All public information, no confidential text.
 const wc = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 
-test("case study: Apple circular pizza box screenshots", async ({ page }) => {
+const CLAIMS =
+  "1. A molded fiber container suitable for containing a food item, comprising: a base, the base comprising a plurality of ridges integrated with an interior surface of the base, wherein when the food item is placed on at least some of the plurality of ridges, a gap is formed between the food item and the interior surface of the base, the gap assisting in thermally isolating the food item and allowing moisture expelled from the food item to be transported away from the food item; and a lid, the lid comprising a plurality of openings arranged in accordance with at least some of the plurality of ridges, and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the plurality of openings and the gap to provide a path by which at least some of the moisture is transported out of the container.\n" +
+  "2. The container of claim 1, wherein the base and the lid are integrally formed from a single piece of molded fiber connected by a hinge.\n" +
+  "3. The container of claim 1, wherein the plurality of ridges are arranged substantially concentrically about a center of the base.\n" +
+  "4. The container of claim 6, wherein the plurality of openings comprise a plurality of slots.\n" +
+  "5. The container of claims 1 and 2, wherein the base and the lid are shaped to nest with a second container.";
+
+test("case study: Apple molded fiber food container screenshots", async ({ page }) => {
   const errs = captureErrors(page);
   await loginAsTestUser(page);
   await page.goto("/consent");
@@ -15,7 +24,7 @@ test("case study: Apple circular pizza box screenshots", async ({ page }) => {
   await page.waitForURL("**/dashboard");
 
   await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Circular pizza box");
+  await page.getByLabel("Name").fill("Apple molded fiber food container");
   await page.getByRole("button", { name: "Create", exact: true }).click();
   await page.waitForURL("**/projects/**");
   const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
@@ -26,21 +35,46 @@ test("case study: Apple circular pizza box screenshots", async ({ page }) => {
     { auth: { autoRefreshToken: false, persistSession: false } },
   );
 
+  // Applicant is Apple (a company), so the ownership checks apply.
+  await admin
+    .from("projects")
+    .update({
+      applicant_is_inventor: false,
+      applicant_is_juristic: true,
+      applicant_name: "Apple Inc.",
+      entity_status: "large",
+    })
+    .eq("id", id);
+  await admin.from("project_inventors").insert([
+    {
+      project_id: id,
+      legal_name: "Francesco Longoni",
+      residence: "Cupertino, CA",
+      mailing_address: "1 Apple Park Way, Cupertino, CA 95014",
+      citizenship: "",
+      ord: 0,
+    },
+    {
+      project_id: id,
+      legal_name: "Mark E. Doutt",
+      residence: "Cupertino, CA",
+      mailing_address: "1 Apple Park Way, Cupertino, CA 95014",
+      citizenship: "",
+      ord: 1,
+    },
+  ]);
+
   const sections: Record<string, string> = {
-    title: "Circular container for a pizza",
+    title: "Container",
     background:
-      "Pizza is usually delivered in square corrugated boxes. Those boxes trap steam and waste material around a round pizza.",
+      "Food is often delivered in closed containers that trap steam and make the food soggy. These containers also take up storage space when they are empty.",
     summary:
-      "A circular container with a vented lid and a central support post reduces sogginess and material use.",
+      "A single piece molded fiber container has a ridged base and a vented lid that carry steam away from the food, and the containers nest to save space.",
     detailed_description:
-      "The circular container has a round base sized to hold a pizza. A vented lid is coupled to the round base. The vented lid has a plurality of raised vents that let steam escape. A central support post extends upward from the round base and holds the vented lid above the food.",
+      "The container is formed from a single piece of molded fiber. The base has a plurality of ridges on its interior surface. When food is placed on the ridges a gap forms between the food and the base. The lid has a plurality of openings and a moisture channeling feature. The openings and the channel carry moisture out of the container through the gap. The base and the lid are joined by a hinge. The sidewalls taper so that one container nests inside another.",
     abstract:
-      "A circular food container has a round base and a vented lid. Raised vents in the lid release steam. A central support post holds the lid above the food to reduce sogginess.",
-    claims:
-      "1. A circular container for food comprising a round base and a vented lid coupled to the round base.\n" +
-      "2. The container of claim 1, wherein the vented lid comprises a plurality of raised vents.\n" +
-      "3. The container of claim 5, wherein a central support post extends from the round base and holds the vented lid above the food.\n" +
-      "4. The container of claims 1 and 2, wherein the round base is corrugated.",
+      "A container is constructed in a preformed manner so no assembly is required. A lid is coupled to the base through a hinge so the container is made from a single piece of material. The base and lid nest with a second container to save storage space. The container can be made from molded fiber. Ridges in the base lift the food and a vented lid carries moisture away to keep the food from getting soggy.",
+    claims: CLAIMS,
   };
   await admin.from("project_sections").insert(
     Object.entries(sections).map(([section_key, content]) => ({
@@ -55,28 +89,30 @@ test("case study: Apple circular pizza box screenshots", async ({ page }) => {
       project_id: id,
       field_industry: "Food packaging and containers.",
       problem_solved:
-        "Square pizza boxes trap steam and make the pizza soggy. They also waste material around a round pizza.",
+        "Hot food in a closed container traps steam and gets soggy. Empty boxes also waste storage space.",
       how_it_works:
-        "A round container holds the pizza. The lid has raised vents that let steam escape. A central support post keeps the lid off the food.",
-      components: "round base\nvented lid\ncentral support post\nside latch",
-      advantages: "Less soggy pizza. Less wasted material. The containers stack.",
+        "A single piece of molded fiber forms a ridged base and a hinged lid. The ridges lift the food and create a gap. Openings and a moisture channeling feature in the lid carry the steam out.",
+      components:
+        "molded fiber base\nintegrated ridges\nhinged lid\nlid openings\nmoisture channeling feature\ncarrying handle",
+      advantages:
+        "Less soggy food. Nesting saves storage space. Made from recycled molded fiber.",
       alternatives:
-        "The vents can be slots or holes. The support can be one post or several ribs.",
+        "The ridges can be concentric or radial. The openings can be holes or slots.",
       known_prior_art:
-        "Square corrugated pizza boxes. The plastic pizza saver tripod.",
+        "Square corrugated pizza boxes. Vented plastic clamshell containers.",
     },
     { onConflict: "project_id" },
   );
 
-  // Dashboard with the example project.
+  // Dashboard.
   await page.goto("/dashboard");
-  await expect(page.getByText("Circular pizza box")).toBeVisible();
+  await expect(page.getByText("Apple molded fiber food container")).toBeVisible();
   await screenshot(page, "case-dashboard");
 
-  // Invention intake with the cross-reference flag (side latch not described).
+  // Invention intake with the cross-reference flag (stacking tab not described).
   await page.goto(`/projects/${id}/disclosure`);
   await expect(
-    page.getByText(/Component "side latch" .* is not claimed or described/i).first(),
+    page.getByText(/Component "carrying handle" .* is not claimed or described/i).first(),
   ).toBeVisible();
   await screenshot(page, "case-disclosure");
 
@@ -84,29 +120,26 @@ test("case study: Apple circular pizza box screenshots", async ({ page }) => {
   await page.goto(`/projects/${id}/review`);
   await page.getByTestId("run-check").click();
   await expect(
-    page.getByText(/refers to claim 5, which does not exist/i).first(),
+    page.getByText(/refers to claim 6, which does not exist/i).first(),
   ).toBeVisible();
+  await expect(page.getByText(/must be in the alternative/i).first()).toBeVisible();
   await screenshot(page, "case-review");
 
-  // MPEP evidence pane.
-  await page.goto("/ask");
-  await page
-    .getByTestId("ask-input")
-    .fill("2111.03 transitional phrases comprising consisting");
-  await page.getByRole("button", { name: "Ask" }).click();
-  await expect(page.getByTestId("evidence")).toContainText("Transitional Phrases");
+  // Automatic MPEP reference: open the rule pinned to a finding, in the evidence pane.
+  await page.getByRole("button", { name: /Open MPEP/i }).first().click();
+  await expect(page.getByTestId("rule-pane")).toContainText(/MPEP/i);
   await screenshot(page, "case-evidence");
 
   // Similar patents, pinpoint overlaps against a public example.
   await page.goto(`/projects/${id}/prior-art`);
-  await page.getByTestId("cmp-number").fill("USD670491");
+  await page.getByTestId("cmp-number").fill("US20090090643A1");
   await page
     .getByTestId("cmp-text")
     .fill(
-      "A round container for a pizza comprising a base and a vented cover. The vented cover has openings that release steam. A central support holds the cover above the food.",
+      "A food container comprising a base with raised ribs that support a food item above an interior surface of the base, and a lid having a plurality of vent openings that allow moisture to escape from the container.",
     );
   await page.getByRole("button", { name: "Compare", exact: true }).click();
-  await expect(page.getByText("USD670491").first()).toBeVisible();
+  await expect(page.getByText("US20090090643A1").first()).toBeVisible();
   await expect(page.getByTestId("overlap-detail")).toBeVisible();
   await screenshot(page, "case-prior-art");
 

@@ -1,12 +1,25 @@
-# Pincite
+<h1 align="center">Pincite</h1>
 
-Draft a US patent section by section. Pincite flags the rule violations, finds similar public patents, and pins every claim it makes to real MPEP and CFR text. Nothing reaches the screen without a citation you can open and verify.
+<p align="center">
+  <strong>An active patent review workbench.</strong><br />
+  Draft a patent section by section. Pincite flags the rule violations, finds similar public patents,
+  and pins every claim it makes to real MPEP text you can open and verify.
+</p>
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black) ![React](https://img.shields.io/badge/React-19-149ECA) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6) ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20pgvector-3FCF8E) ![Tests](https://img.shields.io/badge/e2e-21%20green-success)
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Supabase-Postgres_%2B_pgvector-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Grok-grok--4.3-1D9BF0" alt="Grok" />
+  <img src="https://img.shields.io/badge/Playwright-21_green-2EAD33?logo=playwright&logoColor=white" alt="Playwright" />
+</p>
 
-Pincite is a research and review aid for people drafting a US patent. It serves both pro se inventors and patent attorneys. It is not legal advice and not a filing service. It checks what you wrote, shows you the governing rule, and produces a filing ready document set that you hand to the USPTO yourself.
+---
 
-The screenshots below use a public example, Apple's circular pizza box (design patent USD670491). All sample text is synthetic.
+Pincite helps people draft a US patent. It serves both pro se inventors and patent attorneys. It is not legal advice and not a filing service. It checks what you wrote, shows you the governing rule, and produces a filing ready document set that you hand to the USPTO yourself.
+
+The screenshots use a real already filed example, Apple's molded fiber food container (US 2012/0024859 A1 by Francesco Longoni and Mark E. Doutt, assigned to Apple Inc.). The draft is shown mid review so the checks have something to catch.
 
 ![Invention intake](screenshots/case-disclosure.png)
 
@@ -14,27 +27,62 @@ The screenshots below use a public example, Apple's circular pizza box (design p
 
 ## What it does
 
-### Finding similar patents
-
-Pincite breaks each claim into its limitations and key terms. It compares them against a patent you paste or against candidates pulled from Google BigQuery public patents data. For each limitation it finds the overlapping passage and shows a transparent decomposed score with the exact spans. It never reduces this to a single black box novelty number. The matching is deterministic lexical overlap today. Voyage semantic ranking is a planned layer (see below).
-
-![Similar patents](screenshots/case-prior-art.png)
-
 ### Catching errors
 
-Errors are deterministic rule checks over your draft. They run in tiers for structure and format, for consistency, and for substance, plus a model assisted §101 walkthrough. Each finding carries a severity, an actionable or informational flag, and a citation to the governing rule. A finding only shows its MPEP pin when that section actually resolves in the ingested corpus, so it can never invent a rule.
+Pincite runs deterministic rule checks over your draft. They cover formatting and structure, then consistency, then substance, plus a model assisted §101 walkthrough. Each finding has a severity and a citation to the rule, and the list is grouped by where the problem sits. A finding only shows its MPEP pin when that section resolves in the ingested corpus, so it can never invent a rule.
 
 ![Error checking](screenshots/case-review.png)
 
-### Finding the relevant MPEP text
+### Finding similar patents
 
-When your question names a section number Pincite loads that exact section from the ingested MPEP corpus. Otherwise it runs a Postgres full text search over section titles and bodies and returns the best matches. It then highlights the most responsive passage in a side by side evidence pane.
+Pincite breaks each claim into its limitations and key terms. It compares them against a patent you paste or against candidates pulled from Google BigQuery public patents data. For each limitation it finds the overlapping passage and shows a transparent score with the exact spans. It never reduces this to a single novelty number.
+
+![Similar patents](screenshots/case-prior-art.png)
+
+### Referencing the MPEP automatically
+
+When a finding cites a rule you open it in place and the section text loads beside your draft. When you ask by section number Pincite loads that exact section, and otherwise it runs a full text search over the corpus and highlights the responsive passage.
 
 ![MPEP evidence pane](screenshots/case-evidence.png)
 
+### And the rest
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <h4>Invention intake</h4>
+      <p>A plain language disclosure (problem, mechanism, components) that Pincite cross references against your draft to catch what does not line up.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Two roles</h4>
+      <p>Pro se inventors sign their own oath. Attorneys get a portfolio across clients and the power of attorney path.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Lifecycle actions</h4>
+      <p>What to do now by status, from an office action reply to the issue fee to maintenance fees, each pinned to its rule.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <h4>USPTO export</h4>
+      <p>A 37 CFR 1.77 specification DOCX plus an ADS data card, a declaration, a transmittal, and a fee summary in one ZIP.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Versioning and audit</h4>
+      <p>Every save is an append only snapshot and every meaningful action is written to an audit log.</p>
+    </td>
+    <td width="33%" valign="top">
+      <h4>Confidentiality</h4>
+      <p>US region storage with row level security per user, and synthetic text only until vendor zero data retention is confirmed.</p>
+    </td>
+  </tr>
+</table>
+
 ---
 
-## How each pipeline works
+## How it works
+
+The spine of the app is `validateCitations` in `lib/mpep/citation.ts`. Every MPEP number a check or the model produces gets looked up in the ingested corpus before display. Numbers that resolve are shown and openable. Numbers that do not resolve get dropped. This is also why there is no single novelty score for prior art. A single number invites over trust, so Pincite leads with the spans instead.
 
 Similar patents
 
@@ -46,7 +94,7 @@ flowchart LR
   C -->|Live search| E[Google BigQuery public patents]
   D --> F[Per limitation term overlap match]
   E --> F
-  F --> G[Spans plus transparent decomposed score]
+  F --> G[Spans plus a transparent decomposed score]
   G --> H[Evidence pane shows your text beside the patent passage]
 ```
 
@@ -80,23 +128,7 @@ flowchart LR
 
 ---
 
-## The discipline behind it
-
-The spine of the app is `validateCitations` in `lib/mpep/citation.ts`. Every MPEP number a check or the model produces gets looked up in the ingested corpus before display. Numbers that resolve are shown and openable. Numbers that do not resolve get dropped. This keeps findings honest. It is also why there is no single novelty score for prior art. A single number invites over trust, so Pincite leads with the spans instead.
-
----
-
-## Two roles, one engine
-
-You pick a role once after consent. The drafting, checking, and export engine is the same for both. What changes is the framing.
-
-A pro se inventor gets a guided plain English flow and personally signs the inventor declaration (PTO/AIA/01). A patent attorney gets a denser portfolio grouped by client and matter, files a power of attorney (PTO/AIA/82), and signs the prosecution papers while inventors sign their own oath. Who may sign and assignment checks fire when the applicant is a company.
-
-![Dashboard](screenshots/case-dashboard.png)
-
----
-
-## The full filing workflow
+## The filing workflow
 
 A left step rail walks the whole process. Each step turns green when it is complete, and Dashboard is one click away from any step. The draft autosaves.
 
@@ -106,65 +138,56 @@ flowchart LR
   W --> R[Review] --> U[Rules] --> P[Prior art] --> S[Sign] --> X[Submission]
 ```
 
-- **Draft** is the specification in 37 CFR 1.77 order. It is plain text so character offsets stay stable for highlights.
-- **Disclosure** is the plain language invention intake. Pincite cross references it against your draft.
-- **Inventors and ADS** captures inventor and applicant data (PTO/AIA/14), entity status, and citizenship.
-- **Drawings** uploads images and PDFs to a private US region bucket.
-- **Review, Rules, Prior art** show findings grouped by area, the applicable rules, and similar patents.
-- **Sign** records the inventor declaration and runs the filing readiness checks.
-- **Submission** produces the export.
-
 The export is a real document set rather than a generic PDF. The specification comes out as a 37 CFR 1.77 DOCX with `[0001]` paragraph numbering and claims and abstract on their own pages, which also avoids the USPTO non DOCX surcharge. The package adds an ADS data card for the Patent Center web form, the inventor declaration, a transmittal, and a fee summary, bundled as a ZIP.
+
+![Dashboard](screenshots/case-dashboard.png)
 
 ---
 
 ## Tech stack
 
-| Layer | What we use |
+| Layer | Tools |
 | --- | --- |
 | Framework | Next.js 15 App Router with React Server Components, Server Actions, and Route Handlers |
 | Language | TypeScript 5 |
-| UI | React 19, Tailwind CSS v4, shadcn/ui (new-york) on Radix primitives, Turbopack in dev |
-| Design system | A strict three signal color system where red means violation, yellow means attention, and green means pass, with a shape and label on every signal for accessibility |
+| UI | React 19, Tailwind CSS v4, shadcn/ui on Radix primitives, Turbopack in dev |
+| Design system | A three signal color system where red is a violation, yellow is attention, and green is a pass, each with a shape and a label for accessibility |
 | Database | Supabase Postgres with pgvector for embeddings and a tsvector full text index for MPEP search |
-| Data access | PostgREST through `@supabase/supabase-js` and cookie based SSR sessions through `@supabase/ssr` |
+| Data access | PostgREST through `@supabase/supabase-js` with cookie based SSR sessions through `@supabase/ssr` |
 | Migrations | Raw SQL applied with node-postgres (`pg`) via `scripts/db-apply.mjs` |
 | Security | Row level security on every table, append only versioning, and an audit log |
-| Auth | Supabase Auth with Google OAuth, plus a development only login used by the test suite |
+| Auth | Supabase Auth with Google OAuth, plus a development only login used by the tests |
 | Storage | A private US region Supabase Storage bucket for drawings, written through an ownership checked service role client |
-| Generation model | xAI Grok `grok-4.3` for the §101 walkthrough, with a Gemini fallback |
+| Generation model | xAI Grok `grok-4.3` for the §101 walkthrough with a Gemini fallback |
 | Embeddings | Voyage `voyage-law-2`, a legal tuned 1024 dimension model, over the MPEP corpus |
-| Prior art | Google BigQuery `patents-public-data` through a server side service account, with PatentsView documented as a key free fallback |
+| Prior art | Google BigQuery `patents-public-data` through a service account, with PatentsView as a key free fallback |
 | Export | `docx` for the specification and `jszip` for the filing package |
 | Testing | Playwright end to end gate and `@axe-core/playwright` for accessibility |
 | Tooling | pnpm and ESLint |
 
 ---
 
-## How the code is laid out
+## Data model
 
 ```
-app/                     Next routes (dashboard, /projects/[id]/* step pages, /api)
-lib/
-  mpep/                  locate, load, citation validation, highlight (the evidence pane)
-  patents/               extract limitations, BigQuery search, pinpoint match and score
-  validators/            tier1 to tier3 plus filing and crossref checks that produce findings
-  filing/                inventors, applicant and ADS, attachments, declarations
-  disclosure/            the plain language invention intake
-  lifecycle/             what to do now by application status
-  export/                report (TXT), docx (specification), filing package (zip)
-  stage/  rules/         stage detection and rule surfacing
-  projects/              projects, sections, append only versions
-  supabase/              server, client, middleware, and admin clients
-supabase/migrations/     0001 through 0009, each with row level security
-e2e/                     Playwright specs (one per feature) plus helpers
-scripts/                 db-apply, ingest-mpep, embed-mpep, verify-rls, setup-storage
-docs/                    architecture, style guide, business context, api reference
+projects             id, user_id, name, patent_type, declared_status, applicant fields, entity_status, client_name, matter_no
+project_sections     project_id, section_key, content, word_count        (history in project_versions, append only)
+project_disclosure   project_id, problem_solved, how_it_works, components, advantages, alternatives, known_prior_art
+project_inventors    project_id, legal_name, residence, mailing_address, citizenship
+project_declarations project_id, inventor_id, legal_name, statements, signed_at        (append only)
+project_attachments  project_id, kind, storage_path, filename, mime       (bytes live in the private Storage bucket)
+findings             project_id, section_key, span_start, span_end, severity, kind, mpep_section, cfr_ref
+mpep_sections        the ingested MPEP, with a tsvector full text index
+mpep_chunks          chunked MPEP text embedded into a pgvector column
+prior_art_matches    scored candidate patents, with the pinpoint overlaps in match_spans
+audit_log            append only record of every meaningful action
 ```
+
+Row level security scopes every table to its owner. Saves never overwrite history.
 
 ---
 
-## Getting started
+## Running it locally
 
 ```bash
 pnpm install
@@ -198,22 +221,29 @@ Other commands are `pnpm build`, `pnpm lint`, `pnpm exec playwright test` for th
 
 ---
 
-## Verification
+## Project structure
 
-Every feature ships behind a Playwright gate. It passes only with zero console errors, zero page exceptions, no failed requests on its path, and a screenshot that matches the spec including the color discipline. Results live in [VERIFICATION-LOG.md](screenshots/VERIFICATION-LOG.md). Current state is 21 specs green with the accessibility scan clean on every screen.
+```
+app/                     Next routes (dashboard, /projects/[id]/* step pages, /api)
+lib/
+  mpep/                  locate, load, citation validation, highlight (the evidence pane)
+  patents/               extract limitations, BigQuery search, pinpoint match and score
+  validators/            tier1 to tier3 plus filing and crossref checks that produce findings
+  filing/                inventors, applicant and ADS, attachments, declarations
+  disclosure/            the plain language invention intake
+  lifecycle/             what to do now by application status
+  export/                report (TXT), docx (specification), filing package (zip)
+  stage/  rules/         stage detection and rule surfacing
+  projects/              projects, sections, append only versions
+  supabase/              server, client, middleware, and admin clients
+supabase/migrations/     0001 through 0009, each with row level security
+e2e/                     Playwright specs (one per feature) plus the case study generator
+scripts/                 db-apply, ingest-mpep, embed-mpep, verify-rls, setup-storage
+docs/                    architecture, style guide, business context, api reference
+```
 
 ---
 
-## Enabling Voyage semantic ranking
+## Honest numbers
 
-The embeddings client already exists in `lib/embeddings/voyage.ts` and the MPEP is already embedded into `mpep_chunks` with pgvector, so the pieces are in place. Two places can use it.
-
-For prior art, embed each claim limitation and each candidate passage with `embedOne`, score them by cosine similarity, and blend that with the existing lexical score in `lib/patents/match.ts`. For MPEP locate, embed the query and run a pgvector nearest neighbor search over `mpep_chunks`, then fall back to the current full text search. Both need a Voyage API key with a billing method, since the free tier throttles at a few requests per minute.
-
----
-
-## Status and disclaimers
-
-- Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability.
-- Use synthetic or non confidential text for now. Real unfiled invention text should only go to zero data retention vendors, and xAI currently reports that retention is on for the team, so keep the data synthetic until that is fixed.
-- Not built yet are the wired semantic MPEP locate inside Ask, Voyage semantic ranking for prior art, and any analysis of the drawings themselves.
+Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Not built yet are the semantic MPEP locate wired into Ask, Voyage semantic ranking for prior art, and any analysis of the drawings themselves.
