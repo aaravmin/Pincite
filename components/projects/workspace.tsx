@@ -158,6 +158,12 @@ export function Workspace({
             Review
           </Link>
           <Link
+            href={`/projects/${project.id}/rules`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Rules
+          </Link>
+          <Link
             href={`/projects/${project.id}/versions`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >

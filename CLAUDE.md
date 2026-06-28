@@ -122,7 +122,10 @@ the end of each session — but be stringent; trim before it bloats.
 - [x] Phase 3 — stage detection: transparent engine (`lib/stage/detect.ts`), `/stage` view
       (why + what's missing) + declared-status form; detected stage + open-red-findings count
       on the dashboard. DONE + gated; full e2e suite 9/9 green.
-- [ ] Phases 6, 8, 9 — rule surfacing, export, polish.
+- [x] Phase 6 — rule surfacing: `lib/rules/surface.ts` applies-now (green) + conditional
+      (yellow, with trigger + "now applies" when met) keyed to stage/type/draft; `/rules`,
+      pins corpus-validated + openable in the evidence pane. DONE + gated.
+- [ ] Phases 8, 9 — export, polish.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
