@@ -32,3 +32,6 @@ the §2.1 color discipline.
 | 2026-06-27 | full e2e suite | PASS | (9 specs) | All gates green together (phases 0-7) after per-login test isolation fix; 9/9 in 1.6m. |
 | 2026-06-27 | phase-6 rule surfacing | PASS | phase-6-rules.png | Applies-now rules (green) keyed to stage+type, each pinned + openable; may-apply-next conditional rules (yellow) with triggers; the means-for trigger lights up "now applies"; clean. |
 | 2026-06-27 | phase-8 export (TXT + report) | PASS | phase-8-report.png | /report renders the full review (draft, findings by severity, applies-now/conditional rules, prior art) grayscale-legible with labels+markers; TXT route returns the serialized review; recorded in exports + audit. |
+| 2026-06-27 | phase-9 audit-log viewer | PASS | phase-9-audit.png | Read-only filterable action history; lists project_created/section_edited/version_saved; filter narrows to one action; clean. |
+| 2026-06-27 | phase-9 accessibility (axe) | PASS | (8 screens) | No serious/critical violations across landing/dashboard/workspace/review/rules/stage/report/audit; fixed small-green text contrast (--pass darkened to AA). |
+| 2026-06-27 | full e2e suite | PASS | (13 specs) | All gates green together; 13/13 in 3.7m. Roadmap phases 0-9 complete. |

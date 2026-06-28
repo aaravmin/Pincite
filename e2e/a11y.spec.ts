@@ -1,0 +1,51 @@
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { loginAsTestUser } from "./auth";
+
+const BLOCKING = ["serious", "critical"];
+
+test("phase-9: key screens have no serious or critical accessibility violations", async ({
+  page,
+}) => {
+  await loginAsTestUser(page);
+  await page.goto("/consent");
+  await page.getByRole("button", { name: /i understand, continue/i }).click();
+  await page.waitForURL("**/dashboard");
+
+  await page.getByRole("button", { name: /new project/i }).click();
+  await page.getByLabel("Name").fill("A11y synthetic");
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.waitForURL("**/projects/**");
+  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+
+  // Give the screens content + findings to render.
+  await page.getByRole("button", { name: "Claims", exact: true }).click();
+  await page
+    .locator("[data-testid^='editor-']")
+    .fill("1. A device comprising means for adjusting a widget.");
+  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await page.goto(`/projects/${id}/review`);
+  await page.getByTestId("run-check").click();
+  await expect(page.getByText(/Violation|Attention/).first()).toBeVisible();
+
+  const routes = [
+    "/",
+    "/dashboard",
+    `/projects/${id}`,
+    `/projects/${id}/review`,
+    `/projects/${id}/rules`,
+    `/projects/${id}/stage`,
+    `/projects/${id}/report`,
+    `/projects/${id}/audit`,
+  ];
+
+  for (const route of routes) {
+    await page.goto(route);
+    await page.waitForLoadState("networkidle").catch(() => {});
+    const results = await new AxeBuilder({ page }).analyze();
+    const blocking = results.violations.filter((v) =>
+      BLOCKING.includes(v.impact ?? ""),
+    );
+    expect(blocking, `${route}: ${blocking.map((v) => v.id).join(", ")}`).toEqual([]);
+  }
+});

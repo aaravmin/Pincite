@@ -176,6 +176,12 @@ export function Workspace({
             Version history
           </Link>
           <Link
+            href={`/projects/${project.id}/audit`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Audit log
+          </Link>
+          <Link
             href={`/projects/${project.id}/prior-art`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
@@ -270,6 +276,7 @@ export function Workspace({
               value={sections[active]}
               onChange={(e) => onChange(active, e.target.value)}
               spellCheck
+              aria-label={SECTION_LABELS[active]}
               className="mt-4 min-h-[420px] resize-y font-mono text-sm leading-relaxed"
               placeholder="Type or paste this section…"
               data-testid={`editor-${active}`}

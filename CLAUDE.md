@@ -128,7 +128,10 @@ the end of each session — but be stringent; trim before it bloats.
 - [x] Phase 8 — export: `lib/export/report.ts` (TXT serializer + report view), `/report`
       print-to-PDF (grayscale-legible: labels + filled/outline markers) and
       `/api/projects/[id]/export?format=txt`; logged to `exports` + audit. migration 0006.
-- [ ] Phase 9 — polish: version-history/audit-log viewers, accessibility (axe), perf.
+- [x] Phase 9 — polish: audit-log viewer (`/audit`, filterable) + version history (Phase 1);
+      accessibility axe pass (8 screens, 0 serious/critical; `--pass` darkened for AA text).
+- ROADMAP COMPLETE (phases 0-9); 13/13 e2e gates green. Optional enhancements not built:
+  semantic MPEP locate + Grok cited answer in `/ask` (corpus embedded, ready to wire).
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

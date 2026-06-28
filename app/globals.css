@@ -47,8 +47,8 @@
   --attention-foreground: oklch(0.27 0.05 80);
   --attention-bg: oklch(0.987 0.045 95);
 
-  /* Signal: pass (green) */
-  --pass: oklch(0.627 0.17 149.2);
+  /* Signal: pass (green) — darkened so text-pass meets WCAG AA (4.5:1) on white */
+  --pass: oklch(0.52 0.16 150);
   --pass-foreground: oklch(0.985 0 0);
   --pass-bg: oklch(0.969 0.045 152);
 
