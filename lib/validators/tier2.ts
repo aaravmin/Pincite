@@ -31,17 +31,6 @@ const CONNECTORS = new Set([
   "said", "the", "a", "an", "further", "being",
 ]);
 
-function normTerm(phrase: string): string {
-  const words = phrase.trim().toLowerCase().split(/\s+/);
-  if (words.length === 2 && CONNECTORS.has(words[1])) return words[0];
-  return words.join(" ");
-}
-
-function head(term: string): string {
-  const parts = normTerm(term).split(/\s+/);
-  return parts[parts.length - 1] ?? term;
-}
-
 export function runTier2(
   sections: Record<string, string>,
   patentType: PatentType = "utility",
@@ -83,26 +72,37 @@ export function runTier2(
       });
     }
 
-    // (B) Antecedent basis (MPEP 2173.05(e)). Collect elements introduced with
-    // "a"/"an" in this claim and any referenced parent claim, then check each
-    // "the"/"said" reference resolves to one of them by head noun.
-    const introducedHeads = new Set<string>();
-    const collect = (text: string) => {
-      for (const m of text.matchAll(/\b(?:a|an)\s+([a-z]+(?:\s+[a-z]+)?)\b/gi)) {
-        introducedHeads.add(head(m[1].toLowerCase()));
+    // (B) Antecedent basis (MPEP 2173.05(e)). Collect the words introduced with "a"/"an"
+    // in this claim and, transitively, every claim it depends on (a dependent claim
+    // inherits its parent's elements). A "the"/"said" reference has antecedent basis if any
+    // of its noun words was introduced, so a verb that trails a properly introduced noun
+    // (e.g. "the lid rotates") is not mistaken for a missing element.
+    const introduced = new Set<string>();
+    const visited = new Set<number>();
+    const collect = (num: number) => {
+      if (visited.has(num)) return;
+      visited.add(num);
+      const cl = byNumber.get(num);
+      if (!cl) return;
+      for (const a of cl.raw.matchAll(/\b(?:a|an)\s+([a-z]+(?:\s+[a-z]+)?)\b/gi)) {
+        for (const w of a[1].toLowerCase().split(/\s+/)) {
+          if (!CONNECTORS.has(w)) introduced.add(w);
+        }
       }
+      for (const r of cl.raw.matchAll(/\bclaim\s+(\d+)\b/gi)) collect(Number(r[1]));
     };
-    collect(c.raw);
-    for (const m of c.raw.matchAll(/\bclaim\s+(\d+)\b/gi)) {
-      const p = byNumber.get(Number(m[1]));
-      if (p) collect(p.raw);
-    }
+    collect(c.number);
 
     for (const m of c.raw.matchAll(/\b(?:the|said)\s+([a-z]+(?:\s+[a-z]+)?)\b/gi)) {
-      const term = m[1].toLowerCase();
-      const h = head(term);
-      if (ANTECEDENT_STOP.has(h) || ANTECEDENT_STOP.has(term)) continue;
-      if (introducedHeads.has(h)) continue;
+      const words = m[1]
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((w) => !CONNECTORS.has(w));
+      if (words.length === 0) continue;
+      // Skip boilerplate ("the present invention", "the first ...") and any reference whose
+      // noun was introduced earlier (which also covers the verb-trailing case above).
+      if (words.some((w) => ANTECEDENT_STOP.has(w))) continue;
+      if (words.some((w) => introduced.has(w))) continue;
       const idx = c.raw.toLowerCase().indexOf(m[0].toLowerCase());
       out.push({
         section_key: "claims",

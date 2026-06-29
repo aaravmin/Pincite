@@ -304,6 +304,6 @@ Most are already in Apple's real patent text.
 
 2. Relative term "substantially" - claim 13 says the angle is "substantially 180 degrees." Same rule, flagged separately.
 
-3. Antecedent basis - claim 8 refers to "the integrated bottom feature" and "the integrated side feature," but the claim only introduces an "integrated sidewall feature." Those two terms lack antecedent basis (35 U.S.C. 112(b); MPEP 2173.05(e)).
+3. Consistency (Pincite cross-reference) - the disclosure lists "a tamper-evident band" as a key component, but it never appears in the detailed description or the claims. The review flags a disclosed component that is not claimed or described. Either add it to the draft or remove it from the disclosure.
 
-4. Consistency (Pincite cross-reference) - the disclosure lists "a tamper-evident band" as a key component, but it never appears in the detailed description or the claims. The review flags a disclosed component that is not claimed or described. Either add it to the draft or remove it from the disclosure.
+Note: the antecedent-basis check was tightened so it no longer flags a noun followed by a verb (for example "the lid rotates") or a term carried down from a parent claim, so the review on these real claims stays clean instead of showing false positives.
