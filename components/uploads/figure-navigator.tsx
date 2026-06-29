@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { deleteAttachment, analyzeDrawing } from "@/lib/filing/actions";
@@ -56,7 +56,7 @@ export function FigureNavigator({
   // any EXIF orientation), re-upload the corrected bytes, and drop the old one. The stored
   // image is corrected, so both the display and the vision check see it upright; the new
   // copy has no analysis yet, which is correct since rotation invalidates the old one.
-  async function rotate() {
+  async function rotate(dir: "cw" | "ccw") {
     setRotating(true);
     try {
       const blob = await (await fetch(url)).blob();
@@ -67,7 +67,7 @@ export function FigureNavigator({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(Math.PI / 2);
+      ctx.rotate(dir === "cw" ? Math.PI / 2 : -Math.PI / 2);
       ctx.drawImage(bmp, -bmp.width / 2, -bmp.height / 2);
       const out: Blob | null = await new Promise((r) =>
         canvas.toBlob((b) => r(b), "image/png"),
@@ -196,15 +196,28 @@ export function FigureNavigator({
               Open
             </a>
             {!threeD && !isPdf && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={rotate}
-                disabled={rotating}
-                title="Rotate this figure 90° to fix a sideways scan"
-              >
-                {rotating ? "Rotating…" : "Rotate"}
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => rotate("ccw")}
+                  disabled={rotating}
+                  title="Rotate left 90°"
+                  aria-label="Rotate left"
+                >
+                  <RotateCcw className="size-4" aria-hidden />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => rotate("cw")}
+                  disabled={rotating}
+                  title="Rotate right 90°"
+                  aria-label="Rotate right"
+                >
+                  <RotateCw className="size-4" aria-hidden />
+                </Button>
+              </>
             )}
             <Button variant="outline" size="sm" onClick={remove} disabled={pending}>
               Remove
