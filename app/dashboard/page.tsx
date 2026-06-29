@@ -6,6 +6,9 @@ import { DashboardProjects } from "@/components/dashboard/dashboard-projects";
 import { getDashboardProjects } from "@/lib/projects/queries";
 import { isAdminEmail } from "@/lib/admin";
 
+// Always render per request for the signed-in user; never serve another account's cache.
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {

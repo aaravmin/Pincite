@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Hide the dev-only on-screen indicator (the floating "N" badge).
+  devIndicators: false,
 };
 
 export default nextConfig;
