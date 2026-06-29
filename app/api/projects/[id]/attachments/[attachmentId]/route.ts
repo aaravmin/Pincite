@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// Redirect to a short-lived signed URL for a private attachment (preview/download).
+// Serve a private attachment. By default redirect to a short-lived signed URL (good for
+// <img> previews and downloads). With ?raw=1 stream the bytes from this same-origin route
+// instead, so the 3D model viewer can fetch a model without a cross-origin CORS problem.
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string; attachmentId: string }> },
 ) {
   const { id: projectId, attachmentId } = await params;
@@ -16,14 +18,34 @@ export async function GET(
 
   const { data: row } = await supabase
     .from("project_attachments")
-    .select("storage_path")
+    .select("storage_path, mime")
     .eq("id", attachmentId)
     .eq("project_id", projectId)
     .maybeSingle();
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Ownership confirmed via the user client above; sign with the admin client.
+  // Ownership confirmed via the user client above; read with the admin client.
   const admin = createAdminClient();
+
+  if (new URL(request.url).searchParams.has("raw")) {
+    const { data: blob, error } = await admin.storage
+      .from("project-files")
+      .download(row.storage_path);
+    if (error || !blob) {
+      return NextResponse.json(
+        { error: error?.message ?? "Could not read the file" },
+        { status: 400 },
+      );
+    }
+    const buf = Buffer.from(await blob.arrayBuffer());
+    return new NextResponse(new Uint8Array(buf), {
+      headers: {
+        "Content-Type": row.mime || "application/octet-stream",
+        "Cache-Control": "private, max-age=120",
+      },
+    });
+  }
+
   const { data: signed, error } = await admin.storage
     .from("project-files")
     .createSignedUrl(row.storage_path, 120);

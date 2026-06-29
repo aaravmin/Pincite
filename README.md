@@ -61,6 +61,12 @@ Upload a figure and Pincite reads it for drawing defects under 37 CFR 1.84 and 1
 
 ![Drawing check](screenshots/case-drawing.png)
 
+### Multiple views and 3D models
+
+A patent has many views, so each figure is tagged with its orientation - perspective, top, front, side, and so on - and you upload as many as you need. You can also upload a 3D model (GLB or GLTF) and rotate it by orientation right in the browser. It renders locally and is never sent to a model.
+
+![3D model viewer](screenshots/case-3d.png)
+
 ---
 
 ## How it works

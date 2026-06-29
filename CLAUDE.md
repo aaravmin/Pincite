@@ -100,6 +100,11 @@ the end of each session — but be stringent; trim before it bloats.
   JWT to Supabase Storage, so Storage RLS rejects writes ("new row violates RLS"). Verify
   ownership with the user client, then upload/sign/remove via `lib/supabase/admin.ts`
   (service role). Bucket `project-files` is private; objects namespaced by `{projectId}/`.
+  The bucket also enforces an `allowed_mime_types` allowlist (`scripts/setup-storage.mjs`): a
+  new upload type (e.g. 3D `model/gltf-binary`/`model/gltf+json`) must be added there or
+  Storage 400s the upload (the route then surfaces "Upload failed"). 3D models render via
+  `@google/model-viewer` (dynamic import, client only); bytes stream same-origin via the
+  attachment route's `?raw=1` to avoid a cross-origin CORS fetch.
 - **xAI ZDR header.** Don't send `x-zero-data-retention: true` on Grok requests unless the
   team has enterprise ZDR (xAI 400s: "team does not have zero data retention enabled"). Read
   the response header for ZDR status; it currently reads "false".

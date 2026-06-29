@@ -21,10 +21,49 @@ export type InventorInput = {
 
 export type AttachmentKind = "drawing" | "supporting";
 
+/** Standard patent drawing views (MPEP 1503 / common practice). "" means not specified. */
+export const ATTACHMENT_VIEWS = [
+  "",
+  "perspective",
+  "top",
+  "bottom",
+  "front",
+  "rear",
+  "left",
+  "right",
+  "section",
+  "exploded",
+] as const;
+export type AttachmentView = (typeof ATTACHMENT_VIEWS)[number];
+export const ATTACHMENT_VIEW_LABELS: Record<AttachmentView, string> = {
+  "": "Not specified",
+  perspective: "Perspective",
+  top: "Top / plan",
+  bottom: "Bottom",
+  front: "Front",
+  rear: "Rear",
+  left: "Left side",
+  right: "Right side",
+  section: "Sectional",
+  exploded: "Exploded",
+};
+
+/** A 3D model upload, rendered in-browser with an orientation toggle (never sent to a model). */
+export function is3dModel(mime: string, filename: string): boolean {
+  const n = filename.toLowerCase();
+  return (
+    mime === "model/gltf-binary" ||
+    mime === "model/gltf+json" ||
+    n.endsWith(".glb") ||
+    n.endsWith(".gltf")
+  );
+}
+
 export type Attachment = {
   id: string;
   project_id: string;
   kind: AttachmentKind;
+  view: string | null;
   storage_path: string;
   filename: string;
   mime: string;

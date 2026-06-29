@@ -34,13 +34,16 @@ test("phase-v3: inventors/ADS intake + secure drawing upload", async ({ page }) 
   await expect(page.getByText("Inventors named")).toBeVisible();
   await screenshot(page, "v3-inventors");
 
-  // Drawings upload.
+  // Drawings upload, tagged with its orientation/view.
   await page.goto(`/projects/${projectId}/uploads`);
+  await page.getByLabel("Drawing orientation").click();
+  await page.getByRole("option", { name: "Perspective" }).click();
   await page
     .getByTestId("upload-input")
     .setInputFiles({ name: "fig1.png", mimeType: "image/png", buffer: PNG });
   await expect(page.getByText("fig1.png")).toBeVisible();
   await expect(page.getByText("Drawing", { exact: true })).toBeVisible();
+  await expect(page.getByText("Perspective").first()).toBeVisible();
   // A drawing offers vision describe-and-check (the vision call itself is smoke-tested).
   await expect(page.getByTestId("describe-drawing")).toBeVisible();
   await screenshot(page, "v3-uploads");
@@ -60,10 +63,11 @@ test("phase-v3: inventors/ADS intake + secure drawing upload", async ({ page }) 
 
   const { data: att } = await admin
     .from("project_attachments")
-    .select("kind, storage_path")
+    .select("kind, view, storage_path")
     .eq("project_id", projectId);
   expect((att ?? []).length).toBe(1);
   expect(att![0].storage_path.startsWith(`${projectId}/`)).toBe(true);
+  expect(att![0].view).toBe("perspective");
 
   // Bucket is private: an unauthenticated anon client cannot read the object.
   const anon = createClient(

@@ -175,7 +175,9 @@ This data builds the PTO/AIA/14 ADS data card used in the filing package.
 
 ## Drawings and uploads
 
-You can upload drawings and supporting documents, as images or PDFs, up to 25 MB each.
+You can upload drawings and supporting documents as images, PDFs, or 3D models (GLB or GLTF), up to 25 MB each.
+A patent has many views, so each figure is tagged with its orientation - perspective, top, front, side, and so on - and you can upload as many figures as you need.
+A 3D model renders in the browser and can be turned by orientation with a toggle or by dragging, so you can inspect it from any angle. It stays local and is never sent to a model.
 Files are stored in a private US region storage bucket, encrypted at rest, with per owner row level security so no other user can read them.
 Uploads never go to a model unless you explicitly ask for the vision analysis below.
 

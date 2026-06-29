@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/select";
 import { deleteAttachment } from "@/lib/filing/actions";
 import { DrawingAnalysis } from "@/components/uploads/drawing-analysis";
-import type { Attachment, AttachmentKind } from "@/lib/filing/types";
+import { ModelViewer } from "@/components/uploads/model-viewer";
+import {
+  is3dModel,
+  ATTACHMENT_VIEWS,
+  ATTACHMENT_VIEW_LABELS,
+  type Attachment,
+  type AttachmentKind,
+  type AttachmentView,
+} from "@/lib/filing/types";
 
 function fmtSize(n: number): string {
   if (n < 1024) return `${n} B`;
@@ -31,6 +39,7 @@ export function UploadsPanel({
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [kind, setKind] = useState<AttachmentKind>("drawing");
+  const [view, setView] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -43,6 +52,7 @@ export function UploadsPanel({
     const fd = new FormData();
     fd.append("file", f);
     fd.append("kind", kind);
+    fd.append("view", kind === "drawing" ? view : "");
     const res = await fetch(`/api/projects/${projectId}/attachments`, {
       method: "POST",
       body: fd,
@@ -74,11 +84,31 @@ export function UploadsPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="drawing">Drawing / figure</SelectItem>
+              <SelectItem value="drawing">Drawing / figure / 3D</SelectItem>
               <SelectItem value="supporting">Supporting document</SelectItem>
             </SelectContent>
           </Select>
         </div>
+        {kind === "drawing" && (
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Orientation</span>
+            <Select
+              value={view || "none"}
+              onValueChange={(v) => setView(v === "none" ? "" : v)}
+            >
+              <SelectTrigger className="w-44" aria-label="Drawing orientation">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ATTACHMENT_VIEWS.map((v) => (
+                  <SelectItem key={v || "none"} value={v || "none"}>
+                    {ATTACHMENT_VIEW_LABELS[v]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <Button
           type="button"
           onClick={() => fileRef.current?.click()}
@@ -89,16 +119,17 @@ export function UploadsPanel({
         <input
           ref={fileRef}
           type="file"
-          accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"
+          accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,model/gltf-binary,model/gltf+json,.glb,.gltf"
           className="sr-only"
           aria-label="Choose a file to upload"
           data-testid="upload-input"
           onChange={onPick}
         />
         <p className="text-xs text-muted-foreground">
-          PNG, JPEG, GIF, WEBP, or PDF, up to 25 MB. Stored encrypted in the US.
-          Describing a figure sends it to a vision model, so use public or synthetic
-          figures only for now.
+          PNG, JPEG, GIF, WEBP, PDF, or a 3D model (GLB/GLTF), up to 25 MB. Stored encrypted
+          in the US. Tag each figure with its view; a 3D model can be rotated by orientation
+          in the browser. Describing a figure sends it to a vision model, so use public or
+          synthetic figures only for now.
         </p>
       </div>
 
@@ -112,39 +143,55 @@ export function UploadsPanel({
         <p className="text-sm text-muted-foreground">No files uploaded yet.</p>
       ) : (
         <ul className="divide-y divide-border rounded-lg border border-border">
-          {initial.map((a) => (
-            <li key={a.id} className="px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <a
-                    href={`/api/projects/${projectId}/attachments/${a.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="truncate font-medium text-foreground hover:underline"
-                  >
-                    {a.filename}
-                  </a>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                    <Badge variant="secondary">
-                      {a.kind === "drawing" ? "Drawing" : "Supporting"}
-                    </Badge>
-                    <span>{fmtSize(a.size_bytes)}</span>
+          {initial.map((a) => {
+            const threeD = is3dModel(a.mime, a.filename);
+            return (
+              <li key={a.id} className="px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <a
+                      href={`/api/projects/${projectId}/attachments/${a.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="truncate font-medium text-foreground hover:underline"
+                    >
+                      {a.filename}
+                    </a>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="secondary">
+                        {threeD
+                          ? "3D model"
+                          : a.kind === "drawing"
+                            ? "Drawing"
+                            : "Supporting"}
+                      </Badge>
+                      {a.view && (
+                        <span>
+                          {ATTACHMENT_VIEW_LABELS[a.view as AttachmentView] ?? a.view}
+                        </span>
+                      )}
+                      <span>{fmtSize(a.size_bytes)}</span>
+                    </div>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => remove(a.id)}
+                    disabled={pending}
+                  >
+                    Remove
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => remove(a.id)}
-                  disabled={pending}
-                >
-                  Remove
-                </Button>
-              </div>
-              {a.kind === "drawing" && a.mime.startsWith("image/") && (
-                <DrawingAnalysis projectId={projectId} attachmentId={a.id} />
-              )}
-            </li>
-          ))}
+                {threeD ? (
+                  <ModelViewer
+                    src={`/api/projects/${projectId}/attachments/${a.id}?raw=1`}
+                  />
+                ) : a.kind === "drawing" && a.mime.startsWith("image/") ? (
+                  <DrawingAnalysis projectId={projectId} attachmentId={a.id} />
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

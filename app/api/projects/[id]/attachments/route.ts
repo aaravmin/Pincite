@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logAudit, clientIp } from "@/lib/audit";
+import { ATTACHMENT_VIEWS } from "@/lib/filing/types";
 
 const ALLOWED = [
   "image/png",
@@ -30,19 +31,35 @@ export async function POST(
   const kind = String(form.get("kind") ?? "drawing") === "supporting"
     ? "supporting"
     : "drawing";
+  const viewRaw = String(form.get("view") ?? "");
+  const view =
+    viewRaw && (ATTACHMENT_VIEWS as readonly string[]).includes(viewRaw)
+      ? viewRaw
+      : null;
 
   if (!file || typeof file.arrayBuffer !== "function") {
     return NextResponse.json({ error: "No file provided." }, { status: 400 });
   }
-  if (!ALLOWED.includes(file.type)) {
+  const lname = file.name.toLowerCase();
+  const is3d = lname.endsWith(".glb") || lname.endsWith(".gltf");
+  if (!ALLOWED.includes(file.type) && !is3d) {
     return NextResponse.json(
-      { error: "Unsupported file type. Use PNG, JPEG, GIF, WEBP, or PDF." },
+      {
+        error:
+          "Unsupported file type. Use PNG, JPEG, GIF, WEBP, PDF, or a 3D model (GLB/GLTF).",
+      },
       { status: 400 },
     );
   }
   if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "File too large (max 25 MB)." }, { status: 400 });
   }
+  // 3D files often arrive with an empty or generic mime; normalize so the viewer can detect it.
+  const mime = is3d
+    ? lname.endsWith(".glb")
+      ? "model/gltf-binary"
+      : "model/gltf+json"
+    : file.type;
 
   const { data: proj } = await supabase
     .from("projects")
@@ -60,7 +77,7 @@ export async function POST(
   const admin = createAdminClient();
   const { error: upErr } = await admin.storage
     .from("project-files")
-    .upload(path, bytes, { contentType: file.type, upsert: false });
+    .upload(path, bytes, { contentType: mime, upsert: false });
   if (upErr) return NextResponse.json({ error: upErr.message }, { status: 400 });
 
   const { data: row, error: insErr } = await supabase
@@ -68,9 +85,10 @@ export async function POST(
     .insert({
       project_id: projectId,
       kind,
+      view,
       storage_path: path,
       filename: file.name,
-      mime: file.type,
+      mime,
       size_bytes: file.size,
     })
     .select("*")
@@ -87,7 +105,7 @@ export async function POST(
     userId: user.id,
     action: "attachment_uploaded",
     projectId,
-    detail: { kind, filename: file.name, mime: file.type },
+    detail: { kind, view, filename: file.name, mime },
     ip: clientIp(request),
   });
 
