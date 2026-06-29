@@ -3,7 +3,6 @@
 import { useRef, useState, useTransition, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -12,15 +11,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { deleteAttachment } from "@/lib/filing/actions";
-import { DrawingAnalysis } from "@/components/uploads/drawing-analysis";
-import { ModelViewer } from "@/components/uploads/model-viewer";
+import { FigureNavigator } from "@/components/uploads/figure-navigator";
 import {
-  is3dModel,
   ATTACHMENT_VIEWS,
   ATTACHMENT_VIEW_LABELS,
   type Attachment,
   type AttachmentKind,
-  type AttachmentView,
 } from "@/lib/filing/types";
 
 function fmtSize(n: number): string {
@@ -74,6 +70,9 @@ export function UploadsPanel({
     });
   }
 
+  const figures = initial.filter((a) => a.kind === "drawing");
+  const supporting = initial.filter((a) => a.kind === "supporting");
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border p-4">
@@ -109,11 +108,7 @@ export function UploadsPanel({
             </Select>
           </div>
         )}
-        <Button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          disabled={busy}
-        >
+        <Button type="button" onClick={() => fileRef.current?.click()} disabled={busy}>
           {busy ? "Uploading…" : "Upload file"}
         </Button>
         <input
@@ -125,11 +120,13 @@ export function UploadsPanel({
           data-testid="upload-input"
           onChange={onPick}
         />
-        <p className="text-xs text-muted-foreground">
-          PNG, JPEG, GIF, WEBP, PDF, or a 3D model (GLB/GLTF), up to 25 MB. Stored encrypted
-          in the US. Tag each figure with its view; a 3D model can be rotated by orientation
-          in the browser. Describing a figure sends it to a vision model, so use public or
-          synthetic figures only for now.
+        <p className="max-w-prose text-xs text-muted-foreground">
+          Figures upload as PNG, JPEG, GIF, WEBP, or PDF. The USPTO files 2D drawings, so
+          these are what go in the package. You can also upload a 3D model (GLB or GLTF) to
+          turn and inspect while you draft; it is a visualization aid and is not part of the
+          filing. Tag each figure with its view to flip between perspectives. Up to 25 MB,
+          stored encrypted in the US. Describing a figure sends it to a vision model, so use
+          public or synthetic figures for now.
         </p>
       </div>
 
@@ -139,40 +136,36 @@ export function UploadsPanel({
         </p>
       )}
 
-      {initial.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No files uploaded yet.</p>
-      ) : (
-        <ul className="divide-y divide-border rounded-lg border border-border">
-          {initial.map((a) => {
-            const threeD = is3dModel(a.mime, a.filename);
-            return (
-              <li key={a.id} className="px-4 py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <a
-                      href={`/api/projects/${projectId}/attachments/${a.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="truncate font-medium text-foreground hover:underline"
-                    >
-                      {a.filename}
-                    </a>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="secondary">
-                        {threeD
-                          ? "3D model"
-                          : a.kind === "drawing"
-                            ? "Drawing"
-                            : "Supporting"}
-                      </Badge>
-                      {a.view && (
-                        <span>
-                          {ATTACHMENT_VIEW_LABELS[a.view as AttachmentView] ?? a.view}
-                        </span>
-                      )}
-                      <span>{fmtSize(a.size_bytes)}</span>
-                    </div>
-                  </div>
+      {figures.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-sm font-semibold text-foreground">
+            Figures ({figures.length})
+          </h2>
+          <FigureNavigator projectId={projectId} figures={figures} />
+        </section>
+      )}
+
+      {supporting.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-sm font-semibold text-foreground">
+            Supporting documents
+          </h2>
+          <ul className="divide-y divide-border rounded-lg border border-border">
+            {supporting.map((a) => (
+              <li
+                key={a.id}
+                className="flex items-center justify-between gap-3 px-4 py-3"
+              >
+                <a
+                  href={`/api/projects/${projectId}/attachments/${a.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="truncate font-medium text-foreground hover:underline"
+                >
+                  {a.filename}
+                </a>
+                <div className="flex shrink-0 items-center gap-3 text-xs text-muted-foreground">
+                  <span>{fmtSize(a.size_bytes)}</span>
                   <Button
                     variant="outline"
                     size="sm"
@@ -182,17 +175,14 @@ export function UploadsPanel({
                     Remove
                   </Button>
                 </div>
-                {threeD ? (
-                  <ModelViewer
-                    src={`/api/projects/${projectId}/attachments/${a.id}?raw=1`}
-                  />
-                ) : a.kind === "drawing" && a.mime.startsWith("image/") ? (
-                  <DrawingAnalysis projectId={projectId} attachmentId={a.id} />
-                ) : null}
               </li>
-            );
-          })}
-        </ul>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {initial.length === 0 && (
+        <p className="text-sm text-muted-foreground">No files uploaded yet.</p>
       )}
     </div>
   );

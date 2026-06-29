@@ -80,8 +80,10 @@ The takeaway is that the filing identity is captured cleanly and checked, not le
 ## 9. Drawings, multiple views, and 3D
 
 You upload figures as images or PDFs, or a 3D model in GLB or GLTF, all stored encrypted in a private US region bucket scoped to you.
-A patent has many views, so each figure is tagged with its orientation, perspective, top, front, side, and so on, and you upload as many as you need.
-A 3D model renders in the browser and turns by orientation with a toggle or by dragging, and it never leaves your account.
+A patent has many views, so each figure is tagged with its orientation, perspective, top, front, side, and so on, you upload as many as you need, and you flip between them in one navigator.
+The USPTO files 2D drawings, so the images and PDFs are what go in the package.
+A 3D model is a visualization aid, not a filed document; it renders in the browser and turns by orientation with a toggle or by dragging, and it never leaves your account or goes to a model.
+The web 3D format is glTF, so a CAD file is exported to GLB or GLTF first.
 On an image figure you run the drawing check, which reads the figure for defects under 37 CFR 1.84 and 1.83.
 It circles in red, on the figure, each reference numeral that appears in the drawing but was never introduced in the specification, numbered to a findings list and pinned to the rule.
 Defects with no single location, like a missing figure label, a drawing that is too small, or color where line art is required, are listed without a circle and tagged as whole figure.

@@ -46,9 +46,10 @@ export default async function UploadsPage({
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
         <p className="text-sm text-muted-foreground">
-          Upload your figures and any supporting documents. Drawings flow into the filing
-          package as the drawings PDF. Files are stored encrypted in the US, scoped to you;
-          they are never sent to a model or embedding vendor.
+          Upload your figures and any supporting documents. The 2D drawings flow into the
+          filing package; a 3D model is a visualization aid and is not filed. Files are
+          stored encrypted in the US and scoped to you. Only the optional drawing check
+          sends a figure to a vision model.
         </p>
         <div className="mt-6">
           <UploadsPanel projectId={id} initial={attachments} />

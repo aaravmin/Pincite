@@ -51,7 +51,7 @@ Upload a figure and Pincite reads it for drawing defects under 37 CFR 1.84 and 1
 
 ### 5. Multiple views and 3D models
 
-A patent has many views, so each figure is tagged with its orientation - perspective, top, front, side, and so on - and you upload as many as you need. You can also upload a 3D model (GLB or GLTF) and rotate it by orientation right in the browser. It renders locally and is never sent to a model.
+A patent has many views, so you upload as many figures as you need, images or PDFs, tag each with its orientation, and flip between them in one navigator. The USPTO files 2D drawings, so those are what go in the package. You can also upload a 3D model in GLB or GLTF to turn and inspect while you draft, with an orientation toggle and drag to rotate. The model here is a representative round container standing in for the invention. It is a visualization aid, it renders locally, and it is never sent to a model or included in the filing.
 
 ![3D model viewer](screenshots/case-3d.png)
 

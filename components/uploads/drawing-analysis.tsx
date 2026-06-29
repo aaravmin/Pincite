@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { analyzeDrawing } from "@/lib/filing/actions";
 import type { DrawingReview } from "@/lib/filing/types";
 
+/** Shows an image figure and, on demand, runs the vision drawing check, overlaying red
+ *  circles on the located issues and listing whole-figure issues without one. */
 export function DrawingAnalysis({
   projectId,
   attachmentId,
@@ -30,8 +32,6 @@ export function DrawingAnalysis({
   }
 
   const imgUrl = `/api/projects/${projectId}/attachments/${attachmentId}`;
-
-  // Number the located findings so the on-figure circle matches the list entry.
   const circleNo = new Map<string, number>();
   if (review) {
     let c = 0;
@@ -41,16 +41,39 @@ export function DrawingAnalysis({
   }
 
   return (
-    <div className="mt-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={run}
-        disabled={pending}
-        data-testid="describe-drawing"
-      >
-        {pending ? "Reading the figure…" : "Check drawing (vision)"}
-      </Button>
+    <div>
+      <div className="relative inline-block max-w-full">
+        <img
+          src={imgUrl}
+          alt="Uploaded figure under review"
+          className="max-h-[460px] w-auto rounded border border-border"
+        />
+        {review?.findings.map((f) =>
+          f.x !== null && f.y !== null ? (
+            <span
+              key={f.id}
+              style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}
+              className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-violation bg-background/70 text-[11px] font-semibold text-violation"
+              aria-hidden
+            >
+              {circleNo.get(f.id)}
+            </span>
+          ) : null,
+        )}
+      </div>
+
+      <div className="mt-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={run}
+          disabled={pending}
+          data-testid="describe-drawing"
+        >
+          {pending ? "Reading the figure…" : "Check drawing (vision)"}
+        </Button>
+      </div>
+
       {err && (
         <p className="mt-2 text-sm text-violation" role="alert">
           {err}
@@ -58,29 +81,7 @@ export function DrawingAnalysis({
       )}
 
       {review && (
-        <div className="mt-2 space-y-4 rounded-md border border-border p-3">
-          {/* The figure with red circles on the located issues. */}
-          <div className="relative inline-block max-w-full">
-            <img
-              src={imgUrl}
-              alt="Uploaded figure under review"
-              className="max-h-[460px] w-auto rounded border border-border"
-            />
-            {review.findings.map((f) =>
-              f.x !== null && f.y !== null ? (
-                <span
-                  key={f.id}
-                  style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}
-                  className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-violation bg-background/70 text-[11px] font-semibold text-violation"
-                  aria-hidden
-                >
-                  {circleNo.get(f.id)}
-                </span>
-              ) : null,
-            )}
-          </div>
-
-          {/* The issues. Red circles point to the located ones; the rest are listed plainly. */}
+        <div className="mt-3 space-y-3">
           {review.findings.length === 0 ? (
             <p className="flex items-center gap-1.5 text-sm text-pass">
               <span className="inline-block size-2.5 rounded-full bg-pass" aria-hidden />

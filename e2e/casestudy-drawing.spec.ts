@@ -5,14 +5,15 @@ import { screenshot } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 /**
- * Manual screenshot generator for the drawing check, run against a real PUBLIC figure:
- * Apple's molded fiber food container (US 2012/0024859 A1, FIG. 1). It makes a live Grok
- * vision call, so it is skipped in the normal gate; regenerate case-drawing.png with:
+ * Manual screenshot generator for the figure navigator, the drawing check, and the 3D
+ * viewer, run against PUBLIC Apple material (US 2012/0024859 A1, FIG. 1 and FIG. 6) plus a
+ * generated round-container model. It makes a live Grok vision call, so it is skipped in
+ * the normal gate. Regenerate case-drawing.png and case-3d.png with:
  *   CASE_VISION=1 pnpm exec playwright test e2e/casestudy-drawing.spec.ts
  */
-test.skip(!process.env.CASE_VISION, "manual: set CASE_VISION=1 to regenerate the screenshot");
+test.skip(!process.env.CASE_VISION, "manual: set CASE_VISION=1 to regenerate the screenshots");
 
-test("case study: drawing check flags undescribed numerals with red circles", async ({
+test("figures: navigator across views, drawing check, and 3D model", async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -27,9 +28,8 @@ test("case study: drawing check flags undescribed numerals with red circles", as
   await page.waitForURL("**/projects/**");
   const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
 
-  // A detailed description that introduces MOST reference numerals but deliberately omits a
-  // few (16, 44, 46), so the drawing check circles only the undescribed ones - a realistic
-  // draft with a small gap, not a wall of findings.
+  // A detailed description that names most reference numerals but omits a few (16, 44, 46),
+  // so the drawing check circles only the undescribed ones.
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -46,22 +46,38 @@ test("case study: drawing check flags undescribed numerals with red circles", as
   ]);
 
   await page.goto(`/projects/${id}/uploads`);
-  await page
-    .getByTestId("upload-input")
-    .setInputFiles({
-      name: "fig1.png",
-      mimeType: "image/png",
-      buffer: readFileSync("e2e/fixtures/apple-container-fig.png"),
-    });
-  await expect(page.getByText("fig1.png")).toBeVisible();
 
+  async function uploadFigure(orientation: string, name: string, file: string) {
+    await page.getByLabel("Drawing orientation").click();
+    await page.getByRole("option", { name: orientation, exact: true }).click();
+    await page
+      .getByTestId("upload-input")
+      .setInputFiles({
+        name,
+        mimeType: name.endsWith(".glb") ? "model/gltf-binary" : "image/png",
+        buffer: readFileSync(`e2e/fixtures/${file}`),
+      });
+    await expect(page.getByText(name)).toBeVisible();
+  }
+
+  // Three views: a perspective figure, a top figure, and the 3D container model.
+  await uploadFigure("Perspective", "fig1.png", "apple-container-fig.png");
+  await uploadFigure("Top / plan", "fig6.png", "apple-fig-top.png");
+  await uploadFigure("Not specified", "container.glb", "sample-model.glb");
+
+  // The newest upload (the 3D model) is selected first. Snap it to an orientation and shoot.
+  await expect(page.getByRole("button", { name: "Top" })).toBeVisible({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Perspective", exact: true }).click();
+  await page.waitForTimeout(1500);
+  await screenshot(page, "case-3d");
+
+  // Switch to the perspective figure and run the drawing check.
+  await page.getByRole("button", { name: "3. Perspective" }).click();
   await page.getByTestId("describe-drawing").click();
   await expect(
     page.getByText(/vision estimate, verify|No drawing issues/i),
   ).toBeVisible({ timeout: 90_000 });
-  // Wait for the figure image to actually finish loading so the red circles sit on it.
   const fig = page.locator('img[alt="Uploaded figure under review"]');
-  await fig.waitFor({ state: "visible", timeout: 30_000 });
   await page.waitForFunction(
     () => {
       const i = document.querySelector(
@@ -71,7 +87,7 @@ test("case study: drawing check flags undescribed numerals with red circles", as
     },
     { timeout: 30_000 },
   );
-  await page.waitForTimeout(500);
   await fig.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
   await screenshot(page, "case-drawing");
 });
