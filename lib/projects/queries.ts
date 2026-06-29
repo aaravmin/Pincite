@@ -4,8 +4,8 @@
  */
 import { createClient } from "@/lib/supabase/server";
 import {
-  SECTION_KEYS,
   ADVANCED_SECTION_KEYS,
+  filingCompleteness,
   type SectionKey,
 } from "@/lib/projects/sections";
 import type { Project, ProjectVersion } from "@/lib/projects/types";
@@ -28,23 +28,38 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
   if (!projects || projects.length === 0) return [];
 
   const ids = projects.map((p) => p.id);
-  const [{ data: sections }, { data: versions }, { data: findingsRows }] =
-    await Promise.all([
-      supabase
-        .from("project_sections")
-        .select("project_id, section_key, word_count")
-        .in("project_id", ids),
-      supabase.from("project_versions").select("project_id").in("project_id", ids),
-      supabase.from("findings").select("project_id, severity").in("project_id", ids),
-    ]);
+  const [
+    { data: sections },
+    { data: versions },
+    { data: findingsRows },
+    { data: disclosure },
+    { data: inventors },
+    { data: declarations },
+  ] = await Promise.all([
+    supabase
+      .from("project_sections")
+      .select("project_id, section_key, word_count")
+      .in("project_id", ids),
+    supabase.from("project_versions").select("project_id").in("project_id", ids),
+    supabase.from("findings").select("project_id, severity").in("project_id", ids),
+    supabase
+      .from("project_disclosure")
+      .select("project_id, problem_solved, how_it_works")
+      .in("project_id", ids),
+    supabase.from("project_inventors").select("project_id").in("project_id", ids),
+    supabase.from("project_declarations").select("project_id").in("project_id", ids),
+  ]);
 
-  const requiredCount = SECTION_KEYS.filter(
-    (k) => !ADVANCED_SECTION_KEYS.has(k),
-  ).length;
-
+  // filled = required sections with any content (drives stage detection).
+  // words = per-section word counts (drives the depth-weighted completeness).
   const filled = new Map<string, Set<string>>();
+  const words = new Map<string, Record<string, number>>();
   for (const s of sections ?? []) {
-    if ((s.word_count ?? 0) <= 0) continue;
+    const wc = s.word_count ?? 0;
+    const wm = words.get(s.project_id) ?? {};
+    wm[s.section_key] = wc;
+    words.set(s.project_id, wm);
+    if (wc <= 0) continue;
     if (ADVANCED_SECTION_KEYS.has(s.section_key as SectionKey)) continue;
     const set = filled.get(s.project_id) ?? new Set<string>();
     set.add(s.section_key);
@@ -59,14 +74,34 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
     if (r.severity === "violation")
       reds.set(r.project_id, (reds.get(r.project_id) ?? 0) + 1);
   }
+  const hasDisclosure = new Set<string>();
+  for (const d of disclosure ?? []) {
+    if (
+      String(d.problem_solved ?? "").trim() ||
+      String(d.how_it_works ?? "").trim()
+    ) {
+      hasDisclosure.add(d.project_id);
+    }
+  }
+  const inventorCount = new Map<string, number>();
+  for (const r of inventors ?? []) {
+    inventorCount.set(r.project_id, (inventorCount.get(r.project_id) ?? 0) + 1);
+  }
+  const signedCount = new Map<string, number>();
+  for (const r of declarations ?? []) {
+    signedCount.set(r.project_id, (signedCount.get(r.project_id) ?? 0) + 1);
+  }
 
   return projects.map((p) => {
     const proj = p as Project;
     return {
       ...proj,
-      completeness: Math.round(
-        ((filled.get(p.id)?.size ?? 0) / requiredCount) * 100,
-      ),
+      completeness: filingCompleteness({
+        sectionWords: words.get(p.id) ?? {},
+        hasDisclosure: hasDisclosure.has(p.id),
+        inventorCount: inventorCount.get(p.id) ?? 0,
+        signedCount: signedCount.get(p.id) ?? 0,
+      }),
       versionCount: versionCount.get(p.id) ?? 0,
       openReds: reds.get(p.id) ?? 0,
       stage: detectStage({

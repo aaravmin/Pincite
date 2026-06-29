@@ -107,9 +107,54 @@ export function wordCount(text: string): number {
   return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
-/** Fraction of required sections with any content. Used for the dashboard card. */
-export function completeness(sections: Partial<Record<SectionKey, string>>): number {
+/**
+ * Word counts at which a section reads as substantively drafted. These are not the legal
+ * length, just enough that a one-word stub does not count as a finished section. Used for
+ * partial-credit progress so the dashboard number tracks real depth, not mere presence.
+ */
+export const SECTION_TARGET_WORDS: Partial<Record<SectionKey, number>> = {
+  title: 3,
+  cross_reference: 3,
+  gov_interest: 3,
+  background: 40,
+  summary: 25,
+  brief_description_drawings: 8,
+  detailed_description: 80,
+  claims: 20,
+  abstract: 30,
+  drawings_meta: 8,
+};
+
+/** Substantive draft progress (0..1) across the required spec sections, by depth not presence. */
+export function specProgress(
+  sectionWords: Partial<Record<SectionKey, number>>,
+): number {
   const required = SECTION_KEYS.filter((k) => !ADVANCED_SECTION_KEYS.has(k));
-  const filled = required.filter((k) => (sections[k] ?? "").trim().length > 0);
-  return Math.round((filled.length / required.length) * 100);
+  if (required.length === 0) return 0;
+  let sum = 0;
+  for (const k of required) {
+    const target = SECTION_TARGET_WORDS[k] ?? 10;
+    sum += Math.min((sectionWords[k] ?? 0) / target, 1);
+  }
+  return sum / required.length;
+}
+
+/**
+ * How much of the whole filing is actually done (0..100). The drafted specification is the
+ * bulk, weighted 0.7 and credited by depth rather than presence, and the three filing
+ * prerequisites - a filled disclosure, at least one inventor, and a signed declaration -
+ * each add 0.1. So typing one word in every box no longer reads as nearly complete.
+ */
+export function filingCompleteness(input: {
+  sectionWords: Partial<Record<SectionKey, number>>;
+  hasDisclosure: boolean;
+  inventorCount: number;
+  signedCount: number;
+}): number {
+  const spec = specProgress(input.sectionWords);
+  const disclosure = input.hasDisclosure ? 1 : 0;
+  const inventors = input.inventorCount > 0 ? 1 : 0;
+  const signed = input.signedCount > 0 ? 1 : 0;
+  const score = 0.7 * spec + 0.1 * disclosure + 0.1 * inventors + 0.1 * signed;
+  return Math.round(score * 100);
 }

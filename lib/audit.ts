@@ -22,7 +22,8 @@ export type AuditAction =
   | "attachment_uploaded"
   | "attachment_deleted"
   | "disclosure_saved"
-  | "drawing_analyzed";
+  | "drawing_analyzed"
+  | "project_deleted";
 
 export async function logAudit(
   supabase: SupabaseClient,

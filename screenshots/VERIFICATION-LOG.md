@@ -6,6 +6,7 @@ the §2.1 color discipline.
 
 | Date | Phase / feature | Result | Screenshot | Notes |
 |---|---|---|---|---|
+| 2026-06-28 | admin patent delete + accurate % | PASS | (e2e suite) | Admin-only patent removal (lib/admin.ts allowlist aarav.minocha@gmail.com; deleteProject re-checks the email server side; trash control on the dashboard list and attorney portfolio, hidden for everyone else; audited as project_deleted). Reworked completeness to be depth-weighted across the real filing (filingCompleteness = 0.7 spec by word-count targets plus 0.1 each for disclosure, inventor, signed); one word per section now reads 10 percent, not 100. New admin-gate e2e (non-admin sees no remove control). lint clean, build OK, 22/22 green. |
 | 2026-06-28 | readme + cleanup + product doc | PASS | (e2e suite) | Refreshed README (email+Google auth, rate limits + budget caps, ZDR posture, latest migrations, link to product doc). Removed dead code (citationExists, findSpan, ROLE_LABELS, components/ui/card + separator, scripts/verify-phase1.mjs) and 33 unused gate screenshots (now gitignored; case-* + log kept). Cleared a stray lint warning (tier2 unused var) and tidied .gitignore. Added docs/product-functionality.md (full feature reference). lint clean, build OK, 21/21 green. |
 | 2026-06-26 | phase-0 landing | PASS | phase-0-landing.png | Clean Notion-style landing; neutral palette only; no console/page/network errors. |
 | 2026-06-26 | phase-0 login | PASS | phase-0-login.png | Google sign-in button renders; connects to new dedicated Supabase project; neutral palette; clean. |

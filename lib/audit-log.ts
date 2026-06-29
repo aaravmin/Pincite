@@ -23,4 +23,5 @@ export const ACTION_LABELS: Record<string, string> = {
   prior_art_searched: "Prior-art searched",
   rule_surfaced: "Rules surfaced",
   export_generated: "Export generated",
+  project_deleted: "Patent removed",
 };

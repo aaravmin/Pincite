@@ -4,12 +4,19 @@ import type { DashboardProject } from "@/lib/projects/queries";
 import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
 import { nextStep } from "@/lib/projects/next-step";
 import { fmtDate } from "@/lib/format";
+import { DeleteProjectButton } from "@/components/dashboard/delete-project-button";
 
 /**
  * Attorney portfolio: a denser table of every matter, grouped by client. Color stays
  * neutral except open findings, which go red when > 0 (the only signal color here).
  */
-export function PortfolioTable({ projects }: { projects: DashboardProject[] }) {
+export function PortfolioTable({
+  projects,
+  isAdmin,
+}: {
+  projects: DashboardProject[];
+  isAdmin: boolean;
+}) {
   const groups = new Map<string, DashboardProject[]>();
   for (const p of projects) {
     const key = p.client_name?.trim() || "Unassigned";
@@ -34,6 +41,7 @@ export function PortfolioTable({ projects }: { projects: DashboardProject[] }) {
             <th className="px-4 py-2 text-right font-medium">Findings</th>
             <th className="px-4 py-2 text-right font-medium">Versions</th>
             <th className="px-4 py-2 text-right font-medium">Last edited</th>
+            {isAdmin && <th className="px-4 py-2" aria-label="Remove" />}
           </tr>
         </thead>
         <tbody>
@@ -41,7 +49,7 @@ export function PortfolioTable({ projects }: { projects: DashboardProject[] }) {
             <Fragment key={client}>
               <tr className="border-t border-border bg-secondary/40">
                 <td
-                  colSpan={8}
+                  colSpan={isAdmin ? 9 : 8}
                   className="px-4 py-1.5 text-xs font-semibold text-foreground"
                 >
                   {client}
@@ -95,6 +103,11 @@ export function PortfolioTable({ projects }: { projects: DashboardProject[] }) {
                   <td className="px-4 py-2 text-right text-muted-foreground">
                     {fmtDate(p.updated_at)}
                   </td>
+                  {isAdmin && (
+                    <td className="px-4 py-2 text-right">
+                      <DeleteProjectButton projectId={p.id} name={p.name} />
+                    </td>
+                  )}
                 </tr>
               ))}
             </Fragment>

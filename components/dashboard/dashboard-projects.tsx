@@ -18,14 +18,17 @@ import {
 import { nextStep } from "@/lib/projects/next-step";
 import { fmtDate } from "@/lib/format";
 import { PortfolioTable } from "@/components/projects/portfolio-table";
+import { DeleteProjectButton } from "@/components/dashboard/delete-project-button";
 import type { DashboardProject } from "@/lib/projects/queries";
 
 export function DashboardProjects({
   projects,
   isAttorney,
+  isAdmin,
 }: {
   projects: DashboardProject[];
   isAttorney: boolean;
+  isAdmin: boolean;
 }) {
   const [status, setStatus] = useState<string>("all");
 
@@ -80,7 +83,7 @@ export function DashboardProjects({
           No applications with that status.
         </p>
       ) : isAttorney ? (
-        <PortfolioTable projects={filtered} />
+        <PortfolioTable projects={filtered} isAdmin={isAdmin} />
       ) : (
         <ul className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border">
           {filtered.map((p) => {
@@ -128,6 +131,9 @@ export function DashboardProjects({
                     {fmtDate(p.updated_at)}
                   </div>
                 </div>
+                {isAdmin && (
+                  <DeleteProjectButton projectId={p.id} name={p.name} />
+                )}
               </li>
             );
           })}

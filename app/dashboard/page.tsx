@@ -4,6 +4,7 @@ import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardProjects } from "@/components/dashboard/dashboard-projects";
 import { getDashboardProjects } from "@/lib/projects/queries";
+import { isAdminEmail } from "@/lib/admin";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -20,6 +21,7 @@ export default async function DashboardPage() {
   if (!profile?.consented_at) redirect("/consent");
   if (!profile?.role) redirect("/role");
   const isAttorney = profile.role === "attorney";
+  const isAdmin = isAdminEmail(user.email);
 
   const projects = await getDashboardProjects();
 
@@ -46,7 +48,11 @@ export default async function DashboardPage() {
             </div>
             <NewProjectDialog isAttorney={isAttorney} />
           </div>
-          <DashboardProjects projects={projects} isAttorney={isAttorney} />
+          <DashboardProjects
+            projects={projects}
+            isAttorney={isAttorney}
+            isAdmin={isAdmin}
+          />
         </div>
       </main>
     </div>

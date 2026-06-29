@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit";
+import { isAdminEmail } from "@/lib/admin";
 import {
   SECTION_KEYS,
   PATENT_TYPES,
@@ -70,6 +71,39 @@ export async function createProject(input: {
   });
   revalidatePath("/dashboard");
   return { id: data.id };
+}
+
+/**
+ * Permanently remove a patent and its history (sections, versions, findings, and the rest
+ * cascade). Admin only - gated on the authenticated user's email, not the client - so a
+ * regular user cannot delete patents, only the admin can.
+ */
+export async function deleteProject(input: {
+  projectId: string;
+}): Promise<{ ok: true } | { error: string }> {
+  const { supabase, user } = await requireUser();
+  if (!isAdminEmail(user.email)) {
+    return { error: "Only the admin can remove patents." };
+  }
+  const { data: proj } = await supabase
+    .from("projects")
+    .select("name")
+    .eq("id", input.projectId)
+    .maybeSingle();
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", input.projectId);
+  if (error) return { error: error.message };
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "project_deleted",
+    projectId: input.projectId,
+    detail: { name: proj?.name ?? null },
+  });
+  revalidatePath("/dashboard");
+  return { ok: true };
 }
 
 export async function updateProjectStatus(input: {
