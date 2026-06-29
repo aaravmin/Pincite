@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { HeaderActions } from "@/components/projects/header-actions";
+import { ClaimTree } from "@/components/projects/claim-tree";
 import { saveSection, saveVersion } from "@/lib/projects/actions";
 import {
   SECTION_KEYS,
@@ -311,6 +312,18 @@ export function Workspace({
                       : `${activeWords} words`}
                   </span>
                 </div>
+                {active === "claims" && sections["claims"].trim() && (
+                  <div className="mt-4 rounded-md border border-border p-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Claim structure
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Independent claims with the dependent claims nested under each. Edit the
+                      text above; this tree updates.
+                    </p>
+                    <ClaimTree text={sections["claims"]} />
+                  </div>
+                )}
               </>
             )}
           </div>

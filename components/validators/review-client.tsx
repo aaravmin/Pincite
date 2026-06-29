@@ -91,6 +91,7 @@ export function ReviewClient({
           onClick={analyze101}
           disabled={pending}
           data-testid="analyze-101"
+          title="Section 101 patent eligibility: whether the claim is even the kind of thing that can be patented (the Alice/Mayo test)."
         >
           Analyze §101
         </Button>
@@ -183,10 +184,11 @@ function FindingItem({
     });
   }
 
-  const snippet =
-    sections[f.section_key] && f.span_end > f.span_start
-      ? sections[f.section_key].slice(f.span_start, f.span_end).slice(0, 120)
-      : null;
+  const sec = sections[f.section_key] ?? "";
+  const hasSpan = f.span_end > f.span_start && sec.length > 0;
+  const ctxBefore = hasSpan ? sec.slice(Math.max(0, f.span_start - 45), f.span_start) : "";
+  const ctxTerm = hasSpan ? sec.slice(f.span_start, f.span_end) : "";
+  const ctxAfter = hasSpan ? sec.slice(f.span_end, Math.min(sec.length, f.span_end + 45)) : "";
   const sevColor =
     f.severity === "violation" ? "text-violation" : "text-attention-foreground";
   const issueHref = `/projects/${projectId}?section=${encodeURIComponent(
@@ -239,10 +241,19 @@ function FindingItem({
       {selected && (
         <div className="space-y-2 border-t border-border px-3 py-2.5">
           <p className="text-sm text-muted-foreground">{f.explanation}</p>
-          {snippet && (
-            <p className="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
-              in {f.section_key}: “{snippet}”
-            </p>
+          {hasSpan && (
+            <div className="rounded bg-muted px-2 py-1.5 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">What triggered this: </span>
+              <span className="font-mono">
+                {ctxBefore && "…"}
+                {ctxBefore}
+                <mark className="rounded bg-attention/40 px-0.5 font-medium text-foreground">
+                  {ctxTerm}
+                </mark>
+                {ctxAfter}
+                {ctxAfter && "…"}
+              </span>
+            </div>
           )}
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             {f.cfr_ref && <span>{f.cfr_ref}</span>}
@@ -327,6 +338,13 @@ function EligibilityPanel({
             </>
           )}
         </p>
+      </div>
+      <div className="rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs leading-5 text-muted-foreground">
+        <span className="font-medium text-foreground">What is §101? </span>
+        Section 101 asks whether a claim is even eligible for a patent at all. An abstract
+        idea, a law of nature, or a natural phenomenon is not, unless the claim adds enough to
+        apply it in a practical way. The steps below walk the USPTO Alice/Mayo test; this is a
+        framework to verify, not a yes-or-no verdict.
       </div>
       {rows.map(([label, text]) => (
         <div key={label}>
