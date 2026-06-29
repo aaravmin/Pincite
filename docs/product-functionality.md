@@ -184,6 +184,7 @@ A vision model reads the figure and returns a short description, the figure labe
 Pincite turns that into findings.
 It flags a reference numeral that appears in the drawing but is not mentioned anywhere in your specification, a missing figure label, a disclosed component that does not appear, and the model's own observations.
 Each located issue is marked with a red circle on the figure pointing at where it is, numbered to match the list, and pinned to a corpus-validated MPEP section.
+Defects that do not sit at one spot, such as the figure being too small, in color, low in line quality, or missing a label, are flagged too and listed as whole-figure issues without a circle.
 The locations are an approximate vision estimate, so they are labeled to verify rather than trust.
 Because this sends the image to a model, it is restricted to public or synthetic figures until vendor zero data retention is on.
 

@@ -90,29 +90,47 @@ export function DrawingAnalysis({
           ) : (
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Drawing issues ({review.findings.length}) - vision estimate, verify
+                Drawing issues ({review.findings.length}) - red circles mark the locatable
+                spots; whole-figure issues are listed without a circle. Vision estimate, verify.
               </p>
               <ul className="mt-1 space-y-2">
-                {review.findings.map((f) => (
-                  <li
-                    key={f.id}
-                    className="flex gap-2 rounded-md border border-violation bg-violation-bg p-2 text-sm"
-                  >
-                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-violation text-[10px] font-semibold text-violation">
-                      {circleNo.get(f.id) ?? "!"}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="font-medium text-foreground">{f.title}</span>
-                      {f.detail && (
-                        <span className="text-muted-foreground"> {f.detail}</span>
-                      )}
-                      <span className="mt-0.5 block text-xs text-muted-foreground">
-                        {f.cfr}
-                        {f.mpep ? ` · MPEP ${f.mpep}` : ""}
+                {review.findings.map((f) => {
+                  const n = circleNo.get(f.id);
+                  const located = n !== undefined;
+                  return (
+                    <li
+                      key={f.id}
+                      className="flex gap-2 rounded-md border border-violation bg-violation-bg p-2 text-sm"
+                    >
+                      <span
+                        className={
+                          "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold " +
+                          (located
+                            ? "border-2 border-violation text-violation"
+                            : "bg-violation text-background")
+                        }
+                        aria-hidden
+                      >
+                        {located ? n : "•"}
                       </span>
-                    </span>
-                  </li>
-                ))}
+                      <span className="min-w-0">
+                        <span className="font-medium text-foreground">{f.title}</span>
+                        {!located && (
+                          <span className="ml-1 rounded bg-violation/15 px-1 text-[10px] font-medium text-violation">
+                            whole figure
+                          </span>
+                        )}
+                        {f.detail && (
+                          <span className="text-muted-foreground"> {f.detail}</span>
+                        )}
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {f.cfr}
+                          {f.mpep ? ` · MPEP ${f.mpep}` : ""}
+                        </span>
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

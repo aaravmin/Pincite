@@ -288,8 +288,12 @@ export async function analyzeDrawing(input: {
     const esc = numeral.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return new RegExp(`(^|[^a-z0-9])${esc}([^a-z0-9]|$)`).test(specText);
   };
+  const seenNumerals = new Set<string>();
   let nIdx = 0;
   for (const num of vision.numerals) {
+    const key = num.numeral.toLowerCase();
+    if (seenNumerals.has(key)) continue;
+    seenNumerals.add(key);
     if (inSpec(num.numeral)) continue;
     findings.push({
       id: `numeral-${nIdx++}`,

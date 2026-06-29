@@ -67,7 +67,10 @@ Return ONLY a JSON object (no prose, no markdown fences) with exactly these keys
 - "summary": one factual sentence describing what the figure shows.
 - "figureLabel": the figure label visible in the drawing such as "FIG. 1", or null if none is present.
 - "numerals": an array of every reference numeral you can read in the drawing, each {"numeral":"12","x":0.0,"y":0.0} where x,y is the approximate center of that numeral as a fraction (0..1) of image width and height from the TOP-LEFT.
-- "issues": an array of drawing problems you can actually see, each {"title":"short label","detail":"one sentence","x":0.0 or null,"y":0.0 or null} where x,y locates the problem when it has a position, else null. Look for: a missing or unclear figure label; a reference numeral with no lead line to a part, or a lead line with no numeral; a visible part that has no reference numeral; numerals that are illegible or overlapping. Do NOT invent problems. Return an empty array if the figure looks compliant.
+- "issues": an array of drawing problems you can actually see, each {"title":"short label","detail":"one sentence","x":0.0 or null,"y":0.0 or null}. Give x,y when the problem is at a specific spot, and set BOTH to null when the problem applies to the whole figure. Look for both kinds:
+  - located (give x,y): a reference numeral with no lead line to a part, a lead line with no numeral, a visible part that has no reference numeral, numerals that are illegible or overlapping.
+  - whole-figure (x and y null): the figure is not a clean black-and-white line drawing (it is in color, or is a grayscale photo where line art is required); the background is not solid white; the lines are too light, broken, or poor quality; the drawing is too small or lacks an adequate scale; surfaces that need section or surface hatching are missing it; or the drawing appears cut off at the sheet margins.
+Do NOT invent problems. Return an empty array if the figure looks compliant. Do not report a missing figure label as an issue; that is handled separately.
 All coordinates use the top-left as origin. Output JSON only.`;
 
 function clamp01(n: unknown): number | null {

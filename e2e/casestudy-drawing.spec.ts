@@ -59,6 +59,19 @@ test("case study: drawing check flags undescribed numerals with red circles", as
   await expect(
     page.getByText(/vision estimate, verify|No drawing issues/i),
   ).toBeVisible({ timeout: 90_000 });
-  await page.waitForTimeout(1000);
+  // Wait for the figure image to actually finish loading so the red circles sit on it.
+  const fig = page.locator('img[alt="Uploaded figure under review"]');
+  await fig.waitFor({ state: "visible", timeout: 30_000 });
+  await page.waitForFunction(
+    () => {
+      const i = document.querySelector(
+        'img[alt="Uploaded figure under review"]',
+      ) as HTMLImageElement | null;
+      return !!i && i.complete && i.naturalWidth > 0;
+    },
+    { timeout: 30_000 },
+  );
+  await page.waitForTimeout(500);
+  await fig.scrollIntoViewIfNeeded();
   await screenshot(page, "case-drawing");
 });
