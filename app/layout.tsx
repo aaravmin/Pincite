@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Pincite",
   description: "Cited answers to patent procedure questions from the real MPEP text.",
+  // Google Search Console domain verification (for OAuth consent screen ownership).
+  verification: {
+    google: "gsyHMXdf2b_FY2DV_N07n2cGykh4ZwTFHoV2bJ464HY",
+  },
 };
 
 export default function RootLayout({
