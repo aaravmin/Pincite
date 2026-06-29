@@ -19,6 +19,13 @@ export default async function VersionsPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const unit = profile?.role === "attorney" ? "matter" : "application";
+
   const project = await getProject(id);
   if (!project) notFound();
   const versions = await listVersions(id);
@@ -42,8 +49,9 @@ export default async function VersionsPage({
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
         <p className="text-sm text-muted-foreground">
-          Every save is an immutable snapshot. Restoring or branching opens a
-          snapshot into a new save and never deletes later ones.
+          Every save is an immutable snapshot. You can continue this {unit} from
+          any earlier save. It opens that save into the working draft so you keep
+          editing from there, and never deletes later saves.
         </p>
 
         {versions.length === 0 ? (

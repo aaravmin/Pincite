@@ -33,16 +33,18 @@ export function VersionActions({
         size="sm"
         disabled={pending}
         onClick={() => run("restore")}
+        title="Open this save into the working draft and keep editing from here"
       >
-        Restore
+        Continue from this save
       </Button>
       <Button
         variant="ghost"
         size="sm"
         disabled={pending}
         onClick={() => run("branch")}
+        title="Open this save as a separate copy you can develop in parallel"
       >
-        Branch
+        Branch a copy
       </Button>
     </div>
   );

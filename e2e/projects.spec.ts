@@ -52,8 +52,8 @@ test("phase-1: create project, intake autosave, versioning, restore — all audi
   await expect(page.getByText("Second draft")).toBeVisible();
   await screenshot(page, "phase-1-versions");
 
-  // Restore the oldest save (last row) -> opens a NEW save in the workspace.
-  await page.getByRole("button", { name: "Restore" }).last().click();
+  // Continue from the oldest save (last row) -> opens a NEW save in the workspace.
+  await page.getByRole("button", { name: /continue from this save/i }).last().click();
   await page.waitForURL(`**/projects/${projectId}`);
   await screenshot(page, "phase-1-restore");
 
