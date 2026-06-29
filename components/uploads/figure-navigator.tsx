@@ -47,9 +47,14 @@ export function FigureNavigator({
   async function remove() {
     if (!confirm(`Remove "${sel.filename}"?`)) return;
     setPending(true);
-    await deleteAttachment({ projectId, attachmentId: sel.id });
-    setIdx(0);
-    router.refresh();
+    try {
+      await deleteAttachment({ projectId, attachmentId: sel.id });
+      setIdx(0);
+      router.refresh();
+    } finally {
+      // Always re-enable the button, even after the refresh, so it can be used again.
+      setPending(false);
+    }
   }
 
   // Rotate an image figure 90° clockwise: redraw it on a canvas (the browser also bakes in

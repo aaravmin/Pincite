@@ -38,13 +38,13 @@ Do. Open Inventors, show the two inventors and the company applicant.
 
 ### 1.35 Drawings
 
-Say. "I upload each figure by orientation, so I can flip through perspectives. The drawing check reads every figure at once and circles compliance problems right on the image, like a reference number that is in the drawing but never described. The flags are saved with the matter, so they are still here when I come back. If a scan comes in sideways, one rotate control turns it upright."
+Say. "I upload each figure by orientation, so I can flip through perspectives. The patent drew several sheets sideways, so I straighten one with the rotate control. The drawing check then reads every figure at once and circles problems on the image, including reference numbers that appear on a drawing but are never described in the draft. The flags are saved with the matter, so they are still here when I come back."
 
-Do. Open Drawings. Flip between perspectives. Click Check all drawings and let the red circles appear. Navigate away and back to show the flags persisted. Briefly show the rotate left and rotate right control on a figure.
+Do. Open Drawings. Use rotate right or rotate left to straighten a sideways figure. Flip between perspectives. Click Check all drawings and let the red circles appear, including the undescribed numbers 16, 28, and 54 on FIG. 1. Navigate away and back to show the flags persisted.
 
 ### 2.15 Review, fix, and recheck
 
-Say. "Review runs the rule checks. Each finding is colored by severity, pinned to its source, and shows the exact phrase that triggered it. The part I lean on most is Take me to issue, which jumps to the field that caused it, I make the edit, and Check if fixed re runs that one rule and confirms it. On this real Apple claim set it catches a vague term, about 360 degrees, and a component I disclosed but never described."
+Say. "Review runs the rule checks. Each finding is colored by severity, pinned to its source, and shows the exact phrase that triggered it. The part I lean on most is Take me to issue, which jumps to the field that caused it, I make the edit, and Check if fixed re runs that one rule and confirms it. On this real Apple matter it catches an abstract over the word limit, a claim missing its closing period, a vague term like about 360 degrees, and a component I disclosed but never described."
 
 Do. Open Review, click Check for issues. Expand a relative-term finding and show the What triggered this phrase. Click Take me to issue, edit the text, return to Review, click Check if fixed, show Looks fixed.
 

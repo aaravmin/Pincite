@@ -5,9 +5,9 @@ The text is from the real patent at patents.google.com/patent/US20120024859 (Con
 It is entered as if an outside attorney files on Apple's behalf, so the attorney adds the client and matter while still entering the inventors.
 There is no 3D file in this demo. The figures are PNG drawings uploaded by orientation.
 
-The 23 claims and the abstract are reproduced word for word, so they keep the patent's own wording and punctuation. Everything else here is written without em dashes, semicolons, or colons.
+The 23 claims are reproduced word for word, so they keep the patent's own punctuation. Everything else here is written without em dashes, semicolons, or colons.
 
-The reference numerals printed on the figures, which the detailed description also uses, are 10 container, 12 base portion, 14 bottom surface, 16 bottom feature, 18 concentric ridges, 20 sidewalls, 22 integrated sidewall feature, 24 lid portion, 26 top surface, 28 first top feature, 30 second top feature, 32 vents, 34 channel, 36 central platform, 38 hinge assembly, 40 first hinge portion, 42 second hinge portion, 44 flexure, 46 locking mechanism, 48 first lock portion, 50 second lock portion, 52 lip, 54 recess portion, 80 indicia, 82 contained pizza, 84 bottom airflow, 86 convective airflow, 88 gaps, 90 top surface airflow, 202 lid exterior surface, 204 base exterior surface, 302 concentric recesses, 304 sidewall feature protrusions, 502 first hinge exterior surface, 504 second hinge exterior surface, 602 base lip, 604 lid lip, 702 first container, 704 second container, 802 protrusion, and 804 cavity.
+The reference numerals printed on the figures are 10 container, 12 base portion, 14 bottom surface, 16 bottom feature, 18 concentric ridges, 20 sidewalls, 22 integrated sidewall feature, 24 lid portion, 26 top surface, 28 first top feature, 30 second top feature, 32 vents, 34 channel, 36 central platform, 38 hinge assembly, 40 first hinge portion, 42 second hinge portion, 44 flexure, 46 locking mechanism, 48 first lock portion, 50 second lock portion, 52 lip, 54 recess portion, 80 indicia, 82 contained pizza, 84 bottom airflow, 86 convective airflow, 88 gaps, 90 top surface airflow, 202 lid exterior surface, 204 base exterior surface, 302 concentric recesses, 304 sidewall feature protrusions, 502 first hinge exterior surface, 504 second hinge exterior surface, 602 base lip, 604 lid lip, 702 first container, 704 second container, 802 protrusion, and 804 cavity.
 
 ---
 
@@ -150,13 +150,13 @@ FIG. 1 shows a representative container 10 in a first open configuration.
 The container 10 holds hot food, in particular pizza, which can be assembled in a kitchen, placed in the container 10, and then placed in an oven.
 
 The container 10 has a base portion 12 with a bottom surface 14.
-The bottom surface 14 carries a bottom feature 16 in the form of concentric ridges 18 that each rise above the bottom surface 14.
+The bottom surface 14 carries concentric ridges 18 that each rise above the bottom surface 14.
 The ridges 18 give the container 10 structural support by spreading an applied load and resisting bending, and they lift the pizza so an air gap forms below it.
 That air gap lets excess moisture escape and acts as a thermal barrier that slows heat loss from the pizza.
 The base portion 12 also has sidewalls 20 formed with the bottom surface 14, and the sidewalls 20 carry an integrated sidewall feature 22 recessed into them with a shape that resists flexing of the base.
 
 The container 10 has a lid portion 24 sized and shaped to match the base portion 12, and together they form an enclosed space for the pizza when closed.
-The lid portion 24 has a top surface 26 with a first top feature 28 and a second top feature 30.
+The lid portion 24 has a top surface 26 with a second top feature 30.
 The second top feature 30 has a raised shape that adds support and forms a channel 34, which works with a central platform 36 to create a chimney effect that pulls moisture from the pizza toward the vents 32 for release to the outside.
 The ridges 18, the second top feature 30, and the vents 32 work together to hold a sensible moisture level inside the container 10 so the pizza does not turn soggy.
 
@@ -164,7 +164,7 @@ A hinge assembly 38 is formed with both the lid portion 24 and the base portion 
 A flexure 44 connects them, where the first and second hinge portions 40 and 42 are stiff molded fiber and the flexure 44 is bendable molded fiber, so the flexure 44 folds when the container closes and unfolds when it opens.
 A locking mechanism 46 has a first portion 48 on the base portion 12 and a second portion 50 on the lid portion 24.
 The locking mechanism 46 holds the base and lid together when closed with enough force to keep them from separating.
-A lip 52 on the second portion 50 is reached by a finger in a recess portion 54 of the first portion 48, so a simple lift on the lip 52 releases the lock.
+A lip 52 on the second portion 50 is reached by a finger in a recess of the first portion 48, so a simple lift on the lip 52 releases the lock.
 As FIG. 9 shows, the lock is a press fit where the second portion 50 has a protrusion 802 and the first portion 48 has a cavity 804 that receives the protrusion 802 to generate the holding force.
 
 In the first open configuration the lid portion 24 and the base portion 12 sit about 180 degrees apart so the pizza is easy to see and reach.
@@ -205,7 +205,7 @@ The 23 claims are reproduced word for word from the patent, so they keep the pat
 
 6. The molded fiber food container as recited in claim 4, wherein in the food server configuration, the food container is a reduced footprint food serving apparatus.
 
-7. The molded fiber container as recited in claim 1, wherein at least some of the plurality of ridges are concentric and circular.
+7. The molded fiber container as recited in claim 1, wherein at least some of the plurality of ridges are concentric and circular
 
 8. A container, comprising: a base portion, the base portion comprising: a bottom surface, the bottom surface including concentric ridges, the concentric ridges providing structural support and elevating an item placed on at least some of the ridges, and a sidewall integrally formed with the bottom surface, the sidewall including an integrated sidewall feature, the integrated sidewall feature arranged to provide structural support for the container; a lid portion comprising a top surface, the top surface comprising: a first integrated top feature co-operating with the integrated bottom feature and the integrated side feature to provide structural support for the container, and a second integrated top feature that includes a plurality of apertures that allow for the outflow of air from within the container; a hinge assembly integrally formed with a first section of the sidewall for pivotally connecting the base portion and the lid portion, the hinge assembly comprising: a first hinge portion integrally formed with the base portion, a second hinge portion integrally formed with the lid portion, and a flexure between the first and second hinge portions, the flexure allowing for the pivoting of the second hinge portion about the first hinge portion; and a locking mechanism comprising: a first portion integrally formed with a second section of the sidewall different from the first section, and a second portion integrally formed with a section of the lid portion, wherein the first and second portions of the locking mechanism are co-operatively shaped so that they interlock, wherein in a locking configuration the locking mechanism secures the lid and the base portion.
 
@@ -246,6 +246,8 @@ The container includes a lid portion that is coupled to the base portion through
 A nested configuration is achieved such that the base and lid portions are shaped to receive the corresponding base and lid portions of a second container.
 Such nested configuration allows for multiple containers to be stored in a nested stack, thereby minimizing storage space.
 The container can be fabricated from various types of re-used material along the lines of molded fiber.
+The base further includes a plurality of concentric ridges that elevate a food item above the bottom surface so that a gap is formed beneath the food item, and the gap thermally isolates the food item and allows moisture to be carried away from the food item during transport.
+The lid further includes a plurality of vents and a channel that cooperate with a central platform to create a chimney effect, whereby moisture rising from the food item is drawn upward and expelled from the container into the surrounding environment so that the food item, such as a pizza, stays crisp and does not become soggy while it is stored or carried from one place to another.
 
 ### Drawings metadata
 
@@ -260,24 +262,24 @@ This is a new application and no office action has issued.
 ## Step 5. Drawings (uploads)
 
 Upload the figures from e2e/fixtures and tag each with its orientation so they flip as perspectives.
-The files are the patent's own full resolution drawing sheets, already turned upright.
-What each file shows, with a sensible orientation tag, is below.
+The files are the patent's own full resolution drawing sheets, named fig01 through fig12 for FIG. 1 through FIG. 12.
+They are in their original orientation, and the patent drew most of them sideways on the sheet, so they are a good way to show the rotate control.
 
-fig01 shows the open container (base and lid), tag it Perspective.
-fig02 is FIG. 1, the open container, tag it Perspective.
-fig03 is FIG. 2, the open container, tag it Perspective.
-fig04 is FIG. 3, the cross-section with airflow, tag it Sectional.
-fig05 is FIG. 4, the base exterior, tag it Bottom.
-fig06 is FIG. 5, the lid exterior, tag it Top.
-fig07 is FIG. 6, both exterior surfaces, tag it Perspective.
-fig08 is FIG. 7, the closed profile, tag it Front or Left side.
+fig01 is FIG. 1, the open container, sideways, tag it Perspective.
+fig02 is FIG. 2, the open container, sideways, tag it Perspective.
+fig03 is FIG. 3, the cross-section with airflow, sideways, tag it Sectional.
+fig04 is FIG. 4, the base exterior, upright, tag it Bottom.
+fig05 is FIG. 5, the lid exterior, sideways, tag it Top.
+fig06 is FIG. 6, both exterior surfaces, sideways, tag it Perspective.
+fig07 is FIG. 7, the closed profile, sideways, tag it Front or Left side.
 
-The rest (fig09 through fig13) are the nested stack, the lock close-ups, the hinge detail, the indicia view, and the process flowchart. Upload as many as you like.
+The rest (fig08 through fig12) are the nested stack, the lock close-ups, the hinge detail, the indicia view, and the process flowchart. Upload as many as you like.
 
-If you upload your own figure and it comes in sideways, use the rotate left or rotate right control on that figure to turn it upright. The corrected image is what gets saved and checked.
+A sideways figure here is intentional. Use the rotate left or rotate right control to turn it upright, which shows the rotator working. The corrected image is what gets saved and checked.
 
 After uploading, click Check all drawings.
 It runs the vision check on every uploaded figure at once and saves the result, so the flags stay on each figure when you leave and come back.
+The check also flags any reference number that is on a drawing but never described in the draft, which is the basis for three of the planted issues below.
 
 ## Step 6. Sign (inventor's declaration)
 
@@ -287,11 +289,20 @@ Enter the legal name Francesco Longoni and check all five statements, then repea
 
 ## Issues to point out (planted on purpose)
 
-These are subtle, niche issues, so you can show the review catch what a quick read misses.
-Most are already in Apple's real patent text.
+Seven concrete issues to show the review and the drawing check catch, not just soft attention flags.
+A patent that issued has few, so these are sprinkled in.
 
-1. The relative term about. Claims 3 and 19 say the lid rotates about 360 degrees. A relative term can be indefinite under 35 U.S.C. 112(b) unless the draft gives a standard (MPEP 2173.05(b)). The relative-term finding shows the exact phrase.
+Drawing issues, shown by Check all drawings on FIG. 1. The vision check reads the numbers on the figure and flags any the draft never describes.
 
-2. The relative term substantially. Claim 13 says the angle is substantially 180 degrees. Same rule, flagged on its own.
+1. Reference number 16, the bottom feature, is on the drawing but never described in the draft.
+2. Reference number 28, the first top feature, is on the drawing but never described in the draft.
+3. Reference number 54, the recess of the lock, is on the drawing but never described in the draft.
 
-3. A consistency gap. The disclosure lists a tamper evident band as a key component, but it never appears in the detailed description or the claims, so the review flags a disclosed component that is not claimed or described. Add it to the draft or remove it from the disclosure.
+Spec and claim issues, shown by Check for issues on Review.
+
+4. The abstract runs over the 150 word limit (37 CFR 1.72(b)), a red violation.
+5. Claim 7 is missing its closing period, so it is not one complete sentence (37 CFR 1.75, MPEP 608.01(m)), a red violation.
+6. Claims 3, 13, and 19 use the relative terms about and substantially, which can be indefinite without a standard (35 U.S.C. 112(b), MPEP 2173.05(b)).
+7. The disclosure lists a tamper evident band as a key component, but it never appears in the draft or claims, so the cross-reference check flags a disclosed component that is not claimed or described.
+
+To clear them, describe 16, 28, and 54 in the detailed description, trim the abstract under 150 words, add the period to claim 7, give a standard for the relative terms, and add or remove the tamper evident band.
