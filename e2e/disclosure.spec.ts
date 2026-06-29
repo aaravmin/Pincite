@@ -32,13 +32,15 @@ test("phase-v3: invention disclosure + cross-reference consistency", async ({
   });
 
   await page.goto(`/projects/${id}/disclosure`);
+  // The fields and the explicit save live in the "All fields" view (mirrors the draft).
+  await page.getByRole("button", { name: "All fields", exact: true }).click();
   await page
     .getByTestId("disclosure-problem_solved")
     .fill("Existing washers are slow.");
   await page.getByTestId("disclosure-how_it_works").fill("A motor spins a base.");
   await page.getByTestId("disclosure-components").fill("base\nflux capacitor");
   await page.getByTestId("save-disclosure").click();
-  await expect(page.getByText("Saved")).toBeVisible();
+  await expect(page.getByText("Disclosure saved")).toBeVisible();
 
   // The component absent from the draft is flagged; the problem isn't in the (empty) Background.
   await expect(

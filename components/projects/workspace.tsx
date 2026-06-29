@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { HeaderActions } from "@/components/projects/header-actions";
-import { saveSection } from "@/lib/projects/actions";
+import { saveSection, saveVersion } from "@/lib/projects/actions";
 import {
   SECTION_KEYS,
   SECTION_LABELS,
@@ -18,6 +19,8 @@ import type { Project } from "@/lib/projects/types";
 
 type SaveState = "saved" | "unsaved" | "saving" | "error";
 const AUTOSAVE_MS = 1200;
+const ALL = "__all__" as const;
+type Active = SectionKey | typeof ALL;
 
 export function Workspace({
   project,
@@ -26,6 +29,7 @@ export function Workspace({
   project: Project;
   initialSections: Record<string, string>;
 }) {
+  const router = useRouter();
   const seed = useCallback((): Record<SectionKey, string> => {
     const out = {} as Record<SectionKey, string>;
     for (const k of SECTION_KEYS) out[k] = initialSections[k] ?? "";
@@ -44,7 +48,7 @@ export function Workspace({
       : "title";
   })();
 
-  const [active, setActive] = useState<SectionKey>(initialActive);
+  const [active, setActive] = useState<Active>(initialActive);
   const [state, setState] = useState<Record<SectionKey, SaveState>>(
     {} as Record<SectionKey, SaveState>,
   );
@@ -104,17 +108,49 @@ export function Workspace({
     );
   }
 
-  async function switchTo(next: SectionKey) {
+  function maybeCommit(key: SectionKey) {
+    if (state[key] === "unsaved" || timers.current.has(key)) void commit(key);
+  }
+
+  async function switchTo(next: Active) {
     if (next === active) return;
-    if (state[active] === "unsaved" || timers.current.has(active)) {
+    if (
+      active !== ALL &&
+      (state[active] === "unsaved" || timers.current.has(active))
+    ) {
       await commit(active);
     }
     setActive(next);
   }
 
-  const activeStatus = state[active] ?? "saved";
-  const activeWords = wordCount(sections[active]);
-  const abstractOver = active === "abstract" && activeWords > ABSTRACT_WORD_LIMIT;
+  // Save a version (immutable snapshot) from the All-sections view; flush pending edits first.
+  const [savingVersion, startVersion] = useTransition();
+  const [versionSaved, setVersionSaved] = useState(false);
+  function saveAllVersion() {
+    setVersionSaved(false);
+    startVersion(async () => {
+      const keys = Array.from(timers.current.keys());
+      await Promise.all(keys.map((k) => commit(k)));
+      const res = await saveVersion({ projectId: project.id, label: "" });
+      if (!("error" in res)) {
+        setVersionSaved(true);
+        router.refresh();
+      }
+    });
+  }
+
+  const aggregate: SaveState = Object.values(state).includes("saving")
+    ? "saving"
+    : Object.values(state).includes("unsaved")
+      ? "unsaved"
+      : Object.values(state).includes("error")
+        ? "error"
+        : "saved";
+  const activeStatus: SaveState =
+    active === ALL ? aggregate : (state[active] ?? "saved");
+  const activeWords = active === ALL ? 0 : wordCount(sections[active]);
+  const abstractOver =
+    active === "abstract" && activeWords > ABSTRACT_WORD_LIMIT;
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-background">
@@ -170,50 +206,113 @@ export function Workspace({
                 </li>
               );
             })}
+            <li className="mt-2 border-t border-border pt-2">
+              <button
+                type="button"
+                onClick={() => void switchTo(ALL)}
+                aria-current={active === ALL ? "true" : undefined}
+                className={
+                  "flex w-full items-center rounded-md px-3 py-2 text-left text-sm font-medium " +
+                  (active === ALL
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground hover:bg-accent/50")
+                }
+              >
+                All sections
+              </button>
+            </li>
           </ul>
         </nav>
 
         <main className="flex-1 px-8 py-8">
           <div className="mx-auto max-w-3xl">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              {SECTION_LABELS[active]}
-            </h1>
-            {SECTION_HINTS[active] && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                {SECTION_HINTS[active]}
-              </p>
+            {active === ALL ? (
+              <>
+                <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                  All sections
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Your whole draft in one place. Edit any section, then save a version.
+                </p>
+                <div className="mt-6 space-y-6">
+                  {SECTION_KEYS.map((k) => (
+                    <div key={k} className="space-y-1.5">
+                      <label
+                        htmlFor={`all-${k}`}
+                        className="text-sm font-medium text-foreground"
+                      >
+                        {SECTION_LABELS[k]}
+                      </label>
+                      {SECTION_HINTS[k] && (
+                        <p className="text-xs text-muted-foreground">
+                          {SECTION_HINTS[k]}
+                        </p>
+                      )}
+                      <Textarea
+                        id={`all-${k}`}
+                        value={sections[k]}
+                        onChange={(e) => onChange(k, e.target.value)}
+                        onBlur={() => maybeCommit(k)}
+                        spellCheck
+                        aria-label={SECTION_LABELS[k]}
+                        className="min-h-[140px] resize-y font-mono text-sm leading-relaxed"
+                        placeholder="Type or paste this section…"
+                        data-testid={`editor-${k}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-4">
+                  <Button onClick={saveAllVersion} disabled={savingVersion}>
+                    {savingVersion ? "Saving…" : "Save version"}
+                  </Button>
+                  {versionSaved && (
+                    <span className="text-sm text-pass">Version saved</span>
+                  )}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    Every edit autosaves; Save version stores an immutable snapshot.
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                  {SECTION_LABELS[active]}
+                </h1>
+                {SECTION_HINTS[active] && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {SECTION_HINTS[active]}
+                  </p>
+                )}
+                <Textarea
+                  ref={taRef}
+                  value={sections[active]}
+                  onChange={(e) => onChange(active, e.target.value)}
+                  onBlur={() => maybeCommit(active)}
+                  spellCheck
+                  aria-label={SECTION_LABELS[active]}
+                  className="mt-4 min-h-[420px] resize-y font-mono text-sm leading-relaxed"
+                  placeholder="Type or paste this section…"
+                  data-testid={`editor-${active}`}
+                />
+                <div className="mt-2 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">
+                    {statusLabel(activeStatus)}
+                  </span>
+                  <span
+                    className={
+                      abstractOver ? "text-attention" : "text-muted-foreground"
+                    }
+                  >
+                    {active === "abstract"
+                      ? `${activeWords} / ${ABSTRACT_WORD_LIMIT} words${
+                          abstractOver ? " (over limit)" : ""
+                        }`
+                      : `${activeWords} words`}
+                  </span>
+                </div>
+              </>
             )}
-            <Textarea
-              ref={taRef}
-              value={sections[active]}
-              onChange={(e) => onChange(active, e.target.value)}
-              onBlur={() => {
-                if (state[active] === "unsaved" || timers.current.has(active)) {
-                  void commit(active);
-                }
-              }}
-              spellCheck
-              aria-label={SECTION_LABELS[active]}
-              className="mt-4 min-h-[420px] resize-y font-mono text-sm leading-relaxed"
-              placeholder="Type or paste this section…"
-              data-testid={`editor-${active}`}
-            />
-            <div className="mt-2 flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">
-                {statusLabel(activeStatus)}
-              </span>
-              <span
-                className={
-                  abstractOver ? "text-attention" : "text-muted-foreground"
-                }
-              >
-                {active === "abstract"
-                  ? `${activeWords} / ${ABSTRACT_WORD_LIMIT} words${
-                      abstractOver ? " (over limit)" : ""
-                    }`
-                  : `${activeWords} words`}
-              </span>
-            </div>
           </div>
         </main>
       </div>
