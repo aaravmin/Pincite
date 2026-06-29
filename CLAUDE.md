@@ -20,6 +20,7 @@ the end of each session — but be stringent; trim before it bloats.
 - UI / color system / component conventions: `docs/style-guide.md`
 - Why the product exists, legal posture, scope lines: `docs/business-context.md`
 - External APIs, env vars, vendor notes: `docs/api-reference.md`
+- Demo video aids: `docs/demo-script.md` (timed walkthrough) + `docs/demo-pizza-box-fields.md` (box contents)
 
 ## Stack (authoritative; reconciled with `.env.local`)
 - Next.js 15 (App Router) + React 19 + TypeScript, Tailwind v4 + shadcn/ui (new-york).
@@ -183,6 +184,21 @@ the end of each session — but be stringent; trim before it bloats.
       35 USC 100(f)/MPEP 2109; record-assignment 37 CFR 3.81/MPEP 302). `/review` groups
       findings by process area (Claims vs Specification) + filing-readiness + consistency
       banners. 20/20 e2e green + a11y. Design figure/IMAGE analysis intentionally deferred.
+- [x] v3.2 — DEMO HARDENING + SETTINGS: prior art runs on any machine — keyless Google
+      Patents fallback (`lib/patents/keyless.ts`) when BigQuery creds are absent;
+      `bigQueryConfigured()` is true only with inline JSON creds OR an existing key file, so a
+      missing file degrades instead of ENOENT. `/review` findings get "Take me to issue"
+      (opens the draft section + selects the span via `?section&from&to`) + "Check if fixed"
+      (`recheckFinding` re-runs validators, reports gone/still-present). Draft + disclosure
+      share one dashboard (new `DisclosureWorkspace`) with an All-sections/All-fields view +
+      in-page save. `/settings` (sidebar): dark mode (class on <html> + pre-paint script in
+      layout; tokens already in globals.css), role switch (`lib/profile-actions.ts`
+      `updateRole`), audit-log CSV export (`/api/audit/export`). Drawing vision review is now
+      persisted (migration 0014 `project_attachments.analysis` jsonb, written by `analyzeDrawing`
+      via admin client; shown as `initialReview`) so flags survive page leaves; drawing remove
+      verified incl. 3D. Public `/privacy` + `/terms` (middleware allowlisted) + Google Search
+      Console verification meta tag in the root layout (for OAuth consent-screen domain).
+      Demo aids: `docs/demo-script.md` + `docs/demo-pizza-box-fields.md`.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
