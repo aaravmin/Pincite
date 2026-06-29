@@ -1,12 +1,23 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/brand/logo";
 
-export default function Home() {
+// A signed-in visitor skips the landing and goes straight to their dashboard.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background px-6">
       <main className="w-full max-w-3xl text-center">
-        <Logo className="mx-auto h-14 w-auto" />
-        <p className="mx-auto mt-4 text-lg leading-8 text-muted-foreground">
+        <Logo className="mx-auto h-24 w-auto" />
+        <p className="mx-auto mt-6 text-lg leading-8 text-muted-foreground">
           An active patent review workbench. It flags the rule violations in your draft,
           finds similar public patents, and pins every rule it cites to real MPEP and CFR text.
         </p>

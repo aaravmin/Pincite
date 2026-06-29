@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 
+// Read the consent state fresh every time so a returning user is not re-prompted.
+export const dynamic = "force-dynamic";
+
 export default async function ConsentPage() {
   const supabase = await createClient();
   const {

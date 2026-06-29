@@ -16,7 +16,7 @@ export default async function LoginPage() {
     <div className="flex flex-1 flex-col items-center justify-center bg-background px-6">
       <main className="w-full max-w-sm">
         <Link href="/" className="block">
-          <Logo className="mx-auto h-9 w-auto" />
+          <Logo className="mx-auto h-16 w-auto" />
         </Link>
         <h1 className="mt-6 text-center text-xl font-semibold tracking-tight text-foreground">
           Sign in
