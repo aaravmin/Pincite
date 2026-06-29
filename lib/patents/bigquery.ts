@@ -1,5 +1,5 @@
 /**
- * Google Patents on BigQuery (`patents-public-data`) — candidate discovery (roadmap §4.6
+ * Google Patents on BigQuery (`patents-public-data`) - candidate discovery (roadmap §4.6
  * step 2). SERVER ONLY. Privacy: we query by keywords/CPC derived from the claims, never
  * the full claim text, so invention text stays local.
  *

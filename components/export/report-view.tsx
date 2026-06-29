@@ -64,7 +64,7 @@ export function ReportView({ report: r }: { report: Report }) {
                 >
                   {f.severity === "violation" ? "● Violation" : "○ Attention"}
                 </span>{" "}
-                · {f.actionable ? "Fixable" : "Informational"} — {f.title}
+                · {f.actionable ? "Fixable" : "Informational"} - {f.title}
               </p>
               <p className="text-muted-foreground">{f.explanation}</p>
               <p className="text-xs text-muted-foreground">
@@ -107,9 +107,9 @@ export function ReportView({ report: r }: { report: Report }) {
             <div key={m.id} className="mt-2">
               <p className="font-medium">
                 {m.patent_number}
-                {m.title ? ` — ${m.title}` : ""}{" "}
+                {m.title ? ` - ${m.title}` : ""}{" "}
                 <span className="text-xs text-muted-foreground">
-                  score {m.overall_score?.toFixed(2) ?? "—"}
+                  score {m.overall_score?.toFixed(2) ?? "-"}
                 </span>
               </p>
               {m.spans.map((sp, i) => (
@@ -126,7 +126,7 @@ export function ReportView({ report: r }: { report: Report }) {
       </Section>
 
       <p className="mt-6 text-xs text-muted-foreground">
-        Research signal only — not a validity or freedom-to-operate opinion.
+        Research signal only - not a validity or freedom-to-operate opinion.
       </p>
     </div>
   );

@@ -30,7 +30,7 @@ export async function createClient() {
               cookieStore.set(name, value, options),
             );
           } catch {
-            // Called from a Server Component — safe to ignore because the
+            // Called from a Server Component - safe to ignore because the
             // middleware (lib/supabase/middleware.ts) refreshes the session.
           }
         },

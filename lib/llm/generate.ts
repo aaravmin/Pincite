@@ -1,7 +1,7 @@
 /**
  * Generation client. Grok (xAI) is primary, Gemini is fallback.
  *
- * SERVER ONLY — reads XAI_API_KEY / GEMINI_API_KEY. Never import into a client
+ * SERVER ONLY - reads XAI_API_KEY / GEMINI_API_KEY. Never import into a client
  * component.
  *
  * CONFIDENTIALITY: real invention text requires zero-data-retention on every vendor. xAI
@@ -58,7 +58,7 @@ async function generateWithGrok(
   }
   if (res.headers.get("x-zero-data-retention") !== "true") {
     console.warn(
-      "[llm] Grok zero-data-retention is NOT active for this team — use synthetic text only",
+      "[llm] Grok zero-data-retention is NOT active for this team - use synthetic text only",
     );
   }
   const json = await res.json();

@@ -44,8 +44,8 @@ export function buildAds(
   if (!project.applicant_is_inventor && !appName) missing.push("Applicant name");
 
   const rows = [
-    { label: "Invention title", value: t || "—" },
-    { label: "Applicant", value: appName || "—" },
+    { label: "Invention title", value: t || "-" },
+    { label: "Applicant", value: appName || "-" },
     {
       label: "Applicant type",
       value: project.applicant_is_juristic

@@ -2,9 +2,9 @@
 
 /**
  * Prior-art search orchestration (roadmap §4.6). Two entry points:
- *  - runPriorArtSearch: live — discover candidates on BigQuery from claim keywords, then
+ *  - runPriorArtSearch: live - discover candidates on BigQuery from claim keywords, then
  *    pinpoint-match each against the user's limitations and persist ranked results.
- *  - compareAgainstCandidate: deterministic — match the claims against a supplied candidate
+ *  - compareAgainstCandidate: deterministic - match the claims against a supplied candidate
  *    text (manual comparison, and the basis for the repeatable verification gate; no cost).
  * Both persist prior_art_matches + match_spans (RLS-scoped) and audit the action. Synthetic
  * data only until vendor zero-retention is confirmed (docs/business-context.md).
@@ -102,7 +102,7 @@ export async function runPriorArtSearch(
 
   // Prefer BigQuery only when it is actually usable here; that path is the one that bills,
   // so it also carries the account-wide monthly budget (kept inside the free tier). Anything
-  // missing — no creds, an absent key file, or an auth/quota failure — degrades to the
+  // missing - no creds, an absent key file, or an auth/quota failure - degrades to the
   // keyless Google Patents search, so the feature works on any machine with no setup.
   if (bigQueryConfigured()) {
     const budget = await checkGlobalLimit(supabase, "bq_global_month", 7, 2592000);

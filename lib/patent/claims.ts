@@ -45,7 +45,7 @@ export function parseClaims(content: string): ParsedClaim[] {
   }
 
   if (starts.length === 0) {
-    // Unnumbered single claim — treat the whole thing as claim 1.
+    // Unnumbered single claim - treat the whole thing as claim 1.
     return [{ number: 1, ...splitClaim(content), raw: content.trim(), start: 0 }];
   }
 

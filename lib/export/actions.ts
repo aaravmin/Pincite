@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit";
 
-/** Record an export (roadmap §9) — used by the print-to-PDF path; TXT is logged in its
+/** Record an export (roadmap §9) - used by the print-to-PDF path; TXT is logged in its
  * route handler. Writes to exports + the audit log. */
 export async function logExport(
   projectId: string,

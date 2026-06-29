@@ -1,5 +1,5 @@
 /**
- * Invention disclosure — the plain-language technical intake a practitioner collects
+ * Invention disclosure - the plain-language technical intake a practitioner collects
  * before drafting (separate from the formal 1.77 specification). These answers feed the
  * specification, the duty of disclosure (37 CFR 1.56), and the cross-reference checks.
  */
@@ -22,7 +22,7 @@ export const DISCLOSURE_FIELDS = [
   {
     key: "components",
     label: "Key components",
-    hint: "List the key components, parts, or elements — one per line.",
+    hint: "List the key components, parts, or elements - one per line.",
   },
   {
     key: "advantages",

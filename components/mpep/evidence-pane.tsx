@@ -37,7 +37,7 @@ export function EvidencePane({
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="text-sm font-semibold text-foreground">
             MPEP {section.section_number}
-            {section.title ? ` — ${section.title}` : ""}
+            {section.title ? ` - ${section.title}` : ""}
           </h2>
           <a
             href={section.source_url}

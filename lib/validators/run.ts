@@ -149,10 +149,10 @@ export async function analyzeEligibility(projectId: string): Promise<
   const prompt = `Claim ${indep.number}: ${indep.raw}
 
 Return JSON with these string keys:
-- category: Step 1 — statutory category (process, machine, manufacture, composition of matter, or none).
-- prong_one: Step 2A Prong One — does the claim recite a judicial exception (abstract idea, law of nature, natural phenomenon)? Which, if any?
-- prong_two: Step 2A Prong Two — is any exception integrated into a practical application?
-- step_2b: Step 2B — does the claim add significantly more than the exception?
+- category: Step 1 - statutory category (process, machine, manufacture, composition of matter, or none).
+- prong_one: Step 2A Prong One - does the claim recite a judicial exception (abstract idea, law of nature, natural phenomenon)? Which, if any?
+- prong_two: Step 2A Prong Two - is any exception integrated into a practical application?
+- step_2b: Step 2B - does the claim add significantly more than the exception?
 - summary: one neutral sentence on where the claim sits in the framework (not a verdict).`;
 
   let analysis: EligibilityAnalysis;

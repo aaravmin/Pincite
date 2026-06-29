@@ -49,7 +49,7 @@ export function runCrossRefChecks(
       actionable: true,
       title: `Component "${comp}" from your disclosure is not claimed or described`,
       explanation:
-        "Every component you disclose should appear in the detailed description and, where it is part of the invention, in the claims — otherwise the application and claims do not line up.",
+        "Every component you disclose should appear in the detailed description and, where it is part of the invention, in the claims - otherwise the application and claims do not line up.",
       mpep_section: "2163",
       cfr_ref: "35 U.S.C. 112(a)",
     });

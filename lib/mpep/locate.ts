@@ -44,7 +44,7 @@ export async function locateSemantic(
   try {
     embedding = await embedOne(query, "query");
   } catch {
-    return []; // Voyage unavailable/throttled — caller falls back to keyword.
+    return []; // Voyage unavailable/throttled - caller falls back to keyword.
   }
   if (!embedding || embedding.length === 0) return [];
 

@@ -1,7 +1,7 @@
 /**
  * The structured-intake section model (roadmap §4.1). Section content is stored as a
  * raw plain-text string so character offsets stay stable for later finding/highlight
- * spans — see docs/style-guide.md.
+ * spans - see docs/style-guide.md.
  */
 
 export const SECTION_KEYS = [

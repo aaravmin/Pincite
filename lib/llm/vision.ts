@@ -38,7 +38,7 @@ async function grokVision(
   });
   if (!res.ok) throw new Error(`Grok vision ${res.status}: ${await res.text()}`);
   if (res.headers.get("x-zero-data-retention") !== "true") {
-    console.warn("[vision] Grok ZDR is not active — use public or synthetic figures only");
+    console.warn("[vision] Grok ZDR is not active - use public or synthetic figures only");
   }
   const json = await res.json();
   return (json.choices?.[0]?.message?.content ?? "").trim();

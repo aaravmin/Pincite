@@ -1,5 +1,5 @@
 /**
- * Tier 1 validator: deterministic structural/format checks (roadmap §4.3). No model —
+ * Tier 1 validator: deterministic structural/format checks (roadmap §4.3). No model -
  * each result is true or not and carries a hard MPEP/CFR pin. Honors the actionable vs
  * informational split: fee items are informational (actionable: false), never a field to
  * "do". span_* are character offsets into the relevant section's content. Patent-type
@@ -63,7 +63,7 @@ export function runTier1(
     });
   }
 
-  // Abstract (37 CFR 1.72(b); MPEP 608.01(b)) — design applications have no abstract.
+  // Abstract (37 CFR 1.72(b); MPEP 608.01(b)) - design applications have no abstract.
   const abstract = get("abstract");
   if (patentType !== "design" && abstract.trim()) {
     const w = wordCount(abstract);
@@ -256,7 +256,7 @@ export function runTier1(
         });
       }
 
-      // Claim 1 should be independent (least restrictive first) — 37 CFR 1.75(g)
+      // Claim 1 should be independent (least restrictive first) - 37 CFR 1.75(g)
       if (i === 0 && dependent) {
         out.push({
           section_key: "claims",
@@ -352,7 +352,7 @@ export function runTier1(
       }
     });
 
-    // Claim-count fees — informational (37 CFR 1.16(h)/(i))
+    // Claim-count fees - informational (37 CFR 1.16(h)/(i))
     if (claims.length > 20) {
       out.push({
         section_key: "claims",

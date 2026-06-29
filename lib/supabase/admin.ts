@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Service-role Supabase client. SERVER ONLY — bypasses RLS, so every caller MUST verify
+ * Service-role Supabase client. SERVER ONLY - bypasses RLS, so every caller MUST verify
  * ownership with the user-scoped client first. Used for Storage operations
  * (upload/sign/remove): the cookie-based SSR server client does not carry the user JWT to
  * Storage requests, so Storage RLS would reject them. Table writes still go through the

@@ -47,7 +47,7 @@ export function runTier2(
   patentType: PatentType = "utility",
 ): Finding[] {
   const out: Finding[] = [];
-  // Design claims are a single formal sentence with no elements — no antecedent/MPF check.
+  // Design claims are a single formal sentence with no elements - no antecedent/MPF check.
   if (patentType === "design") return out;
   const claimsText = sections["claims"] ?? "";
   if (!claimsText.trim()) return out;

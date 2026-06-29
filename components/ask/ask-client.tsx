@@ -119,7 +119,7 @@ export function AskClient() {
                         className="text-left text-sm text-foreground underline-offset-2 hover:underline"
                       >
                         MPEP {a.section_number}
-                        {a.title ? ` — ${a.title}` : ""}
+                        {a.title ? ` - ${a.title}` : ""}
                       </button>
                     </li>
                   ))}

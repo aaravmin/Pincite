@@ -54,7 +54,7 @@ export function stemmedTerms(text: string): string[] {
   return significantTerms(text).map(stem);
 }
 
-/** Distinct significant terms across all claims — used to build a candidate query. */
+/** Distinct significant terms across all claims - used to build a candidate query. */
 export function claimKeywords(claimsText: string, limit = 20): string[] {
   const counts = new Map<string, number>();
   for (const t of significantTerms(claimsText)) {

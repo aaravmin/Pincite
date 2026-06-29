@@ -1,5 +1,5 @@
 /**
- * Voyage embeddings client — voyage-law-2 (legal-tuned, 1024-dim, 16K-token input).
+ * Voyage embeddings client - voyage-law-2 (legal-tuned, 1024-dim, 16K-token input).
  * SERVER ONLY (reads VOYAGE_API_KEY). CONFIDENTIALITY: Voyage ZDR is an account-level
  * opt-out (no per-request signal); verify it in the dashboard. Until ZDR is confirmed
  * across vendors, embed only synthetic / non-confidential text. See docs/business-context.md.

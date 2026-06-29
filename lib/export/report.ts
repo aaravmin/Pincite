@@ -74,7 +74,7 @@ const pin = (cfr: string | null, mpep: string | null) =>
 
 export function toText(r: Report): string {
   const L: string[] = [];
-  L.push(`PINCITE REVIEW — ${r.project.name}`);
+  L.push(`PINCITE REVIEW - ${r.project.name}`);
   L.push(
     `Type: ${r.project.patent_type} · Stage: ${r.stage} · Generated: ${r.generatedAt}`,
   );
@@ -123,7 +123,7 @@ export function toText(r: Report): string {
   if (!r.priorArt.length) L.push("(none run)");
   for (const m of r.priorArt) {
     L.push(
-      `- ${m.patent_number}${m.title ? ` — ${m.title}` : ""} (score ${m.overall_score?.toFixed(2) ?? "—"})`,
+      `- ${m.patent_number}${m.title ? ` - ${m.title}` : ""} (score ${m.overall_score?.toFixed(2) ?? "-"})`,
     );
     for (const sp of m.spans)
       L.push(
@@ -132,7 +132,7 @@ export function toText(r: Report): string {
   }
   L.push("");
   L.push(
-    "Research signal only — not a validity or freedom-to-operate opinion.",
+    "Research signal only - not a validity or freedom-to-operate opinion.",
   );
   return L.join("\n");
 }

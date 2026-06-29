@@ -15,7 +15,7 @@ export function buildAdsText(
   title: string,
 ): string {
   const lines: string[] = [];
-  lines.push("APPLICATION DATA SHEET (PTO/AIA/14) — data for Patent Center Web ADS");
+  lines.push("APPLICATION DATA SHEET (PTO/AIA/14) - data for Patent Center Web ADS");
   lines.push("");
   lines.push(`Invention title: ${title.trim() || "[not provided]"}`);
   lines.push(
@@ -89,14 +89,14 @@ export function buildDeclarationText(
 
 export function buildTransmittalAndFeesText(project: Project): string {
   const lines: string[] = [];
-  lines.push("UTILITY PATENT APPLICATION TRANSMITTAL (PTO/AIA/15) — checklist");
+  lines.push("UTILITY PATENT APPLICATION TRANSMITTAL (PTO/AIA/15) - checklist");
   lines.push("");
   lines.push("Documents in this package:");
-  lines.push("  [x] Specification (specification.docx) — DOCX avoids the non-DOCX surcharge");
-  lines.push("  [ ] Drawings (PDF) — upload your figures in Patent Center");
-  lines.push("  [x] Application Data Sheet data (application-data-sheet.txt) — enter via Web ADS");
+  lines.push("  [x] Specification (specification.docx) - DOCX avoids the non-DOCX surcharge");
+  lines.push("  [ ] Drawings (PDF) - upload your figures in Patent Center");
+  lines.push("  [x] Application Data Sheet data (application-data-sheet.txt) - enter via Web ADS");
   lines.push("  [x] Inventor's declaration (inventor-declaration.txt)");
-  lines.push("  [ ] Fees — pay in Patent Center");
+  lines.push("  [ ] Fees - pay in Patent Center");
   lines.push("");
   lines.push("FEE SUMMARY (confirm current amounts on the USPTO fee schedule)");
   lines.push(`Entity status: ${ENTITY_STATUS_LABELS[project.entity_status]}`);
@@ -125,13 +125,13 @@ export function buildReadme(): string {
     "1. Go to patentcenter.uspto.gov and sign in (ID.me verification is required).",
     "2. Start a new nonprovisional utility application.",
     "3. Upload specification.docx as the specification (DOCX avoids the surcharge).",
-    "   After upload, review the USPTO-converted PDF — that converted file is the official record.",
+    "   After upload, review the USPTO-converted PDF - that converted file is the official record.",
     "4. Enter the Application Data Sheet using the Web ADS form, from application-data-sheet.txt.",
     "5. Upload your drawings as a PDF.",
     "6. Upload the inventor's declaration (PTO/AIA/01), signed by each inventor.",
     "7. Pay the fees.",
     "",
     "Pincite does not file for you; you submit these documents yourself. This package contains",
-    "only filing documents — no internal analysis.",
+    "only filing documents - no internal analysis.",
   ].join("\n");
 }

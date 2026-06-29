@@ -171,7 +171,7 @@ export function PriorArtClient({
                           {m.patent_number}
                         </span>
                         <span className="shrink-0 text-xs text-muted-foreground">
-                          score {m.overall_score?.toFixed(2) ?? "—"}
+                          score {m.overall_score?.toFixed(2) ?? "-"}
                         </span>
                       </div>
                       {m.title && (
@@ -390,7 +390,7 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
                 {s.overlap_type === "claim_limitation"
                   ? "reads on full limitation"
                   : "overlap"}{" "}
-                · confidence {s.element_confidence?.toFixed(2) ?? "—"} · your
+                · confidence {s.element_confidence?.toFixed(2) ?? "-"} · your
                 element: “{claims.slice(s.user_span_start, s.user_span_end).slice(0, 90)}”
               </p>
             </li>

@@ -47,7 +47,7 @@ export function detectStage(input: StageInput): StageResult {
   switch (input.declared_status) {
     case "granted":
       return {
-        label: "Granted — maintenance",
+        label: "Granted - maintenance",
         signals: ["You marked this granted."],
         missing: [
           "Maintenance fees fall due at 3.5, 7.5, and 11.5 years (paid to the USPTO).",
@@ -55,7 +55,7 @@ export function detectStage(input: StageInput): StageResult {
       };
     case "allowed":
       return {
-        label: "Allowed — issue",
+        label: "Allowed - issue",
         signals: ["You marked a notice of allowance."],
         missing: ["Pay the issue fee to the USPTO to let the patent grant."],
       };
@@ -75,7 +75,7 @@ export function detectStage(input: StageInput): StageResult {
       };
     case "filed":
       return {
-        label: "Filed — awaiting examination",
+        label: "Filed - awaiting examination",
         signals: [
           "You marked this filed.",
           input.application_number

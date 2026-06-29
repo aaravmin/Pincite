@@ -1,6 +1,6 @@
 /**
  * Lifecycle "what to do now" actions keyed to the declared status (roadmap §4.2 extended).
- * A patent goes well beyond "filed" — there are required, deadline-bound actions after a
+ * A patent goes well beyond "filed" - there are required, deadline-bound actions after a
  * rejection, after allowance, and after grant. Each action carries a CFR reference
  * (display-only) and an MPEP pin validated against the corpus before display.
  */
@@ -91,7 +91,7 @@ export function lifecycleActions(
         {
           title: "Pay the issue fee",
           detail:
-            "Pay the issue fee (and the publication fee if due) so the patent can grant. This deadline is NOT extendable — there is no authority to extend it.",
+            "Pay the issue fee (and the publication fee if due) so the patent can grant. This deadline is NOT extendable - there is no authority to extend it.",
           deadline: "3 months from the Notice of Allowance (non-extendable)",
           cfr_ref: "37 CFR 1.311; 35 U.S.C. 151",
           mpep_section: "1306",

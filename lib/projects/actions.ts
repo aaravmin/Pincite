@@ -4,7 +4,7 @@
  * Phase 1 mutations. Each enforces auth (RLS is the real boundary), records an audit
  * row, and revalidates the affected paths. Saves are append-only: saveVersion always
  * inserts a new immutable snapshot; restore/branch reopen an old snapshot into a NEW
- * version that links back to its source — history is never overwritten.
+ * version that links back to its source - history is never overwritten.
  */
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { deleteAttachment } from "@/lib/filing/actions";
+import { deleteAttachment, analyzeDrawing } from "@/lib/filing/actions";
 import { DrawingAnalysis } from "@/components/uploads/drawing-analysis";
 import { ModelViewer } from "@/components/uploads/model-viewer";
 import {
@@ -33,6 +33,8 @@ export function FigureNavigator({
   const router = useRouter();
   const [idx, setIdx] = useState(0);
   const [pending, setPending] = useState(false);
+  const [checkingAll, setCheckingAll] = useState(false);
+  const [allMsg, setAllMsg] = useState<string | null>(null);
 
   const i = Math.min(idx, figures.length - 1);
   const sel = figures[i];
@@ -49,8 +51,49 @@ export function FigureNavigator({
     router.refresh();
   }
 
+  // Run the vision check on every uploaded image figure at once (not PDFs or 3D models).
+  const imageFigures = figures.filter(
+    (f) => !is3dModel(f.mime, f.filename) && f.mime !== "application/pdf",
+  );
+  async function checkAll() {
+    setCheckingAll(true);
+    setAllMsg(null);
+    let done = 0;
+    let failed = 0;
+    for (const f of imageFigures) {
+      const r = await analyzeDrawing({ projectId, attachmentId: f.id });
+      if ("error" in r) failed++;
+      else done++;
+      setAllMsg(`Checking… ${done + failed}/${imageFigures.length}`);
+    }
+    setCheckingAll(false);
+    setAllMsg(
+      `Checked ${done} drawing${done === 1 ? "" : "s"}${
+        failed ? `, ${failed} could not be read` : ""
+      }.`,
+    );
+    router.refresh();
+  }
+
   return (
     <div className="space-y-3">
+      {imageFigures.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={checkAll}
+            disabled={checkingAll}
+            data-testid="check-all-drawings"
+          >
+            {checkingAll
+              ? "Checking all…"
+              : `Check all drawings (${imageFigures.length})`}
+          </Button>
+          {allMsg && <span className="text-xs text-muted-foreground">{allMsg}</span>}
+        </div>
+      )}
+
       {/* View tabs - flip between perspectives. */}
       <div className="flex items-center gap-2">
         <button

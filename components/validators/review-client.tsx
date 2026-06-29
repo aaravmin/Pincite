@@ -300,17 +300,17 @@ function EligibilityPanel({
 }) {
   const a = data.analysis;
   const rows: [string, string][] = [
-    ["Step 1 — statutory category", a.category],
-    ["Step 2A Prong 1 — judicial exception", a.prong_one],
-    ["Step 2A Prong 2 — practical application", a.prong_two],
-    ["Step 2B — significantly more", a.step_2b],
+    ["Step 1 - statutory category", a.category],
+    ["Step 2A Prong 1 - judicial exception", a.prong_one],
+    ["Step 2A Prong 2 - practical application", a.prong_two],
+    ["Step 2B - significantly more", a.step_2b],
     ["Summary", a.summary],
   ];
   return (
     <div className="space-y-3 px-6 py-5">
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          §101 eligibility — the model&apos;s read, verify
+          §101 eligibility - the model&apos;s read, verify
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">
           Claim {data.claimNumber} · framework only, not a verdict
@@ -331,7 +331,7 @@ function EligibilityPanel({
       {rows.map(([label, text]) => (
         <div key={label}>
           <p className="text-xs font-medium text-foreground">{label}</p>
-          <p className="text-sm text-muted-foreground">{text || "—"}</p>
+          <p className="text-sm text-muted-foreground">{text || "-"}</p>
         </div>
       ))}
     </div>

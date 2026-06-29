@@ -61,7 +61,7 @@ export function PortfolioTable({
                   className="border-t border-border hover:bg-accent/40"
                 >
                   <td className="px-4 py-2 text-muted-foreground">
-                    {p.matter_no || "—"}
+                    {p.matter_no || "-"}
                   </td>
                   <td className="px-4 py-2">
                     <Link

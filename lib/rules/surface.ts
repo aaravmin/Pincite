@@ -1,6 +1,6 @@
 /**
- * Rule surfacing (roadmap §4.4): two lists. "Applies now" — the rules that govern the
- * current work, each pinned. "May apply next" — a conditional decision tree of "if X then
+ * Rule surfacing (roadmap §4.4): two lists. "Applies now" - the rules that govern the
+ * current work, each pinned. "May apply next" - a conditional decision tree of "if X then
  * rule Y" items with the trigger spelled out; each carries `triggered` = whether the draft
  * already meets the trigger (so the UI can show "now applies"). Honors actionable vs
  * informational (fees/deadlines are informational). Pure; MPEP pins are corpus-validated
@@ -70,7 +70,7 @@ export function surfaceRules(input: RuleInput): {
     add(
       "2173",
       "35 U.S.C. 112(b)",
-      "Claims must be definite — particularly point out and distinctly claim the invention.",
+      "Claims must be definite - particularly point out and distinctly claim the invention.",
       draftingReason,
     );
     add(
