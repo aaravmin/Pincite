@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, BookText, LogOut } from "lucide-react";
+import { LayoutDashboard, BookText, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
 
@@ -13,14 +13,14 @@ export function DashboardSidebar({
   active = "dashboard",
 }: {
   email: string;
-  active?: "dashboard" | "ask";
+  active?: "dashboard" | "ask" | "settings";
 }) {
   const initial = (email.trim()[0] ?? "?").toUpperCase();
   const link = (
     href: string,
     label: string,
     Icon: typeof LayoutDashboard,
-    key: "dashboard" | "ask",
+    key: "dashboard" | "ask" | "settings",
   ) => (
     <Link
       href={href}
@@ -45,6 +45,7 @@ export function DashboardSidebar({
       <nav aria-label="Main" className="mt-3 space-y-0.5">
         {link("/dashboard", "Dashboard", LayoutDashboard, "dashboard")}
         {link("/ask", "Ask the MPEP", BookText, "ask")}
+        {link("/settings", "Settings", Settings, "settings")}
       </nav>
 
       <div className="mt-auto space-y-1 border-t border-border pt-3">
