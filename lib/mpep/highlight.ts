@@ -1,10 +1,8 @@
 /**
  * Compute the responsive span to highlight inside a section's full_text (roadmap §4.5
- * "highlight" step). Two strategies:
- *  - findSpan: locate a verbatim quote (used when a model returns an anchor quote).
- *  - selectResponsivePassage: deterministic keyword-overlap passage selection (used now,
- *    before semantic ranking is available). Returns character offsets into full_text so
- *    the evidence pane can wrap the span in place.
+ * "highlight" step). selectResponsivePassage does deterministic keyword-overlap passage
+ * selection and returns character offsets into full_text so the evidence pane can wrap the
+ * span in place.
  */
 
 const STOP = new Set([
@@ -17,17 +15,6 @@ const STOP = new Set([
 function terms(query: string): string[] {
   const found = query.toLowerCase().match(/[a-z0-9]+/g) ?? [];
   return [...new Set(found)].filter((t) => t.length > 2 && !STOP.has(t));
-}
-
-export function findSpan(
-  fullText: string,
-  quote: string,
-): { start: number; end: number } | null {
-  const q = quote?.trim();
-  if (!q) return null;
-  const i = fullText.indexOf(q);
-  if (i >= 0) return { start: i, end: i + q.length };
-  return null;
 }
 
 export function selectResponsivePassage(

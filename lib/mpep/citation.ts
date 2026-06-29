@@ -20,11 +20,6 @@ export async function validateCitations(
   return new Set((data ?? []).map((r) => r.section_number as string));
 }
 
-export async function citationExists(sectionNumber: string): Promise<boolean> {
-  const ok = await validateCitations([sectionNumber]);
-  return ok.has(sectionNumber);
-}
-
 /**
  * Split a model output's cited sections into resolved (real) and dropped (hallucinated
  * or out-of-corpus). Callers display only `resolved` and flag `dropped` for review.

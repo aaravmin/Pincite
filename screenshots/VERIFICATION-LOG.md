@@ -6,6 +6,7 @@ the §2.1 color discipline.
 
 | Date | Phase / feature | Result | Screenshot | Notes |
 |---|---|---|---|---|
+| 2026-06-28 | readme + cleanup + product doc | PASS | (e2e suite) | Refreshed README (email+Google auth, rate limits + budget caps, ZDR posture, latest migrations, link to product doc). Removed dead code (citationExists, findSpan, ROLE_LABELS, components/ui/card + separator, scripts/verify-phase1.mjs) and 33 unused gate screenshots (now gitignored; case-* + log kept). Cleared a stray lint warning (tier2 unused var) and tidied .gitignore. Added docs/product-functionality.md (full feature reference). lint clean, build OK, 21/21 green. |
 | 2026-06-26 | phase-0 landing | PASS | phase-0-landing.png | Clean Notion-style landing; neutral palette only; no console/page/network errors. |
 | 2026-06-26 | phase-0 login | PASS | phase-0-login.png | Google sign-in button renders; connects to new dedicated Supabase project; neutral palette; clean. |
 | 2026-06-26 | phase-0 consent | PASS | phase-0-consent.png | Consent/warning screen; yellow attention box used correctly; clean. |

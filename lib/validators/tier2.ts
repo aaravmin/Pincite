@@ -63,7 +63,6 @@ export function runTier2(
 
   for (const c of claims) {
     const start = offsetOf(c.raw, c.start);
-    const end = start + c.raw.length;
 
     // (A) Means-plus-function / nonce-word invocation (MPEP 2181).
     const mpf = c.raw.match(nonceRe);

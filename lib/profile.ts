@@ -12,11 +12,6 @@ import { createClient } from "@/lib/supabase/server";
 export const USER_ROLES = ["attorney", "inventor"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  attorney: "Patent attorney or agent",
-  inventor: "Inventor filing pro se",
-};
-
 export type Profile = {
   id: string;
   email: string | null;

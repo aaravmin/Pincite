@@ -13,6 +13,7 @@ the end of each session — but be stringent; trim before it bloats.
 
 ## Routing
 - Full product spec / requirements: `Pincite-Product-Roadmap.md`
+- Product functionality (every screen, field, check): `docs/product-functionality.md`
 - Build execution plan (phases, gates): `~/.claude/plans/reactive-squishing-dongarra.md`
   (supersedes the earlier `start-in-plan-mode-reactive-willow.md`)
 - Architecture & data model: `docs/architecture.md`

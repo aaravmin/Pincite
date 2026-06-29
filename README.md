@@ -59,6 +59,8 @@ Compare against a patent you paste or pull candidates from Google BigQuery publi
 
 ## How it works
 
+For a complete walkthrough of every screen, field, and check, see [docs/product-functionality.md](docs/product-functionality.md).
+
 The spine of the app is `validateCitations` in `lib/mpep/citation.ts`. Every MPEP number a check or the model produces gets looked up in the ingested corpus before display. Numbers that resolve are shown and openable. Numbers that do not resolve get dropped. This is the same reason there is no single novelty score for prior art. Pincite leads with the spans instead.
 
 Similar patents
@@ -142,8 +144,8 @@ The export is a real document set rather than a generic PDF. The specification c
       <p>Every save is an append only snapshot and every meaningful action is written to an audit log.</p>
     </td>
     <td width="33%" valign="top">
-      <h4>Confidentiality</h4>
-      <p>US region storage with row level security per user, and synthetic text only until vendor zero data retention is confirmed.</p>
+      <h4>Confidentiality and cost</h4>
+      <p>US region storage with row level security per user, per user rate limits and budget caps on every paid call, and synthetic text only until xAI zero data retention is on (Voyage already opted out).</p>
     </td>
   </tr>
 </table>
@@ -161,8 +163,8 @@ The export is a real document set rather than a generic PDF. The specification c
 | Database | Supabase Postgres with pgvector for embeddings and a tsvector full text index for MPEP search |
 | Data access | PostgREST through `@supabase/supabase-js` with cookie based SSR sessions through `@supabase/ssr` |
 | Migrations | Raw SQL applied with node-postgres (`pg`) via `scripts/db-apply.mjs` |
-| Security | Row level security on every table, append only versioning, and an audit log |
-| Auth | Supabase Auth with Google OAuth, plus a development only login used by the tests |
+| Security | Row level security on every table, per user rate limits and account wide budget caps on paid calls, append only versioning, and an audit log |
+| Auth | Supabase Auth with email and password plus Google OAuth, and a development only login used by the tests |
 | Storage | A private US region Supabase Storage bucket for drawings, written through an ownership checked service role client |
 | Generation model | xAI Grok `grok-4.3` for the §101 walkthrough |
 | Embeddings | Voyage `voyage-law-2`, a legal tuned 1024 dimension model, over the MPEP corpus |
@@ -212,7 +214,7 @@ pnpm install
 
 # Apply the schema, then reload the PostgREST cache.
 node --env-file=.env.local scripts/db-apply.mjs supabase/migrations/0001_phase0_init.sql
-#   repeat through 0009, then run  notify pgrst, 'reload schema'
+#   repeat through the latest migration, then run  notify pgrst, 'reload schema'
 
 # Set up the private Storage bucket for drawings.
 node --env-file=.env.local scripts/setup-storage.mjs
@@ -243,14 +245,14 @@ lib/
   stage/  rules/         stage detection and rule surfacing
   projects/              projects, sections, append only versions
   supabase/              server, client, middleware, and admin clients
-supabase/migrations/     0001 through 0009, each with row level security
+supabase/migrations/     0001 onward, each with row level security
 e2e/                     Playwright specs (one per feature) plus the case study generator
 scripts/                 db-apply, ingest-mpep, embed-mpep, verify-rls, setup-storage
-docs/                    architecture, style guide, business context, api reference
+docs/                    product functionality, architecture, style guide, business context, api reference
 ```
 
 ---
 
 ## Disclaimer
 
-Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors and xAI currently reports that retention is on for the team. The full gate is 21 specs green with the accessibility scan clean on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Drawings analysis is started too. A vision model describes a figure and checks that each disclosed component appears in it (37 CFR 1.83), restricted to public or synthetic figures until vendor zero data retention is on.
+Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors. Voyage retention is opted out, and xAI zero data retention is the last piece to enable, so it stays the blocker until then. The full gate is 21 specs green with the accessibility scan clean on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Drawings analysis is started too. A vision model describes a figure and checks that each disclosed component appears in it (37 CFR 1.83), restricted to public or synthetic figures until vendor zero data retention is on.
