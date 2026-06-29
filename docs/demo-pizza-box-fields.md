@@ -1,264 +1,309 @@
 # Demo field contents - Apple "Container" (the round pizza box)
 
-Everything to paste into Pincite for the demo, box by box, in the order the steps appear.
-This is the real Apple patent, entered as if an outside attorney is filing on Apple's behalf, so the attorney supplies the client and matter while still entering the inventors and the full inventor-level detail the dashboard asks for.
+What to paste into each Pincite box, in the order the steps appear.
+The text is taken from the real patent at https://patents.google.com/patent/US20120024859 (US 2012/0024859 A1, "Container", Apple Inc., inventors Francesco Longoni and Mark E. Doutt, filed July 30, 2010).
+It is entered as if an outside attorney is filing on Apple's behalf, so the attorney supplies the client and matter while still entering the inventors and full inventor detail.
 There is no 3D file in this demo; the figures are PNG drawings uploaded by orientation.
 
-Real patent this is based on (public record):
+Everything below is in plain paragraph form so you can copy a block straight into a box.
+A few subtle issues are planted on purpose so you can show the review catching them; they are listed at the very end under "Issues to point out."
 
-- Title: Container
-- Publication: US 2012/0024859 A1
-- Application: US 12/847,800
-- Filed: July 30, 2010
-- Published: February 2, 2012
-- Inventors: Francesco Longoni and Mark E. Doutt
-- Assignee / applicant: Apple Inc., Cupertino, California
-- Gist: a circular, single-piece, molded-fiber food container with the lid joined to the base by an integral hinge, concentric ridges that lift the pizza off the floor, vents and a channel that move moisture away, and a locking mechanism, so a personal pizza stays crisp.
+The numbers below are the actual reference numerals printed on the patent's figures, and the detailed description uses the same numbers, so the drawing check will not flag undescribed numerals.
 
-Important - reference numerals match the real drawings:
-
-The numbers below are the actual reference numerals printed on this patent's figures.
-The detailed description in Step 4 uses these same numbers, so when you upload the patent's drawings the drawing check will not flag "numeral not described" for numbers like 18, 32, or 302.
-If you upload a different figure, make sure any number visible on it also appears in your detailed description.
-
-Reference numerals (from the patent):
-
-- 10 container
-- 12 base portion
-- 14 bottom surface
-- 16 bottom feature
-- 18 concentric ridges
-- 20 sidewalls
-- 22 integrated sidewall feature
-- 24 lid portion
-- 26 top surface
-- 28 first top feature
-- 30 second top feature
-- 32 vents
-- 34 channel
-- 36 central platform
-- 38 hinge assembly
-- 40 first hinge portion
-- 42 second hinge portion
-- 44 flexure
-- 46 locking mechanism
-- 48 first portion of the locking mechanism
-- 50 second portion of the locking mechanism
-- 52 lip
-- 54 recess portion
-- 80 indicia
-- 82 contained pizza
-- 84 bottom airflow
-- 86 convective airflow
-- 88 gaps
-- 90 top surface airflow
-- 202 exterior surface of the lid portion
-- 204 exterior surface of the base portion
-- 302 concentric recesses
-- 304 integrated sidewall feature protrusions
-- 402 exterior integrated surface profile features
-- 502 first hinge portion exterior surface
-- 504 second hinge portion exterior surface
-- 602 base portion lip
-- 604 lid portion lip
-- 702 first container (nested)
-- 704 second container (nested)
-- 802 protrusion
-- 804 cavity
+Reference numerals: 10 container, 12 base portion, 14 bottom surface, 16 bottom feature, 18 concentric ridges, 20 sidewalls, 22 integrated sidewall feature, 24 lid portion, 26 top surface, 28 first top feature, 30 second top feature, 32 vents, 34 channel, 36 central platform, 38 hinge assembly, 40 first hinge portion, 42 second hinge portion, 44 flexure, 46 locking mechanism, 48 first portion of the locking mechanism, 50 second portion of the locking mechanism, 52 lip, 54 recess portion, 80 indicia, 82 contained pizza, 84 bottom airflow, 86 convective airflow, 88 gaps, 90 top surface airflow, 202 exterior surface of the lid portion, 204 exterior surface of the base portion, 302 concentric recesses, 304 integrated sidewall feature protrusions, 502 first hinge portion exterior surface, 504 second hinge portion exterior surface, 702 first container, 704 second container, 802 protrusion, 804 cavity.
 
 ---
 
 ## Step 0 - Sign in and role
 
-- Sign in with Google, accept the consent screen.
-- Role: choose Patent agent / attorney.
+Sign in with Google and accept the consent screen.
+For Role, choose Patent agent / attorney.
 
 ## Step 1 - New project (Application details)
 
-- Name: Container (round food container)
-- Patent type: Utility
-- Client: Apple Inc.
-- Matter number: APPL-CONTAINER-2026-001
+Name: Container
+
+Patent type: Utility
+
+Client: Apple Inc.
+
+Matter number: APPL-CONTAINER-2026-001
 
 ## Step 2 - Disclosure (Invention intake)
 
 Fill each field in the left nav, then open All fields to review and save.
 
-- Technical field / industry:
-  Food packaging and food transport containers, specifically single-serve hot-food containers such as pizza boxes.
+Technical field / industry
 
-- Problem solved:
-  Standard square pizza boxes trap steam between the pizza and the flat bottom, so the crust turns soggy before it is served.
-  The square footprint also wastes material and space around a round pizza.
-  Multi-piece boxes add cost and require assembly.
+Containers, and more particularly a portable and nestable food container that is environmentally friendly, such as a container for transporting hot pizza.
 
-- How it works:
-  A round container is molded as a single piece, with a lid joined to the base by an integral hinge, so no assembly is needed.
-  Concentric ridges on the base floor lift the pizza off the bottom so steam is not trapped under it.
-  Vents and a channel in the container move moisture away from the food, and convective airflow keeps the crust crisp.
-  A central platform supports the lid, and a locking mechanism holds the container closed in transit.
+Problem solved
 
-- Key components:
-  container 10
-  base portion 12
-  concentric ridges 18
-  sidewalls 20
-  lid portion 24
-  vents 32
-  channel 34
-  central platform 36
-  hinge assembly 38
-  flexure 44
-  locking mechanism 46
+Containers store and transport items of varying sizes and shapes, and traditional containers use plastics for structural support to stay cost effective.
+Environmental concerns have driven demand for containers made from sustainable materials.
+For hot food such as pizza, a flat-bottomed box also traps steam beneath the food, so the crust reabsorbs the moisture and becomes soggy.
+What is needed is a container that is adaptable for a wide variety of applications while staying structurally stable and environmentally friendly.
 
-- Advantages:
-  Keeps the crust crisp by moving moisture away from the food with vents, a channel, and convective airflow.
-  Single-piece molded construction is cost effective and needs no assembly.
-  Uses less material than a square box for a round pizza and can be molded from recycled fiber.
-  Round, low-profile shape nests and ships compactly.
+How it works
 
-- Alternatives and variations:
-  The number of vents can vary.
-  The ridges can be concentric rings, a spiral, or a radial pattern of standoffs.
-  The container can be molded fiber, paperboard, or a compostable polymer.
-  The locking mechanism can be a snap-fit lip and recess or a separate tab.
+The container is molded as a single piece of fiber, with a lid joined to the base by an integral hinge, so no assembly is required.
+Concentric ridges on the interior of the base elevate the pizza and form a gap beneath it, which thermally isolates the food and lets moisture move away from it.
+A second top feature forms a channel that cooperates with a central platform to create a chimney effect, drawing moisture up and out through vents in the lid.
+A press-fit locking mechanism holds the container closed, and the base and lid are tapered so multiple containers nest for storage.
 
-- Known prior solutions:
-  Square corrugated pizza boxes.
-  Pizza boxes with a top vent or a central plastic tripod (a "pizza saver").
-  Multi-piece molded-fiber clamshell food containers.
-  (This feeds the duty to disclose under 37 CFR 1.56.)
+Key components
+
+Base portion with a bottom surface and concentric ridges; sidewalls with an integrated sidewall feature; a lid portion with a top surface, a channel, a central platform, and vents; a hinge assembly with a flexure; a locking mechanism with a lip and recess; and a tamper-evident band around the rim.
+
+Advantages
+
+Keeps the crust crisp by moving moisture away from the food through the gap, the channel, the chimney effect, and the vents.
+Single-piece molded construction is cost effective and needs no assembly.
+Molded fiber is recycled, sustainable, easily formed, and resists moisture absorption so the container keeps its structural integrity.
+The round, tapered shape nests for compact storage and transport.
+
+Alternatives and variations
+
+The container can be molded fiber, bamboo, Begrass, rice hull, or PLA.
+The ridges can be concentric and circular, or another pattern.
+The lid can be rotated about 360 degrees into a food-server configuration where the inverted lid supports the base as a pedestal.
+
+Known prior solutions
+
+Square corrugated pizza boxes; boxes with a top vent or a central plastic tripod (a "pizza saver"); and multi-piece molded-fiber clamshell containers.
+(This feeds the duty to disclose under 37 CFR 1.56.)
 
 ## Step 3 - Inventors and applicant (ADS / PTO-AIA-14)
 
-Inventor 1 (real inventor; residence, address, and citizenship are demo placeholders to confirm):
+The two inventors are real; the residence, mailing address, and citizenship are not in the public record, so confirm them before any real filing.
 
-- Legal name: Francesco Longoni
-- Residence: Cupertino, California, USA
-- Mailing address: c/o Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA
-- Citizenship: Italy
+Inventor 1
 
-Inventor 2 (real inventor; residence, address, and citizenship are demo placeholders to confirm):
+Legal name: Francesco Longoni
 
-- Legal name: Mark E. Doutt
-- Residence: Cupertino, California, USA
-- Mailing address: c/o Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA
-- Citizenship: United States
+Residence: Cupertino, California, USA
 
-Applicant:
+Mailing address: c/o Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA
 
-- Applicant is a company (juristic), not the inventors.
-- Applicant name: Apple Inc.
-- Applicant address: 1 Infinite Loop, Cupertino, CA 95014, USA
-- Entity status: Large entity
+Citizenship: Italy
+
+Inventor 2
+
+Legal name: Mark E. Doutt
+
+Residence: Cupertino, California, USA
+
+Mailing address: c/o Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA
+
+Citizenship: United States
+
+Applicant
+
+The applicant is a company (juristic), not the inventors.
+
+Applicant name: Apple Inc.
+
+Applicant address: 1 Infinite Loop, Cupertino, CA 95014, USA
+
+Entity status: Large entity
 
 ## Step 4 - Draft (left nav)
 
-Fill each section. Then open All sections to review and Save version.
+Fill each section, then open All sections to review and Save version.
 
 ### Title of the invention
+
 Container
 
 ### Cross-reference to related applications
+
 Not applicable.
 This application does not claim priority to any earlier application.
 
 ### Federally sponsored research or development
+
 Not applicable.
 This invention was not made with United States government support.
 
 ### Background
-Hot food such as pizza is commonly transported in square corrugated boxes.
-A pizza placed on the flat bottom of such a box rests directly on the surface, so steam released by the food is trapped between the food and the bottom.
-The trapped steam condenses and is reabsorbed by the crust, which becomes soft and soggy before the food is served.
-Square boxes also enclose a round food item inefficiently, wasting material at the corners and taking more shelf and transport space than the food requires.
-Many containers are also assembled from multiple pieces, which adds cost and labor.
-A need remains for a low-cost, single-piece container that moves moisture away from a round hot-food item from above and below.
+
+Containers serve numerous applications for storing and transporting items in varying sizes and shapes.
+Traditional container construction uses plastics for structural support while remaining cost effective.
+However, environmental concerns have driven demand for containers made from sustainable materials.
+What is needed is a container that is adaptable for use in a wide variety of applications while maintaining structural stability and environmental friendliness.
 
 ### Brief summary
-A container 10 for transporting hot food is disclosed.
-The container 10 is molded as a single piece and includes a base portion 12 and a lid portion 24 joined by a hinge assembly 38.
-The base portion 12 has a bottom surface 14 with concentric ridges 18 that elevate a contained pizza 82 above the bottom surface 14, so steam is not trapped beneath it.
-The lid portion 24 has a top surface 26 with vents 32 and a channel 34 that move moisture away from the contained pizza 82, and a central platform 36.
-A locking mechanism 46 holds the container 10 closed during transport.
+
+A molded fiber container suitable for containing a food item includes a base having a plurality of ridges integrated with an interior surface.
+When a food item rests on the ridges, a gap is formed between the food item and the interior surface of the base, which thermally isolates the food and transports moisture away from it.
+The container includes a lid having a plurality of openings arranged in accordance with the ridges and a moisture channeling feature integrally formed in the lid, which cooperates with the openings and the gap to transport expelled moisture to the external environment.
+A hinge assembly connects the base and lid portions and allows pivotal movement, and a locking mechanism with cooperatively shaped first and second portions secures the lid and the base portion when closed.
+The base and lid are shaped so that multiple containers nest in a stack to minimize storage space.
 
 ### Brief description of the drawings
-FIG. 1 is a representative view of the container 10 in an open configuration.
-FIG. 2 is a perspective view of the container 10 in the open configuration.
-FIG. 3 is a cross-sectional view of the container 10 in a closed configuration, showing airflow.
+
+FIG. 1 shows a representative container 10 in a first open configuration.
+FIG. 2 is a perspective view of the container 10 in the first open configuration.
+FIG. 3 is a cross-sectional view of the container 10 in a closed configuration showing airflow.
 FIG. 4 is a perspective view of the exterior of the base portion 12.
 FIG. 5 is a top view of the exterior of the lid portion 24.
 FIG. 6 is a flipped view showing the exterior surface 202 of the lid portion and the exterior surface 204 of the base portion.
-FIG. 7 is a profile view of the container 10 in the closed configuration.
+FIG. 7 is a profile view of the container 10 in a closed configuration.
 FIG. 8 shows a first container 702 and a second container 704 in a nested stack.
-FIG. 9 is a close-up of the locking mechanism 46.
+FIG. 9 shows the locking mechanism 46 in close-up.
 FIG. 10 is a detail of the hinge assembly 38.
 FIG. 11 is a perspective view of the container 10 showing indicia 80.
+FIG. 12 is a flowchart of a process for forming the molded fiber container.
 
 ### Detailed description
-Referring to FIG. 1 and FIG. 2, a container 10 for transporting hot food is molded as a single piece and comprises a base portion 12 and a lid portion 24 joined by a hinge assembly 38.
-The base portion 12 includes a bottom surface 14 having a bottom feature 16 and a plurality of concentric ridges 18.
-The concentric ridges 18 contact and elevate a contained pizza 82 above the bottom surface 14, defining gaps 88 between the contained pizza 82 and the bottom surface 14 so that steam is not trapped beneath the food.
-Sidewalls 20 extend from the base portion 12 and include an integrated sidewall feature 22.
-The lid portion 24 includes a top surface 26 having a first top feature 28 and a second top feature 30, a plurality of vents 32, a channel 34, and a central platform 36 that supports the lid portion 24 above the contained pizza 82.
 
-Referring to FIG. 3, in the closed configuration a bottom airflow 84 passes through the vents 32 and the gaps 88, a convective airflow 86 circulates within the container 10, and a top surface airflow 90 carries moisture along the channel 34 and away from the contained pizza 82, so the food remains crisp.
+FIG. 1 shows a representative container 10 in a first open configuration in accordance with a described embodiment.
+The container 10 accommodates hot food items, particularly pizza, which can be assembled in a preparation area, placed in the container 10, and subsequently placed in a cooker such as an oven.
 
-The hinge assembly 38 comprises a first hinge portion 40 and a second hinge portion 42 connected by a flexure 44, so the lid portion 24 pivots between the open and closed configurations.
-A locking mechanism 46 comprises a first portion 48 and a second portion 50, in which a lip 52 seats within a recess portion 54 to retain the container 10 in the closed configuration.
+Container 10 includes a base portion 12 having a bottom surface 14.
+The bottom surface 14 incorporates a bottom feature 16 in the form of concentric ridges 18 each extending above the bottom surface 14.
+Ridges 18 provide structural support for the container 10 by distributing an applied load, helping to prevent excessive bending and flexing.
+When a pizza is placed on the ridges 18, an air gap between the bottom surface 14 and the pizza is formed, allowing excess moisture to escape from the pizza, and the air gap also acts as a thermal barrier preventing excess heat transfer away from the pizza.
+Base portion 12 also includes sidewalls 20 integrally formed with the bottom surface 14, and the sidewalls 20 include an integrated sidewall feature 22 recessed into the sidewalls 20 with a shape that helps prevent flexing of the base portion 12.
 
-Referring to FIG. 4 and FIG. 5, the exterior surface 204 of the base portion 12 includes concentric recesses 302 and integrated sidewall feature protrusions 304, and the exterior surface 202 of the lid portion 24 includes exterior integrated surface profile features 402.
-Referring to FIG. 6, a flipped view shows the exterior surface 202 of the lid portion and the exterior surface 204 of the base portion together, along with a first hinge portion exterior surface 502, a second hinge portion exterior surface 504, a base portion lip 602, and a lid portion lip 604.
+Container 10 also includes a lid portion 24 having a size and shape in accordance with the base portion 12, which in a closed configuration come together to form an enclosed space well suited for the pizza.
+The lid portion 24 has a top surface 26 onto which are formed a first top feature 28 and a second top feature 30.
+The second top feature 30 has a raised shape that provides structural support and forms a channel 34, which cooperates with a central platform 36 to create a chimney effect that draws excess moisture from the pizza and channels it to vents 32 for transport to the external environment.
+The ridges 18, the second top feature 30, and the vents 32 work together to maintain a proper moisture level within the container 10 so the pizza does not absorb excess moisture and become soggy.
 
-Referring to FIG. 8, a first container 702 and a second container 704 nest together for storage and transport, with a protrusion 802 of one container seating in a cavity 804 of another.
-Referring to FIG. 11, indicia 80 are provided on the top surface 26 of the lid portion 24.
+A hinge assembly 38 is integrally formed with both the lid portion 24 and the base portion 12, and comprises a first hinge portion 40 of the base portion 12 and a second hinge portion 42 of the lid portion 24.
+A flexure 44 pivotally connects the first hinge portion 40 and the second hinge portion 42; the first and second hinge portions 40, 42 can be formed of stiff molded fiber while the flexure 44 is formed of bendable molded fiber, so the flexure 44 facilitates folding when the container 10 closes and unfolding when it opens.
 
-In one embodiment, the container 10 is molded from recycled fiber, although paperboard or a compostable polymer may be used.
-In operation, a hot contained pizza 82 is placed on the concentric ridges 18, the lid portion 24 is closed about the hinge assembly 38, and the locking mechanism 46 is engaged, after which the vents 32, the channel 34, and the gaps 88 move moisture away from the food so it stays crisp until the container 10 is opened.
+Container 10 also includes a locking mechanism 46 comprising a first portion 48 integrally formed with the base portion 12 and a second portion 50 integrally formed with the lid portion 24.
+The locking mechanism 46 secures the base portion 12 and the lid portion 24 in the closed configuration with a force strong enough to prevent them from separating.
+A lip 52 on the second portion 50 is accessed by inserting a finger within a recess portion 54 of the first portion 48, so a simple lifting action on the lip 52 overcomes the securing force.
+As shown in FIG. 9, the locking mechanism 46 is a press-fit lock in which the second portion 50 includes a protrusion 802 and the first portion 48 includes a cavity 804 that receives the protrusion 802 to generate the locking force.
+
+In the first open configuration, the lid portion 24 and the base portion 12 are positioned approximately 180 degrees relative to each other so the pizza is easily viewed and accessible.
+In a second open configuration, the lid portion 24 and the base portion 12 are rotated about each other approximately 360 degrees so that the exterior surface 202 of the lid portion 24 and the exterior surface 204 of the base portion 12 come into at least partial direct contact, letting the lid portion 24 act as a pedestal support surface.
+
+As shown in FIG. 3, the ridges 18 elevate the contained pizza 82 away from the bottom surface 14, creating gaps 88 between the pizza 82 and the bottom surface 14.
+A bottom airflow 84 carries hot air emitted from the bottom of the pizza 82, forming a convective airflow 86 that rises and becomes a top surface airflow 90 along the top surface 26 of the lid portion 24.
+The second top feature 30 increases the surface area along the exterior of the lid portion 24, creating a lower outside pressure that drives a chimney effect, so the top surface airflow 90 moves along the top surface 26 and exits through the vents 32.
+The vents 32 are positioned in an annular pattern concentric with the center of the lid portion 24 to maximize the hot air that can exit, which prevents the pizza 82 from reabsorbing moisture and becoming soggy.
+
+As shown in FIG. 4, the exterior surface 204 of the base portion 12 includes concentric recesses 302 that correspond to the concentric ridges 18, and integrated sidewall feature protrusions 304 that correspond to the integrated sidewall feature 22.
+The concentric recesses 302 and the sidewall feature protrusions 304 increase the structural stability of the container 10 and limit torsional flexing of the base portion 12.
+A flipped view shows the exterior surface 202 of the lid portion, the exterior surface 204 of the base portion, a first hinge portion exterior surface 502, and a second hinge portion exterior surface 504.
+
+As shown in FIG. 8, the sidewalls 20 of the base portion 12 are tapered so they encompass a greater area at the top than at the bottom, so that a base portion 12 can receive the corresponding base portion 12 of a second container 704, and the lid portion 24 and locking mechanism 46 of a second container 704 fit within those of a first container 702 to form a nested stack.
+Indicia 80 can be provided on the top surface 26 of the lid portion 24.
+
+Molded fiber is derived from recycled paper, is environmentally sustainable, is easily formed into any desired shape, and resists moisture absorption, so the container 10 retains its structural integrity in the presence of moisture.
 
 ### Claims
-1. A container for transporting hot food, the container comprising: a base portion having a bottom surface and sidewalls; a plurality of concentric ridges on the bottom surface configured to elevate a food item above the bottom surface; a lid portion having a top surface, a plurality of vents, and a channel configured to move moisture away from the food item; and a hinge assembly joining the lid portion to the base portion, wherein the base portion, the lid portion, and the hinge assembly are molded as a single piece.
-2. The container of claim 1, wherein the base portion and the lid portion are circular.
-3. The container of claim 1, wherein the concentric ridges define gaps between the food item and the bottom surface through which steam escapes.
-4. The container of claim 1, further comprising a locking mechanism having a lip and a recess portion configured to retain the lid portion in a closed configuration.
-5. The container of claim 1, wherein the hinge assembly comprises a first hinge portion and a second hinge portion connected by a flexure.
-6. The container of claim 1, wherein the single piece is molded recycled fiber.
-7. The container of claim 1, wherein the lid portion includes a central platform that supports the lid portion above the food item.
-8. A method of transporting hot food, the method comprising: placing a food item on a plurality of concentric ridges that elevate the food item above a bottom surface of a single-piece container; closing a lid portion onto a base portion about an integral hinge assembly; and moving moisture away from the food item through a plurality of vents and a channel in the container.
+
+Paste all 23 claims into the Claims box, one after another.
+There are three independent claims (1, 8, and 17); the rest are dependent.
+The tool shows the structure as a tree, where each dependent claim sits under the claim it refers back to:
+
+Claim 1 (independent): 2 under 1; 3 under 2; 4 and 5 under 3; 6 under 4; 7 under 1.
+Claim 8 (independent): 9, 10, 11, 12, 13, 14 under 8; 15 under 12; 16 under 13.
+Claim 17 (independent): 18 under 17; 19 under 18; 20 under 19; 21 under 20; 22 under 21; 23 under 18.
+
+1. A molded fiber container suitable for containing a food item, comprising: a base, the base comprising: a plurality of ridges integrated with an interior surface of the base, wherein when the food item is placed on at least some of the plurality of ridges, a gap is formed between the food item and the interior surface of the base, the gap assisting in thermally isolating the food item and allowing moisture expelled from the food item to be transported away from the food item; and a lid, the lid comprising: a plurality of openings arranged in accordance with at least some of the plurality of ridges, and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the plurality of openings and the gap to provide a path by which at least some of the moisture expelled from the food item is transported out of the container and into an external environment.
+
+2. The molded fiber food container as recited in claim 1, further comprising: a hinge assembly integrally formed with the molded fiber container, the hinge assembly pivotally connecting the base and the lid.
+
+3. The molded fiber food container as recited in claim 2, wherein in a food server configuration, the lid is rotated about the hinge assembly to an inverted position and about 360 degrees rotation relative to the base such that at least a portion of an exterior surface of the lid is in direct contact with at least a portion of an exterior surface of the base, the lid providing full support for the base and the food item.
+
+4. The molded fiber food container as recited in claim 3, wherein in the food server configuration, the inverted lid is placed on a supporting surface, the inverted lid supporting the base.
+
+5. The molded fiber food container as recited in claim 3, wherein in the food server configuration, the food item is fully presented and accessible.
+
+6. The molded fiber food container as recited in claim 4, wherein in the food server configuration, the food container is a reduced footprint food serving apparatus.
+
+7. The molded fiber container as recited in claim 1, wherein at least some of the plurality of ridges are concentric and circular.
+
+8. A container, comprising: a base portion, the base portion comprising: a bottom surface, the bottom surface including concentric ridges, the concentric ridges providing structural support and elevating an item placed on at least some of the ridges, and a sidewall integrally formed with the bottom surface, the sidewall including an integrated sidewall feature, the integrated sidewall feature arranged to provide structural support for the container; a lid portion comprising a top surface, the top surface comprising: a first integrated top feature co-operating with the integrated bottom feature and the integrated side feature to provide structural support for the container, and a second integrated top feature that includes a plurality of apertures that allow for the outflow of air from within the container; a hinge assembly integrally formed with a first section of the sidewall for pivotally connecting the base portion and the lid portion, the hinge assembly comprising: a first hinge portion integrally formed with the base portion, a second hinge portion integrally formed with the lid portion, and a flexure between the first and second hinge portions, the flexure allowing for the pivoting of the second hinge portion about the first hinge portion; and a locking mechanism comprising: a first portion integrally formed with a second section of the sidewall different from the first section, and a second portion integrally formed with a section of the lid portion, wherein the first and second portions of the locking mechanism are co-operatively shaped so that they interlock, wherein in a locking configuration the locking mechanism secures the lid and the base portion.
+
+9. The container as recited in claim 8, wherein the container is used to contain a food item.
+
+10. The container as recited in claim 8, wherein the container is fabricated from a molded fiber.
+
+11. The container as recited in claim 8, wherein the container is fabricated from environmentally friendly materials including bamboo, Begrass, rice hull, and PLA.
+
+12. The container as recited in claim 8, wherein in a second open configuration, the second hinge portion is pivoted with respect to the first hinge portion, such that a portion of the exterior surface of the lid makes contact with a portion of the exterior surface of the base.
+
+13. The container as recited in claim 8, wherein in a first open configuration, the second hinge portion is pivoted with respect to the first hinge portion, such that the angle between the first and second hinge portions is substantially 180 degrees.
+
+14. The container as recited in claim 8, wherein in a closed configuration, the second hinge portion is pivoted with respect to the first hinge portion, such that the lid portion makes contact with the sidewalls of the base portion.
+
+15. The container as recited in claim 12, wherein the container is used in the second open configuration to display a contained item in a manner with a reduced footprint.
+
+16. The container as recited in claim 13, further including at least a second container, wherein at least the first and second containers are stacked together in a nested configuration.
+
+17. A method of forming a molded fiber container suitable for containing a food item, comprising: providing a fiber slurry; providing a mold having a shape in the form of the container; conformally applying the fiber slurry to the mold, wherein the conformally applied fiber slurry takes on essentially the shape of the container; curing the fiber slurry; and obtaining the molded fiber container by separating the mold and the cured fiber slurry, wherein the molded fiber container comprises: a base portion having a bottom surface with concentric ridges that provide structural support and elevate an item placed on at least some of the ridges, and a sidewall integrally formed with the bottom surface and including an integrated sidewall feature; and a lid comprising a plurality of openings arranged in accordance with at least some of the ridges and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the openings and the gap to provide a path by which moisture expelled from the food item is transported out of the container.
+
+18. The method as recited in claim 17, wherein the molded fiber container further comprises a hinge assembly integrally formed with the molded fiber container, the hinge assembly pivotally connecting the base and the lid.
+
+19. The method as recited in claim 18, wherein in a food server configuration, the lid is rotated about the hinge assembly to an inverted position and about 360 degrees rotation relative to the base such that at least a portion of an exterior surface of the lid is in direct contact with at least a portion of an exterior surface of the base, the lid providing full support for the base and the food item.
+
+20. The method as recited in claim 19, wherein in the food server configuration, the inverted lid is placed on a supporting surface, the inverted lid supporting the base.
+
+21. The method as recited in claim 20, wherein in the food server configuration, the food item is fully presented and accessible.
+
+22. The method as recited in claim 21, wherein in the food server configuration, the food container is a reduced footprint food serving apparatus.
+
+23. The method as recited in claim 18, wherein at least some of the plurality of ridges are concentric and circular.
 
 ### Abstract
-A single-piece container transports hot food while keeping it crisp.
-A base portion has a bottom surface with concentric ridges that elevate the food above the surface so steam is not trapped beneath it.
-A lid portion has vents and a channel that move moisture away from the food, and a central platform that supports the lid.
-A hinge assembly joins the lid to the base, and a locking mechanism holds the container closed during transport.
-The container can be molded from recycled fiber, and its round shape nests and ships efficiently for a round food item.
+
+The embodiments herein describe a container constructed in a preformed manner, such that no assembly of the container is required before use.
+The container includes a lid portion that is coupled to the base portion through a hinged connection such that the entire container is singularly constructed from a single piece of material.
+A nested configuration is achieved such that the base and lid portions are shaped to receive the corresponding base and lid portions of a second container.
+Such nested configuration allows for multiple containers to be stored in a nested stack, thereby minimizing storage space.
+The container can be fabricated from various types of re-used material along the lines of molded fiber.
 
 ### Drawings metadata
-Eleven figures of the container on the drawing sheets.
-FIG. 1 through FIG. 11 as described in the brief description of the drawings.
+
+Twelve figures on the drawing sheets.
+FIG. 1 through FIG. 12 as described in the brief description of the drawings.
 
 ### Office action
+
 Not applicable.
 This is a new application and no office action has issued.
 
 ## Step 5 - Drawings (uploads)
 
-Upload each PNG and tag it with its orientation so the figures flip as perspectives.
-These files are in `e2e/fixtures` (downloaded from the patent's own drawings):
+Upload the figures from e2e/fixtures and tag each with its orientation so they flip as perspectives.
+The files are the patent's own drawing sheets at full resolution:
 
-- apple-container-perspective-open.png, view Perspective (FIG. 1)
-- apple-container-perspective.png, view Perspective (FIG. 2)
-- apple-container-section.png, view Sectional (FIG. 3)
-- apple-container-bottom.png, view Bottom (FIG. 4)
-- apple-container-top.png, view Top / plan (FIG. 5)
-- apple-container-exterior.png, view Perspective (FIG. 6)
-- apple-container-side.png, view Front or Left side (FIG. 7)
+apple-container-fig01.png is FIG. 1, view Perspective.
+apple-container-fig02.png is FIG. 2, view Perspective.
+apple-container-fig03.png is FIG. 3, view Sectional.
+apple-container-fig04.png is FIG. 4, view Bottom.
+apple-container-fig05.png is FIG. 5, view Top / plan.
+apple-container-fig06.png is FIG. 6, view Perspective.
+apple-container-fig07.png is FIG. 7, view Front or Left side.
 
-Then click Check all drawings.
+(fig08 through fig13 are the nested view, the locking-mechanism close-ups, the hinge detail, the indicia view, and the process flowchart; upload as many as you like.)
+
+After uploading, click Check all drawings.
 It runs the vision check on every uploaded figure at once and saves the result, so the flags stay on each figure when you leave and come back.
-Because the detailed description above uses the patent's real numerals, the check should not flag undescribed numerals.
 
 ## Step 6 - Sign (inventor's declaration)
 
-- Legal name: Francesco Longoni (then repeat for Mark E. Doutt)
-- Check all five statements (37 CFR 1.63).
+Legal name: Francesco Longoni (then repeat for Mark E. Doutt).
+Check all five statements (37 CFR 1.63).
+
+---
+
+## Issues to point out (planted on purpose)
+
+These are subtle, niche issues so you can show the review catching what a quick read misses.
+Most are already in Apple's real patent text.
+
+1. Relative term "about" - claims 3 and 19 say the lid is rotated "about 360 degrees." A relative term can be indefinite under 35 U.S.C. 112(b) unless the draft gives a standard (MPEP 2173.05(b)). Open Review and the relative-term finding points to it.
+
+2. Relative term "substantially" - claim 13 says the angle is "substantially 180 degrees." Same rule, flagged separately.
+
+3. Antecedent basis - claim 8 refers to "the integrated bottom feature" and "the integrated side feature," but the claim only introduces an "integrated sidewall feature." Those two terms lack antecedent basis (35 U.S.C. 112(b); MPEP 2173.05(e)).
+
+4. Consistency (Pincite cross-reference) - the disclosure lists "a tamper-evident band" as a key component, but it never appears in the detailed description or the claims. The review flags a disclosed component that is not claimed or described. Either add it to the draft or remove it from the disclosure.
