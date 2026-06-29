@@ -62,7 +62,7 @@ export function runCrossRefChecks(
       actionable: true,
       title: "Your problem statement is not reflected in the Background",
       explanation:
-        "You described the problem in the disclosure, but the Background of the Invention is empty. Carry the problem into the specification.",
+        "You described the problem in the disclosure, but the Background of the Invention is empty. Carry the problem into the draft.",
       mpep_section: "608.01(c)",
       cfr_ref: "37 CFR 1.77(b)",
     });

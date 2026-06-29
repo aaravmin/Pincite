@@ -31,7 +31,7 @@ export function ReportToolbar({ projectId }: { projectId: string }) {
           download
           data-testid="download-docx"
         >
-          Specification (.docx)
+          Draft (.docx)
         </a>
       </Button>
       <Button asChild size="sm" variant="outline">

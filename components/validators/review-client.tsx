@@ -24,9 +24,9 @@ type Eligibility = {
 };
 
 // Process areas so the user sees WHERE a problem sits, not just a flat wall.
-const AREAS = ["Claims", "Specification"] as const;
+const AREAS = ["Claims", "Draft"] as const;
 const areaOf = (f: FindingRow): string =>
-  f.section_key === "claims" ? "Claims" : "Specification";
+  f.section_key === "claims" ? "Claims" : "Draft";
 
 export function ReviewClient({
   projectId,

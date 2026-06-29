@@ -138,8 +138,8 @@ export function detectStage(input: StageInput): StageResult {
     has("title") && has("detailed_description") && (has("background") || has("summary"));
   if (specCore) {
     return {
-      label: "Specification drafting",
-      signals: ["Specification sections are present; no claims yet."],
+      label: "Description drafting",
+      signals: ["The description sections are present; no claims yet."],
       missing: labelList(missingRequired),
     };
   }

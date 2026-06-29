@@ -298,7 +298,7 @@ export async function analyzeDrawing(input: {
     findings.push({
       id: `numeral-${nIdx++}`,
       title: `Reference numeral ${num.numeral} not described`,
-      detail: `Numeral ${num.numeral} appears in the drawing but is not mentioned in the specification (37 CFR 1.84(p)).`,
+      detail: `Numeral ${num.numeral} appears in the drawing but is not mentioned in your draft (37 CFR 1.84(p)).`,
       cfr: "37 CFR 1.84(p)",
       mpep: pin(numeralMpep),
       x: num.x,

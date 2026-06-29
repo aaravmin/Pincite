@@ -51,7 +51,7 @@ export function runTier3(
           actionable: true,
           title: `Claim ${c.number} uses the relative term "${m[0]}"`,
           explanation:
-            "Relative terms can be indefinite unless the specification provides a standard for measuring them. Verify the spec gives a standard, or use a definite term.",
+            "Relative terms can be indefinite unless your draft provides a standard for measuring them. Verify the draft gives a standard, or use a definite term.",
           mpep_section: "2173.05(b)",
           cfr_ref: "35 U.S.C. 112(b)",
         });

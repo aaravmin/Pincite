@@ -92,7 +92,7 @@ export function DrawingAnalysis({
             <p className="flex items-center gap-1.5 text-sm text-pass">
               <span className="inline-block size-2.5 rounded-full bg-pass" aria-hidden />
               No drawing issues detected. The figure label and reference numerals look
-              consistent with the specification.
+              consistent with the draft.
             </p>
           ) : (
             <div>

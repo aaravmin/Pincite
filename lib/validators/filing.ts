@@ -108,7 +108,7 @@ export function runFilingChecks(input: {
       severity: "attention",
       actionable: true,
       title: "Invention title is missing",
-      explanation: "The ADS and the specification both need the invention title.",
+      explanation: "The ADS and your draft both need the invention title.",
       mpep_section: null,
       cfr_ref: "37 CFR 1.76",
     });

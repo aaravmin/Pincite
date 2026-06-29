@@ -25,14 +25,14 @@ test("phase-3: stage detection transitions across fill levels and declared statu
   await page.waitForURL("**/projects/**");
   const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
 
-  // Spec sections only, no claims -> Specification drafting.
+  // Description sections only, no claims -> Description drafting.
   for (const [label, text] of SPEC) {
     await page.getByRole("button", { name: label, exact: true }).click();
     await page.locator("[data-testid^='editor-']").fill(text);
     await expect(page.getByTestId("save-status")).toHaveText("Saved");
   }
   await page.goto(`/projects/${projectId}/stage`);
-  await expect(page.getByTestId("stage-label")).toHaveText(/Specification drafting/i);
+  await expect(page.getByTestId("stage-label")).toHaveText(/Description drafting/i);
   await screenshot(page, "phase-3-stage-spec");
 
   // Add claims -> Claims drafting.

@@ -77,7 +77,7 @@ export function runTier2(
         actionable: true,
         title: `Claim ${c.number} invokes means-plus-function ("${mpf[0].trim()}")`,
         explanation:
-          "Under 35 U.S.C. 112(f), make sure the specification discloses the corresponding structure, or the limitation may be indefinite.",
+          "Under 35 U.S.C. 112(f), make sure your draft discloses the corresponding structure, or the limitation may be indefinite.",
         mpep_section: "2181",
         cfr_ref: "35 U.S.C. 112(f)",
       });

@@ -64,7 +64,7 @@ export function surfaceRules(input: RuleInput): {
     add(
       "2161",
       "35 U.S.C. 112(a)",
-      "Written description and enablement: the specification must show possession and enable the full scope of what is claimed.",
+      "Written description and enablement: your draft must show possession and enable the full scope of what is claimed.",
       draftingReason,
     );
     add(
@@ -107,7 +107,7 @@ export function surfaceRules(input: RuleInput): {
       add(
         "2181",
         "35 U.S.C. 112(f)",
-        "If a claim uses functional 'means' language, the specification must disclose the corresponding structure.",
+        "If a claim uses functional 'means' language, your draft must disclose the corresponding structure.",
         claimsReason,
       );
     }
@@ -141,7 +141,7 @@ export function surfaceRules(input: RuleInput): {
       triggered: hasNonce,
       mpep_section: "2181",
       cfr_ref: "35 U.S.C. 112(f)",
-      note: "§112(f) is invoked; disclose corresponding structure in the specification or the limitation may be indefinite.",
+      note: "§112(f) is invoked; disclose corresponding structure in your draft or the limitation may be indefinite.",
       actionable: true,
     },
     {
