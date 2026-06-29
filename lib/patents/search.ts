@@ -18,6 +18,7 @@ import { extractLimitations, claimKeywords } from "@/lib/patents/extract";
 import { matchCandidate } from "@/lib/patents/match";
 import { semanticScores } from "@/lib/patents/semantic";
 import { searchCandidates } from "@/lib/patents/bigquery";
+import { checkRateLimit } from "@/lib/ratelimit";
 import type { SpanMatch } from "@/lib/patents/match";
 
 async function requireUser() {
@@ -83,6 +84,12 @@ export async function runPriorArtSearch(
   const claims = sections["claims"] ?? "";
   if (!claims.trim()) return { error: "Add claims to the project first." };
 
+  // BigQuery live search is the costliest path (~$0.82/scan); cap per user by hour and day.
+  const rlHour = await checkRateLimit(supabase, "prior_art_live_hour", 6, 3600);
+  if (!rlHour.allowed) return { error: rlHour.retryMessage };
+  const rlDay = await checkRateLimit(supabase, "prior_art_live_day", 20, 86400);
+  if (!rlDay.allowed) return { error: rlDay.retryMessage };
+
   const limitations = extractLimitations(claims);
   const keywords = claimKeywords(claims, 8);
 
@@ -139,6 +146,9 @@ export async function compareAgainstCandidate(input: {
   const sections = await getSectionContent(input.projectId);
   const claims = sections["claims"] ?? "";
   if (!claims.trim()) return { error: "Add claims to the project first." };
+
+  const rl = await checkRateLimit(supabase, "prior_art_compare", 60, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
 
   const limitations = extractLimitations(claims);
   const m = matchCandidate(limitations, input.text);

@@ -60,4 +60,5 @@ export default async function globalSetup() {
   // dashboard starts empty and version/audit assertions are deterministic. No-op if
   // the Phase 1 tables don't exist yet.
   await admin.from("projects").delete().eq("user_id", user.id);
+  await admin.from("api_usage").delete().eq("user_id", user.id);
 }

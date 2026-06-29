@@ -26,6 +26,8 @@ async function resetTestUser(): Promise<void> {
     .eq("id", user.id);
   await admin.from("audit_log").delete().eq("user_id", user.id);
   await admin.from("projects").delete().eq("user_id", user.id);
+  // Clear rate-limit usage so the suite is order- and run-count-independent.
+  await admin.from("api_usage").delete().eq("user_id", user.id);
 }
 
 /**

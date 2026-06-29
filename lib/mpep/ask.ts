@@ -11,6 +11,7 @@ import { locate, extractSectionNumbers } from "@/lib/mpep/locate";
 import { loadSection } from "@/lib/mpep/load";
 import { partitionCitations } from "@/lib/mpep/citation";
 import { selectResponsivePassage } from "@/lib/mpep/highlight";
+import { checkRateLimit } from "@/lib/ratelimit";
 import type { AskResult } from "@/lib/mpep/types";
 
 export async function askMpep(
@@ -24,6 +25,9 @@ export async function askMpep(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not signed in." };
+
+  const rl = await checkRateLimit(supabase, "mpep_ask", 60, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
 
   const requested = await partitionCitations(extractSectionNumbers(q));
   const candidates = await locate(q, 6);

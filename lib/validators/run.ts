@@ -18,6 +18,7 @@ import { validateCitations } from "@/lib/mpep/citation";
 import { loadSection, type MpepSection } from "@/lib/mpep/load";
 import { parseClaims } from "@/lib/patent/claims";
 import { generateText } from "@/lib/llm/generate";
+import { checkRateLimit } from "@/lib/ratelimit";
 import type { EligibilityAnalysis } from "@/lib/validators/types";
 
 async function requireUser() {
@@ -97,6 +98,9 @@ export async function analyzeEligibility(projectId: string): Promise<
   const parsed = parseClaims(claims);
   const indep = parsed.find((c) => !/\bclaim\s+\d+\b/i.test(c.raw)) ?? parsed[0];
   if (!indep) return { error: "No claim found." };
+
+  const rl = await checkRateLimit(supabase, "eligibility", 30, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
 
   const system =
     "You are a patent examiner aid applying the USPTO Alice/Mayo subject-matter eligibility framework (MPEP 2106). Do NOT decide whether the claim is eligible or ineligible. Walk the framework concisely and neutrally. Return ONLY a JSON object.";

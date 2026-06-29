@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { describeDrawing } from "@/lib/llm/vision";
+import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
 import type { InventorInput, DeclarationStatements } from "@/lib/filing/types";
@@ -188,6 +189,9 @@ export async function analyzeDrawing(input: {
   if (!att.mime.startsWith("image/")) {
     return { error: "Only image figures can be described." };
   }
+
+  const rl = await checkRateLimit(supabase, "drawing_vision", 30, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
 
   const { data: blob, error: dlErr } = await createAdminClient()
     .storage.from("project-files")

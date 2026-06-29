@@ -40,9 +40,23 @@ RLS isolation; standing consent/warning on intake.
   invention text is NOT yet permitted, despite the intent to enable ZDR. Surfaced to the user.
 - **Pre-production checklist (before ANY real invention text):**
   - [ ] xAI Grok enterprise ZDR enabled on the team (response header reads "true"). CURRENTLY OFF.
-  - [ ] Voyage account zero-retention opt-out confirmed (no per-request signal; verify in dashboard).
+  - [x] Voyage account zero-retention / no-training opt-out confirmed (2026-06-28, user opted out of
+    training in the dashboard; Voyage gives no per-request signal). One vendor cleared; xAI still blocks
+    real invention text, so the synthetic-only posture stands until xAI ZDR flips on.
   - [x] Supabase US-region + encryption at rest + per-user RLS.
   - Uploads: stored encrypted in a US-region Supabase Storage bucket (per-user RLS), never to a non-ZDR vendor.
+
+### Cost / abuse posture (security-audit, 2026-06-28)
+- **Per-user rate limiting** (migration 0011): every paid endpoint is throttled server-side via the
+  `consume_rate_limit` SQL function before the provider call - BigQuery live search (6/hr + 20/day, the
+  ~$0.82/scan path), Grok §101 (30/hr), Grok vision (30/hr), Voyage Ask (60/hr), free compare (60/hr).
+  The `api_usage` table is not user-writable (only the security-definer function and the service role
+  write it), so a client cannot reset its own quota. Fails closed.
+- **Still recommended (account-level, user action):** hard budget caps / alerts on xAI, BigQuery (GCP),
+  and Voyage, since per-user limits bound abuse but not a runaway total. BigQuery also caps each query at
+  160 GB (`maximumBytesBilled`).
+- RLS audit (2026-06-28): all 15 tables owner-scoped, no cross-tenant read/write, admin/service-role
+  call sites verify ownership first; no billing/tier/is_admin columns exist. Clean.
 
 ## Risks to keep in mind (roadmap §11)
 Hallucinated citations (mitigated by corpus-validated cites), over-trust of the

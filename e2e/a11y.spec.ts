@@ -7,6 +7,10 @@ const BLOCKING = ["serious", "critical"];
 test("phase-9: key screens have no serious or critical accessibility violations", async ({
   page,
 }) => {
+  // Scans 12 screens, each a cold Turbopack compile + navigation + axe pass; the default
+  // 60s is not enough on a cold dev server (it only passed before when prior specs had
+  // warmed the routes). Give it room so the gate is not run-order dependent.
+  test.setTimeout(300000);
   await loginAsTestUser(page);
   await page.goto("/consent");
   await page.getByRole("button", { name: /i understand, continue/i }).click();

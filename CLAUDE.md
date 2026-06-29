@@ -48,7 +48,8 @@ the end of each session — but be stringent; trim before it bloats.
   Code subagents; scheduled/recurring (e.g. weekly patent monitoring) → Hermes.
 - **Synthetic / non-confidential text only** until xAI ZDR is actually on — its API reports
   ZDR OFF now (`x-zero-data-retention` response = "false"; setting it on the request 400s).
-  Voyage opt-out unverified. Uploads stored encrypted US-region. See business-context.
+  Voyage opt-out DONE (2026-06-28); xAI is the last blocker. Uploads encrypted US-region. See
+  business-context.
 
 ## Conventions
 - Strict color system (roadmap §2.1), enforced in review + the verify gate:
@@ -103,6 +104,13 @@ the end of each session — but be stringent; trim before it bloats.
   the response header for ZDR status; it currently reads "false".
 - **exports.format CHECK.** `exports.format` is constrained; new formats need a migration
   (0008 added 'docx','package'). A silently-swallowed export insert = the CHECK rejected it.
+- **Rate limiting (migration 0011).** Paid endpoints are throttled per user via the
+  `consume_rate_limit(kind,limit,window)` SQL function (security definer, atomic check+record)
+  called through `lib/ratelimit.ts:checkRateLimit` BEFORE the provider call: BigQuery live search
+  6/hr+20/day (~$0.82/scan), Grok §101 30/hr, Grok vision 30/hr, Voyage Ask 60/hr, free compare
+  60/hr. Fails closed. `api_usage` has no user write policy (only the definer fn + service role
+  write it), so quota can't be reset client-side; `e2e/auth.ts` clears it per run so the suite is
+  run-count-independent.
 
 ## Skills
 - `verify-feature` — the §7 gate as a documented, reusable procedure. Built Phase 0.
