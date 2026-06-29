@@ -5,7 +5,7 @@ type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 // Routes the middleware does not redirect. API routes still get session refresh
 // but enforce their own authorization, so they must never be bounced to /login.
-const PUBLIC_PREFIXES = ["/login", "/auth", "/api"];
+const PUBLIC_PREFIXES = ["/login", "/auth", "/api", "/privacy", "/terms"];
 const PUBLIC_EXACT = ["/"];
 
 function isPublic(pathname: string): boolean {

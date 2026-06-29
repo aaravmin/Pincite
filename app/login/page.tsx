@@ -33,6 +33,15 @@ export default async function LoginPage() {
           A legal research aid, not legal advice. You are responsible for the
           confidentiality of anything you enter.
         </p>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          <Link href="/privacy" className="underline">
+            Privacy Policy
+          </Link>{" "}
+          &middot;{" "}
+          <Link href="/terms" className="underline">
+            Terms of Service
+          </Link>
+        </p>
       </main>
     </div>
   );

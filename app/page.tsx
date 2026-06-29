@@ -33,6 +33,15 @@ export default async function Home() {
           A legal research aid, not legal advice. You are responsible for the
           confidentiality of anything you enter. Verify anything time sensitive.
         </p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          <Link href="/privacy" className="underline">
+            Privacy Policy
+          </Link>{" "}
+          &middot;{" "}
+          <Link href="/terms" className="underline">
+            Terms of Service
+          </Link>
+        </p>
       </main>
     </div>
   );
