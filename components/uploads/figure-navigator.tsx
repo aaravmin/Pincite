@@ -128,7 +128,12 @@ export function FigureNavigator({
               className="h-[480px] w-full rounded border border-border"
             />
           ) : (
-            <DrawingAnalysis key={sel.id} projectId={projectId} attachmentId={sel.id} />
+            <DrawingAnalysis
+              key={sel.id}
+              projectId={projectId}
+              attachmentId={sel.id}
+              initialReview={sel.analysis}
+            />
           )}
         </div>
       </div>

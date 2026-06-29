@@ -69,6 +69,8 @@ export type Attachment = {
   mime: string;
   size_bytes: number;
   created_at: string;
+  /** Persisted vision drawing review, if this figure has been checked (survives reloads). */
+  analysis: DrawingReview | null;
 };
 
 /** The five 37 CFR 1.63 attestations captured when an inventor signs (PTO/AIA/01). */

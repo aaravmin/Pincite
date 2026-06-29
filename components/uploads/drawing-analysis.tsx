@@ -11,12 +11,14 @@ import type { DrawingReview } from "@/lib/filing/types";
 export function DrawingAnalysis({
   projectId,
   attachmentId,
+  initialReview = null,
 }: {
   projectId: string;
   attachmentId: string;
+  initialReview?: DrawingReview | null;
 }) {
   const [pending, start] = useTransition();
-  const [review, setReview] = useState<DrawingReview | null>(null);
+  const [review, setReview] = useState<DrawingReview | null>(initialReview);
   const [err, setErr] = useState<string | null>(null);
 
   function run() {
@@ -70,7 +72,11 @@ export function DrawingAnalysis({
           disabled={pending}
           data-testid="describe-drawing"
         >
-          {pending ? "Reading the figure…" : "Check drawing (vision)"}
+          {pending
+            ? "Reading the figure…"
+            : review
+              ? "Re-check drawing (vision)"
+              : "Check drawing (vision)"}
         </Button>
       </div>
 

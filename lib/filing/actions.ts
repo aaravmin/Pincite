@@ -306,6 +306,21 @@ export async function analyzeDrawing(input: {
     });
   }
 
+  const review: DrawingReview = {
+    summary: vision.summary,
+    figureLabel: vision.figureLabel,
+    components,
+    findings,
+  };
+  // Persist the review so the issues flagged on this figure survive a page leave. Ownership
+  // was verified above; use the admin client because project_attachments has no row-update
+  // RLS policy.
+  await createAdminClient()
+    .from("project_attachments")
+    .update({ analysis: review })
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId);
+
   await logAudit(supabase, {
     userId: user.id,
     action: "drawing_analyzed",
@@ -317,11 +332,5 @@ export async function analyzeDrawing(input: {
     },
   });
 
-  return {
-    ok: true,
-    summary: vision.summary,
-    figureLabel: vision.figureLabel,
-    components,
-    findings,
-  };
+  return { ok: true, ...review };
 }
