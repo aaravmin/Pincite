@@ -19,7 +19,7 @@ import { loadSection, type MpepSection } from "@/lib/mpep/load";
 import { parseClaims } from "@/lib/patent/claims";
 import { generateText } from "@/lib/llm/generate";
 import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
-import type { EligibilityAnalysis } from "@/lib/validators/types";
+import type { EligibilityAnalysis, Finding } from "@/lib/validators/types";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -30,10 +30,16 @@ async function requireUser() {
   return { supabase, user };
 }
 
-export async function runValidators(
+/**
+ * Re-run the deterministic validators (tiers 1-3) over the project's current saved text,
+ * validate each MPEP pin against the corpus (dropping unresolved ones), and replace the
+ * stored findings. Returns the freshly computed findings so callers can report on them.
+ * Deterministic and cheap (no model call), so it is safe to run on every recheck.
+ */
+async function computeAndPersistFindings(
+  supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
   projectId: string,
-): Promise<{ ok: true; count: number; dropped: number } | { error: string }> {
-  const { supabase, user } = await requireUser();
+): Promise<{ findings: Finding[]; dropped: number }> {
   const [sections, project] = await Promise.all([
     getSectionContent(projectId),
     getProject(projectId),
@@ -63,6 +69,14 @@ export async function runValidators(
       findings.map((f) => ({ project_id: projectId, ...f })),
     );
   }
+  return { findings, dropped };
+}
+
+export async function runValidators(
+  projectId: string,
+): Promise<{ ok: true; count: number; dropped: number } | { error: string }> {
+  const { supabase, user } = await requireUser();
+  const { findings, dropped } = await computeAndPersistFindings(supabase, projectId);
 
   await logAudit(supabase, {
     userId: user.id,
@@ -72,6 +86,31 @@ export async function runValidators(
   });
   revalidatePath(`/projects/${projectId}/review`);
   return { ok: true, count: findings.length, dropped };
+}
+
+/**
+ * Re-check a single issue the user believes they fixed. Re-runs the validators over the
+ * current text and reports whether an issue with the same section and title still appears.
+ * Also refreshes the stored findings so the list reflects the latest state.
+ */
+export async function recheckFinding(
+  projectId: string,
+  sectionKey: string,
+  title: string,
+): Promise<{ ok: true; fixed: boolean; total: number } | { error: string }> {
+  const { supabase, user } = await requireUser();
+  const { findings } = await computeAndPersistFindings(supabase, projectId);
+  const stillPresent = findings.some(
+    (f) => f.section_key === sectionKey && f.title === title,
+  );
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "findings_run",
+    projectId,
+    detail: { kind: "recheck", section: sectionKey, fixed: !stillPresent },
+  });
+  revalidatePath(`/projects/${projectId}/review`);
+  return { ok: true, fixed: !stillPresent, total: findings.length };
 }
 
 export async function getRuleSection(

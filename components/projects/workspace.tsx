@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { saveSection } from "@/lib/projects/actions";
@@ -35,13 +36,41 @@ export function Workspace({
   const sectionsRef = useRef(sections);
   sectionsRef.current = sections;
 
-  const [active, setActive] = useState<SectionKey>("title");
+  const searchParams = useSearchParams();
+  const initialActive = ((): SectionKey => {
+    const s = searchParams.get("section");
+    return s && (SECTION_KEYS as readonly string[]).includes(s)
+      ? (s as SectionKey)
+      : "title";
+  })();
+
+  const [active, setActive] = useState<SectionKey>(initialActive);
   const [state, setState] = useState<Record<SectionKey, SaveState>>(
     {} as Record<SectionKey, SaveState>,
   );
   const timers = useRef<Map<SectionKey, ReturnType<typeof setTimeout>>>(
     new Map(),
   );
+
+  // Arriving from a review finding (?section&from&to): open that section and select the
+  // offending span so the user lands on exactly the text to change.
+  const taRef = useRef<HTMLTextAreaElement>(null);
+  const focusedRef = useRef(false);
+  useEffect(() => {
+    if (focusedRef.current || !taRef.current) return;
+    const from = Number(searchParams.get("from"));
+    const to = Number(searchParams.get("to"));
+    if (Number.isFinite(from) && Number.isFinite(to) && to > from) {
+      focusedRef.current = true;
+      const ta = taRef.current;
+      ta.focus();
+      try {
+        ta.setSelectionRange(from, to);
+      } catch {
+        /* offsets shifted out of range after an edit; ignore */
+      }
+    }
+  }, [searchParams]);
 
   const commit = useCallback(
     async (key: SectionKey) => {
@@ -155,6 +184,7 @@ export function Workspace({
               </p>
             )}
             <Textarea
+              ref={taRef}
               value={sections[active]}
               onChange={(e) => onChange(active, e.target.value)}
               onBlur={() => {

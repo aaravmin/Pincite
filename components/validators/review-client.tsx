@@ -1,11 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EvidencePane } from "@/components/mpep/evidence-pane";
-import { runValidators, getRuleSection, analyzeEligibility } from "@/lib/validators/run";
+import {
+  runValidators,
+  recheckFinding,
+  getRuleSection,
+  analyzeEligibility,
+} from "@/lib/validators/run";
 import type { MpepSection } from "@/lib/mpep/load";
 import type { FindingRow } from "@/lib/validators/results";
 import type { EligibilityAnalysis } from "@/lib/validators/types";
@@ -115,6 +121,7 @@ export function ReviewClient({
                         <FindingItem
                           key={f.id}
                           f={f}
+                          projectId={projectId}
                           sections={sections}
                           selected={selectedId === f.id}
                           onSelect={() => selectFinding(f)}
@@ -148,23 +155,43 @@ export function ReviewClient({
 
 function FindingItem({
   f,
+  projectId,
   sections,
   selected,
   onSelect,
   onOpenRule,
 }: {
   f: FindingRow;
+  projectId: string;
   sections: Record<string, string>;
   selected: boolean;
   onSelect: () => void;
   onOpenRule: (n: string) => void;
 }) {
+  const router = useRouter();
+  const [checking, startCheck] = useTransition();
+  const [verdict, setVerdict] = useState<"fixed" | "present" | null>(null);
+
+  function recheck() {
+    setVerdict(null);
+    startCheck(async () => {
+      const r = await recheckFinding(projectId, f.section_key, f.title);
+      if ("error" in r) return;
+      setVerdict(r.fixed ? "fixed" : "present");
+      // When resolved, refresh so it drops out of the list and any new issues appear.
+      if (r.fixed) router.refresh();
+    });
+  }
+
   const snippet =
     sections[f.section_key] && f.span_end > f.span_start
       ? sections[f.section_key].slice(f.span_start, f.span_end).slice(0, 120)
       : null;
   const sevColor =
     f.severity === "violation" ? "text-violation" : "text-attention-foreground";
+  const issueHref = `/projects/${projectId}?section=${encodeURIComponent(
+    f.section_key,
+  )}&from=${f.span_start}&to=${f.span_end}`;
 
   return (
     <li
@@ -227,6 +254,35 @@ function FindingItem({
               >
                 Open MPEP {f.mpep_section} →
               </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <Link
+              href={issueHref}
+              className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent/50"
+            >
+              Take me to issue →
+            </Link>
+            {f.actionable && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={recheck}
+                disabled={checking}
+              >
+                {checking ? "Checking…" : "Check if fixed"}
+              </Button>
+            )}
+            {verdict === "fixed" && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-pass">
+                <Check className="size-3.5" aria-hidden /> Looks fixed
+              </span>
+            )}
+            {verdict === "present" && (
+              <span className="text-xs font-medium text-attention-foreground">
+                Still present, not resolved yet
+              </span>
             )}
           </div>
         </div>
