@@ -13,6 +13,8 @@ export type SurfacedRule = {
   mpep_section: string | null;
   cfr_ref: string | null;
   note: string;
+  /** Plain-language reason this rule is in the Applies-now list right now. */
+  reason?: string;
   actionable: boolean;
 };
 export type ConditionalRule = SurfacedRule & { trigger: string; triggered: boolean };
@@ -50,44 +52,79 @@ export function surfaceRules(input: RuleInput): {
     mpep_section: string | null,
     cfr_ref: string | null,
     note: string,
+    reason: string,
     actionable = true,
-  ) => appliesNow.push({ mpep_section, cfr_ref, note, actionable });
+  ) => appliesNow.push({ mpep_section, cfr_ref, note, reason, actionable });
+
+  // Plain-language reasons so the user sees WHY each rule is on the Applies-now list.
+  const draftingReason = "Your application is at the drafting stage, so the disclosure and format rules govern now.";
+  const claimsReason = "You have written claims, so the claim-form rules apply to them.";
 
   if (drafting) {
     add(
       "2161",
       "35 U.S.C. 112(a)",
       "Written description and enablement: the specification must show possession and enable the full scope of what is claimed.",
+      draftingReason,
     );
     add(
       "2173",
       "35 U.S.C. 112(b)",
       "Claims must be definite — particularly point out and distinctly claim the invention.",
+      draftingReason,
     );
-    add("608.01(a)", "37 CFR 1.77", "Arrange the application in the standard section order.");
+    add(
+      "608.01(a)",
+      "37 CFR 1.77",
+      "Arrange the application in the standard section order.",
+      draftingReason,
+    );
     add(
       "608.01(b)",
       "37 CFR 1.72(b)",
       "Abstract: a single paragraph, 150 words or fewer.",
+      draftingReason,
     );
     if (f.has("claims")) {
-      add("608.01(m)", "37 CFR 1.75", "Each claim is a single sentence; number claims consecutively.");
+      add(
+        "608.01(m)",
+        "37 CFR 1.75",
+        "Each claim is a single sentence; number claims consecutively.",
+        claimsReason,
+      );
       add(
         "608.01(n)",
         "37 CFR 1.75(c)",
         "A dependent claim must refer to a preceding claim and further limit it.",
+        claimsReason,
       );
-      add("2111.03", null, "Use a recognized transitional phrase; it sets the claim's open or closed scope.");
+      add(
+        "2111.03",
+        null,
+        "Use a recognized transitional phrase; it sets the claim's open or closed scope.",
+        claimsReason,
+      );
       add(
         "2181",
         "35 U.S.C. 112(f)",
         "If a claim uses functional 'means' language, the specification must disclose the corresponding structure.",
+        claimsReason,
       );
     }
   } else if (input.declared_status === "filed" || input.declared_status === "published") {
-    add("714", "37 CFR 1.121", "After filing, amendments must follow the amendment-practice format.");
+    add(
+      "714",
+      "37 CFR 1.121",
+      "After filing, amendments must follow the amendment-practice format.",
+      "You marked this application as filed or published, so amendment practice now applies.",
+    );
   } else if (isOfficeAction) {
-    add("714", "37 CFR 1.111", "Respond to the office action and address every ground of rejection.");
+    add(
+      "714",
+      "37 CFR 1.111",
+      "Respond to the office action and address every ground of rejection.",
+      "You marked this application as having an office action, so a reply is due.",
+    );
   }
 
   const conditional: ConditionalRule[] = [

@@ -27,6 +27,10 @@ export function RulesClient({
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Applies now
           </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Rules that govern your application right now. Each shows why it applies; open the
+            pin to read the source.
+          </p>
           <ul className="mt-2 space-y-2">
             {appliesNow.map((r, i) => (
               <li key={i} className="rounded-md border border-border p-3">
@@ -38,6 +42,14 @@ export function RulesClient({
                   {!r.actionable && <Tag>Informational</Tag>}
                 </div>
                 <p className="mt-1 text-sm text-foreground">{r.note}</p>
+                {r.reason && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      Why this applies:{" "}
+                    </span>
+                    {r.reason}
+                  </p>
+                )}
                 <Pins r={r} onOpen={open} />
               </li>
             ))}
@@ -47,6 +59,10 @@ export function RulesClient({
         <section>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             May apply next
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            These do not apply yet. Each shows the condition that would trigger it; a met
+            condition is marked &quot;now applies.&quot;
           </p>
           <ul className="mt-2 space-y-2">
             {conditional.map((r, i) => (

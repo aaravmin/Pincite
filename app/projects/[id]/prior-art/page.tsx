@@ -30,7 +30,7 @@ export default async function PriorArtPage({
   const { claims, matches } = await getPriorArtResults(id);
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <div className="flex items-center gap-3">
           <Link
@@ -45,9 +45,7 @@ export default async function PriorArtPage({
         </div>
         <HeaderActions projectId={id} />
       </header>
-      <div className="min-h-0 flex-1">
-        <PriorArtClient projectId={id} claims={claims} matches={matches} />
-      </div>
+      <PriorArtClient projectId={id} claims={claims} matches={matches} />
     </div>
   );
 }

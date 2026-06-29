@@ -73,7 +73,7 @@ export function PriorArtClient({
   const sel = matches[selected];
 
   return (
-    <div className="flex h-full flex-col">
+    <div>
       <div className="border-b border-border px-6 py-3">
         <p className="text-xs text-muted-foreground">
           Find public patents that overlap your claims. <strong>Run search</strong> pulls
@@ -148,8 +148,8 @@ export function PriorArtClient({
           No prior-art matches yet. Run a search, or compare a specific patent.
         </p>
       ) : (
-        <div className="flex min-h-0 flex-1">
-          <aside className="w-2/5 shrink-0 overflow-auto border-r border-border">
+        <div className="grid md:grid-cols-[2fr_3fr]">
+          <aside className="border-b border-border md:sticky md:top-0 md:max-h-screen md:self-start md:overflow-auto md:border-b-0 md:border-r">
             <ul className="divide-y divide-border">
               {matches.map((m, i) => {
                 const url = patentUrl(m.patent_number, m.source_url);
@@ -200,10 +200,7 @@ export function PriorArtClient({
               })}
             </ul>
           </aside>
-          <section
-            className="min-w-0 flex-1 overflow-auto px-6 py-5"
-            data-testid="overlap-detail"
-          >
+          <section className="min-w-0 px-6 py-5" data-testid="overlap-detail">
             {sel && <MatchDetail key={sel.id} claims={claims} match={sel} />}
           </section>
         </div>
