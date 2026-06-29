@@ -199,6 +199,13 @@ the end of each session — but be stringent; trim before it bloats.
       verified incl. 3D. Public `/privacy` + `/terms` (middleware allowlisted) + Google Search
       Console verification meta tag in the root layout (for OAuth consent-screen domain).
       Demo aids: `docs/demo-script.md` + `docs/demo-pizza-box-fields.md`.
+- [x] Readiness overview (`/projects/[id]/overview`, `lib/readiness.ts`): the per-matter home
+      you land on when you open a matter (dashboard cards + a step-rail Overview link route
+      here; new-project create still lands on Draft). Assembles stage + what-to-advance + a
+      depth-weighted completeness bar (neutral fill) + a checklist of all nine steps each with a
+      live status and link + a Next-step CTA. Issue/filing counts are computed live by reusing
+      detectStage/runTier1-3/runFilingChecks/runCrossRefChecks, so the overview never disagrees
+      with the detail screens. Color discipline: red dot = violation only. e2e `overview.spec.ts`.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

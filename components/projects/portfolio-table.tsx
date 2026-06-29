@@ -65,7 +65,7 @@ export function PortfolioTable({
                   </td>
                   <td className="px-4 py-2">
                     <Link
-                      href={`/projects/${p.id}`}
+                      href={`/projects/${p.id}/overview`}
                       className="font-medium text-foreground hover:underline"
                     >
                       {p.name}

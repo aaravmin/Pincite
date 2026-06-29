@@ -95,7 +95,7 @@ export function DashboardProjects({
               >
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={`/projects/${p.id}`}
+                    href={`/projects/${p.id}/overview`}
                     className="font-medium text-foreground hover:underline"
                   >
                     {p.name}

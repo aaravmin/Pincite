@@ -42,9 +42,20 @@ export function StepRail({
     >
       <Link
         href="/dashboard"
-        className="mb-3 flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+        className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground"
       >
         ← Dashboard
+      </Link>
+      <Link
+        href={`${base}/overview`}
+        aria-current={pathname === `${base}/overview` ? "page" : undefined}
+        className={`mt-1 mb-3 flex items-center gap-1.5 rounded-md px-2 py-1 text-sm ${
+          pathname === `${base}/overview`
+            ? "bg-accent font-medium text-foreground"
+            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+        }`}
+      >
+        Overview
       </Link>
       <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Steps
