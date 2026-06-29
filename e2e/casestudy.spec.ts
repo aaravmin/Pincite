@@ -146,5 +146,35 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   await page.getByTestId("toggle-claims").click();
   await screenshot(page, "case-prior-art");
 
+  // Inventors and the ADS, with Apple Inc. as the juristic applicant.
+  await page.goto(`/projects/${id}/inventors`);
+  await expect(page.getByTestId("inventor-name-0")).toHaveValue("Francesco Longoni");
+  await screenshot(page, "case-inventors");
+
+  // Rules that apply now and conditionally.
+  await page.goto(`/projects/${id}/rules`);
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await screenshot(page, "case-rules");
+
+  // Stage detection and what to do now.
+  await page.goto(`/projects/${id}/stage`);
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await screenshot(page, "case-stage");
+
+  // The inventor's declaration to sign.
+  await page.goto(`/projects/${id}/sign`);
+  await expect(page.getByText(/original inventor/i).first()).toBeVisible();
+  await screenshot(page, "case-sign");
+
+  // The filing-ready report and export.
+  await page.goto(`/projects/${id}/report`);
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await screenshot(page, "case-report");
+
+  // The audit trail.
+  await page.goto(`/projects/${id}/audit`);
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await screenshot(page, "case-audit");
+
   assertClean(errs);
 });

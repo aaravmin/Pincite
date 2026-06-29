@@ -23,49 +23,85 @@ Pincite helps people draft a US patent. It serves both pro se inventors and pate
 
 ## A case study, Apple's circular pizza box
 
-To show the whole thing in action we follow one real already filed invention from intake to review. It is Apple's molded fiber food container, US 2012/0024859 A1 by Francesco Longoni and Mark E. Doutt, the round vented box Apple designed so a pizza does not go soggy. The draft is kept mid review on purpose so the checks have something to catch. All of the text is public.
+To show the whole thing end to end we follow one real, already filed invention through the workflow in the order you would actually use it. It is Apple's molded fiber food container, US 2012/0024859 A1 by Francesco Longoni and Mark E. Doutt, the round vented box Apple designed so a pizza does not go soggy. The draft is kept mid review on purpose so the checks have something to catch. Every bit of text and every figure here is public.
 
-### The dashboard
+### 1. The dashboard
 
-Every application shows its status and the single next step that matters, with the deadline critical steps marked in attention. The sidebar is the spine and Dashboard is one click from anywhere.
+Every application shows its detected stage, how complete it is, the open issues, and the single next step that matters, with deadline critical steps marked in attention. The sidebar is the spine and the dashboard is one click from anywhere.
 
 ![Dashboard](screenshots/case-dashboard.png)
 
-### Invention intake
+### 2. Invention intake
 
 You describe the invention in plain language and Pincite cross references it against your specification and claims. Here it catches a carrying handle that was disclosed but never described, so the draft and the disclosure do not drift apart.
 
 ![Invention intake](screenshots/case-disclosure.png)
 
-### Error handling in action
+### 3. Inventors and the application data sheet
+
+You name every inventor and say who owns the invention. Apple is the applicant here, a company, so the ownership rules apply. Pincite assembles the ADS data card the USPTO needs and checks it for defects.
+
+![Inventors and ADS](screenshots/case-inventors.png)
+
+### 4. Checking the drawings
+
+Upload a figure and Pincite reads it for drawing defects under 37 CFR 1.84 and 1.83. On Apple's own FIG. 1 it catches reference numerals that appear in the drawing but were never introduced in the specification, circling each one in red and pinning it to the rule. Defects with no single spot, like a missing label or a drawing that is too small, are listed without a circle. The circle positions are an approximate vision estimate, labeled to verify.
+
+![Drawing check](screenshots/case-drawing.png)
+
+### 5. Multiple views and 3D models
+
+A patent has many views, so each figure is tagged with its orientation - perspective, top, front, side, and so on - and you upload as many as you need. You can also upload a 3D model (GLB or GLTF) and rotate it by orientation right in the browser. It renders locally and is never sent to a model.
+
+![3D model viewer](screenshots/case-3d.png)
+
+### 6. Error handling in action
 
 Run the checks and the findings come back grouped by area as a scannable list. You triage at a glance instead of reading a wall of text. Two real violations sit at the top, a dependent claim that points at a claim that does not exist and a multiple dependent claim written cumulatively rather than in the alternative.
 
 ![Error handling](screenshots/case-review.png)
 
-### Click a finding to see why
+### 7. Click a finding to see why
 
 Click any finding and you land on the reasoning and the governing rule, side by side with your draft. Here the dependent claim that points at a non existent claim 6 opens MPEP 608.01(n) on dependent claims, scrolled to the relevant passage, with the USPTO source linked.
 
 ![From a finding to the rule](screenshots/case-evidence.png)
 
-### Finding similar patents
+### 8. Rules that apply now
 
-Compare against a patent you paste or pull candidates from Google BigQuery public patents data. Each overlap is pinned to the patent passage and to your own claim element, with a transparent score and a source link. There is no single novelty number, because one number invites over trust.
+Alongside the errors, Pincite surfaces the rules that govern this application right now, each one corpus validated and openable in the evidence pane. Conditional rules wait in attention until their trigger is met.
+
+![Rules](screenshots/case-rules.png)
+
+### 9. Stage and what to do now
+
+Pincite reads where the draft sits in the lifecycle, explains why, and says what is missing to advance. Once you declare a status like filed or office action, it tells you the next deadline driven step.
+
+![Stage and lifecycle](screenshots/case-stage.png)
+
+### 10. Finding similar patents
+
+Compare against a patent you paste, or pull candidates from Google BigQuery public patents data. Each overlap is pinned to the patent passage and to your own claim element, with a transparent score and a source link. There is no single novelty number, because one number invites over trust.
 
 ![Similar patents](screenshots/case-prior-art.png)
 
-### Checking the drawings
+### 11. Signing the inventor's declaration
 
-Upload a figure and Pincite reads it for drawing defects under 37 CFR 1.84 and 1.83. Here, on Apple's own FIG. 1, it catches reference numerals that appear in the drawing but were never introduced in the specification, circling each one in red on the figure and pinning it to the rule. The circle positions are an approximate vision estimate, labeled to verify.
+Each inventor reviews the application and confirms the five statements the USPTO requires, then types their legal name to record it. The filing readiness checks run here too and flag any defect, like a declaration that does not match the ADS, before you rely on it.
 
-![Drawing check](screenshots/case-drawing.png)
+![Signing the declaration](screenshots/case-sign.png)
 
-### Multiple views and 3D models
+### 12. The filing-ready export
 
-A patent has many views, so each figure is tagged with its orientation - perspective, top, front, side, and so on - and you upload as many as you need. You can also upload a 3D model (GLB or GLTF) and rotate it by orientation right in the browser. It renders locally and is never sent to a model.
+The output is a real document set, not a generic PDF. The specification comes out as a 37 CFR 1.77 DOCX with paragraph numbering, and the package adds the ADS data card, the declaration, a transmittal, and a fee summary as a ZIP.
 
-![3D model viewer](screenshots/case-3d.png)
+![Filing-ready export](screenshots/case-report.png)
+
+### 13. The audit trail
+
+Every meaningful action is written to an append only audit log you can filter, so there is a complete record of what happened and when.
+
+![Audit trail](screenshots/case-audit.png)
 
 ---
 

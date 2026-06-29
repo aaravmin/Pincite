@@ -1,371 +1,181 @@
-# Pincite product functionality
+# Pincite product walkthrough
 
-This is the complete functional reference for Pincite.
-It covers every screen, every input, every check, and the rules that sit behind them.
-For architecture and data model see `docs/architecture.md`.
-For the legal and confidentiality posture see `docs/business-context.md`.
+This document walks through every feature in the order it appears, so it can be turned into a demo script and then a video.
+Each numbered step is one screen or feature, with what it is, what you do, what you see, and the one line that matters.
 
 Pincite is an active patent review workbench.
-A person drafts a US patent section by section, and Pincite checks what they wrote, shows the governing rule pinned to real MPEP and CFR text, finds similar public patents with pinpoint overlaps, and produces a filing ready document set they hand to the USPTO themselves.
-Pincite is a research aid, not legal advice, and it never files anything for you.
+A person drafts a US patent section by section, and Pincite checks what they wrote against the real rules, finds similar public patents, and produces a filing ready document set they hand to the USPTO themselves.
+It is a research aid, not legal advice, and it never files anything.
 
-The core discipline is simple.
-No claim, finding, or rule reaches the screen without a citation that resolves to real corpus text.
+The running example throughout is Apple's molded fiber food container, US 2012/0024859 A1, a public and already filed patent.
+The matching screenshots live in `/screenshots` as `case-*.png`.
+
+One idea to state up front, because it underpins everything.
+No finding, rule, or citation reaches the screen unless its MPEP section resolves to real text in the ingested corpus.
 Anything that cannot be resolved is dropped rather than shown.
 
 ---
 
-## The two roles
+## 1. Landing and sign in
 
-A user picks a role once, right after consent, and the whole workflow adapts.
+The home page states what Pincite does in two lines, then sends you to the sign in screen.
+You can sign in with email and password, with a link to create an account, or continue with Google.
+Both run through Supabase Auth.
+A development only login exists for the automated tests and is dead in production.
+The takeaway is that this is a real, familiar sign in, not a demo stub.
 
-- **Inventor filing pro se.**
-  This person files their own patent.
-  They get plain English guidance, and they personally sign the inventor's declaration (37 CFR 1.63).
-- **Patent attorney or agent.**
-  This person files on behalf of clients.
-  They get a denser portfolio view across clients and matters, the power of attorney path, and they sign the prosecution papers.
+## 2. Consent
 
-The role only changes the workflow and the wording you see.
-It is not a security boundary.
-Every user can only ever see and edit their own projects, enforced by row level security on every table.
+Before any work you accept a short confidentiality and not legal advice notice.
+It is recorded with a timestamp and written to the audit log.
+The takeaway is that the confidentiality posture is explicit from the first screen.
 
-How the two paths differ in practice:
+## 3. Choose your role
 
-- The attorney dashboard groups projects by client and matter and shows a denser table.
-  The inventor dashboard shows a guided single project flow.
-- The New project dialog shows Client and Matter fields only for attorneys.
-- The Sign step centers on the inventor's own oath for a pro se filer.
-  For a juristic applicant (a company), the signature path expects a registered practitioner, which the filing checks enforce.
+Right after consent you pick a role, and it shapes the whole workflow.
+A pro se inventor gets plain English guidance and personally signs the inventor's declaration.
+A patent attorney gets a denser portfolio across clients and matters and the power of attorney path.
+The role only changes guidance and layout, never what data you can see, because row level security scopes every table to its owner.
+The takeaway is that one product serves both the solo inventor and the firm.
 
----
+## 4. The dashboard
 
-## Getting in
+The dashboard is the home base, and the sidebar is the spine of the app.
+Each project shows its detected stage, how complete it is, the count of open red issues, and the single next step that matters, with deadline critical steps marked in attention.
+An attorney sees a denser table grouped by client; a pro se inventor sees a guided list.
+See `screenshots/case-dashboard.png`.
+The takeaway is that you always know the one next thing to do.
 
-### Sign in
-
-The login screen offers two ways in.
-You can sign in with email and password, with a link to create an account.
-You can also continue with Google.
-Both run through Supabase Auth, and a new account flows straight into consent and then role selection.
-
-There is a development only login used by the automated tests.
-It returns a 404 in production and is never reachable by real users.
-
-### Consent
-
-Before any work, you accept a standing confidentiality and not legal advice notice.
-This is recorded with a timestamp and written to the audit log.
-
-### Role selection
-
-Right after consent you choose inventor or attorney.
-You can think of this as choosing which guidance and layout you want.
-
----
-
-## The dashboard
-
-The dashboard is the home base.
-Every project shows its detected stage, its completeness, the count of open red findings, and the single next step that matters.
-Deadline critical steps, like an office action reply or an issue fee, are marked in the attention color so they stand out.
-The sidebar is the spine of the app, and Dashboard is one click away from any screen.
-
-You can leave any input mid way and return to the dashboard at any time without losing work, because section edits autosave.
-
----
-
-## A project and the step rail
+## 5. Start a project
 
 A project is one in progress patent.
-Inside a project the left step rail lays out the whole flow in order, and each step turns green when it is complete.
+Creating one asks for a name, a patent type, and, for attorneys, a client and matter number.
+Patent type matters because it changes which checks run; utility covers how something works, design covers only the ornamental look, and plant covers a new plant variety.
+The takeaway is that the type you pick drives the rest of the review.
 
-The order is Draft, Disclosure, Inventors and ADS, Drawings, Review, Rules, Prior art, Sign, and Submission.
-You do not have to do them strictly in order, but some steps depend on earlier ones, and Pincite tells you when a step cannot be done yet.
+## 6. Draft the specification
 
-Creating a project asks for three things.
+The draft is the patent specification, entered as eleven plain text sections such as title, background, detailed description, claims, and abstract.
+Each section autosaves as you type, shows a saved indicator, and carries a short hint on what to put there.
+Every save is an append only snapshot, so you can save named versions, restore an old one into a new save without losing history, and branch.
+The takeaway is structured drafting with full, immutable version history.
 
-- **Name.**
-  A label so you can find the project later.
-  It is not the patent title.
-- **Patent type.**
-  Utility covers how something works or is used, which is most inventions.
-  Design covers only the ornamental look of an object.
-  Plant covers a new asexually reproduced plant variety.
-  This choice changes which checks run, so it is hard to change later.
-- **Client and Matter** (attorneys only).
-  The client name and your internal matter number.
+## 7. Invention disclosure
 
----
+The disclosure captures the invention in plain language, the way an inventor would explain it, separate from the formal specification.
+It records the problem, how it works, the key components, advantages, alternatives, and known prior art.
+Pincite cross references it against the draft and flags drift, like a component you disclosed but never claimed or described.
+On the Apple example it catches a carrying handle that was disclosed but never described.
+See `screenshots/case-disclosure.png`.
+The takeaway is that the plain language story and the legal draft are kept in sync.
 
-## Draft, the specification sections
+## 8. Inventors and the application data sheet
 
-The draft is the patent specification, entered as eleven plain text sections.
-The editors are plain text, not rich text, so character offsets stay stable and findings can underline the exact span later.
-Each section autosaves as you type and shows a saved indicator.
-Each section carries a short plain language hint that explains what to put there and flags when it depends on earlier work.
+Here you name every inventor and say who owns the invention.
+For each inventor you enter legal name, citizenship, residence, and mailing address, and you set the applicant and the fee entity status.
+Apple is the applicant in the example, a company, so the ownership rules apply, and Pincite assembles the ADS data card the USPTO needs and checks it for defects.
+See `screenshots/case-inventors.png`.
+The takeaway is that the filing identity is captured cleanly and checked, not left to a form at the end.
 
-The sections are the following.
+## 9. Drawings, multiple views, and 3D
 
-- **Title of the invention.**
-  A short specific technical name for the invention, not a brand name.
-- **Cross reference to related applications.**
-  Any earlier filing you are claiming priority to, or a note that none applies.
-- **Federally sponsored research and development.**
-  Government funding details, or a note that none applies.
-- **Background.**
-  The field, the problem, and why existing solutions fall short.
-- **Brief summary.**
-  A plain high level statement of the invention.
-- **Brief description of the drawings.**
-  One short line per figure.
-  This depends on uploading your figures first on the Drawings step.
-- **Detailed description.**
-  The full enabling description, introducing each part with a reference numeral that matches the drawings.
-- **Claims.**
-  The legal definition of what you are protecting.
-  One numbered claim per block, each a single sentence.
-  Claim 1 stands alone, and a dependent claim refers back to an earlier claim and adds to it.
-  Best drafted after the disclosure and detailed description so the claims are supported.
-- **Abstract.**
-  A single paragraph of 150 words or fewer, with a live word count toward the limit.
-- **Drawings metadata.**
-  The figure list and the reference numerals each figure shows.
-- **Office action.**
-  Hidden until you reach examination, where you paste the examiner's text so Pincite can help you respond.
+You upload figures as images or PDFs, or a 3D model in GLB or GLTF, all stored encrypted in a private US region bucket scoped to you.
+A patent has many views, so each figure is tagged with its orientation, perspective, top, front, side, and so on, and you upload as many as you need.
+A 3D model renders in the browser and turns by orientation with a toggle or by dragging, and it never leaves your account.
+On an image figure you run the drawing check, which reads the figure for defects under 37 CFR 1.84 and 1.83.
+It circles in red, on the figure, each reference numeral that appears in the drawing but was never introduced in the specification, numbered to a findings list and pinned to the rule.
+Defects with no single location, like a missing figure label, a drawing that is too small, or color where line art is required, are listed without a circle and tagged as whole figure.
+The circle positions are an approximate vision estimate, labeled to verify.
+See `screenshots/case-drawing.png` and `screenshots/case-3d.png`.
+The takeaway is that the drawings are reviewed and viewable, in 2D and 3D, not just attached.
 
-Every save is an append only snapshot.
-You can save a named version, restore an old version into a new save without losing history, and branch from a version.
-Nothing ever overwrites earlier history.
+## 10. Review, the error checking
 
----
+Review runs the validators across the draft and returns findings grouped by area, Claims and Specification, as a scannable list rather than a wall of text.
+The findings use a strict three signal system where red is a violation, yellow is attention, and green passes, and every colored item also carries a label and a shape so color is never the only signal.
+The checks run in tiers and are aware of the patent type: structure and format, consistency, substance including the Alice and Mayo eligibility walkthrough, filing readiness, and the disclosure cross references.
+On the Apple example two real violations sit at the top, a dependent claim that points at a claim that does not exist and a multiple dependent claim written cumulatively rather than in the alternative.
+See `screenshots/case-review.png`.
+The takeaway is that you triage real, rule backed issues at a glance.
 
-## Invention disclosure
+## 11. Click a finding to see why
 
-The disclosure is separate from the formal specification.
-It captures the invention in plain language, the way an inventor would explain it, before it is dressed in patent prose.
+Click any finding and you land on the reasoning beside the governing rule, with your draft on one side and the real MPEP text on the other, scrolled to the responsive passage and linked to the USPTO source.
+On the example the non existent claim 6 finding opens MPEP 608.01(n) on dependent claims.
+See `screenshots/case-evidence.png`.
+The takeaway is that every issue is one click from the exact rule that backs it, which is the anti hallucination spine in action.
 
-The fields are technical field, problem solved, how it works, key components, advantages, alternatives and variations, and known prior solutions.
-Each field has a hint that explains what to write.
+## 12. Rules that apply now and next
 
-The disclosure feeds cross reference checks.
-Pincite flags a component you disclosed but never claimed or described, and a problem you raised that never made it into the Background.
-This keeps the disclosure and the specification from drifting apart.
+Alongside the errors, Pincite surfaces the rules that govern this application right now, each one corpus validated and openable in the same evidence pane.
+Conditional rules wait in attention with their trigger shown, and light up once the trigger is met.
+See `screenshots/case-rules.png`.
+The takeaway is that you see not just what you got wrong but what the rules require going forward.
 
----
+## 13. Stage and what to do now
 
-## Inventors and applicant, the ADS
+Pincite reads where the draft sits in the lifecycle, explains why, and says what is missing to advance.
+Once you declare a status such as filed, published, office action, allowed, or granted, it tells you the next deadline driven step, from an office action reply window to the issue fee to maintenance fees, each pinned to its rule.
+See `screenshots/case-stage.png`.
+The takeaway is that the tool follows the patent through its whole life, not just drafting.
 
-This step captures the filing identity that the USPTO Application Data Sheet needs.
+## 14. Prior art, the similar patents
 
-For each inventor you enter legal name, citizenship, residence, and mailing address.
-An inventor is a person who contributed to conceiving the claimed invention, not an assistant, a funder, or a company.
-Each inventor signs the declaration later, so full legal names matter.
+This step finds public patents that overlap your claims, and it needs at least one drafted claim, so it tells you and stays disabled until then.
+You can compare against one patent you paste, which is free and local, or run a live search that pulls candidates from Google's public patent data on BigQuery.
+Each result leads with the overlaps, pinned to the patent passage and to your own claim element, with a transparent score and a link to the patent.
+There is deliberately no single novelty number, because one number invites over trust.
+See `screenshots/case-prior-art.png`.
+The takeaway is decomposed, verifiable overlaps instead of a black box score.
 
-The applicant is who is asking for the patent.
-Usually that is the inventors themselves.
-You check the company option only if a business owns the invention, for example through an employment assignment, and then you enter the company's legal name.
+## 15. Sign the inventor's declaration
 
-Entity status sets your USPTO fee tier.
-Most individuals and very small businesses qualify as micro or small entity and pay reduced fees, and large entity is the default for bigger companies.
+A pro se inventor completes the oath here, and the step needs inventors entered first.
+Each inventor reviews the application, confirms the five statements the USPTO requires under 37 CFR 1.63, and types their legal name to record the attestation.
+The filing readiness checks run here too and flag defects such as a declaration that does not match the ADS or a missing required statement.
+Pincite records the attestation; the legally binding signature is the one you submit to the USPTO, because Pincite never files.
+See `screenshots/case-sign.png`.
+The takeaway is a checked, recorded declaration, with the human kept in the loop.
 
-This data builds the PTO/AIA/14 ADS data card used in the filing package.
+## 16. The filing-ready export
 
----
+The output is a real document set, not a generic PDF.
+The specification exports as a DOCX in 37 CFR 1.77 section order with bracketed paragraph numbering, which also avoids the USPTO non DOCX surcharge.
+The package adds the ADS data card for the Patent Center web form, the inventor declaration, a transmittal, and a fee summary, bundled as a ZIP, and it carries only filing documents, never the internal analysis.
+See `screenshots/case-report.png`.
+The takeaway is that what you hand the USPTO comes out ready, not as a homework printout.
 
-## Drawings and uploads
+## 17. Audit log and version history
 
-You can upload drawings and supporting documents as images, PDFs, or 3D models (GLB or GLTF), up to 25 MB each.
-A patent has many views, so each figure is tagged with its orientation - perspective, top, front, side, and so on - and you can upload as many figures as you need.
-A 3D model renders in the browser and can be turned by orientation with a toggle or by dragging, so you can inspect it from any angle. It stays local and is never sent to a model.
-Files are stored in a private US region storage bucket, encrypted at rest, with per owner row level security so no other user can read them.
-Uploads never go to a model unless you explicitly ask for the vision analysis below.
+Every meaningful action is written to an append only audit log with a filterable viewer, and section saves keep a full restorable version history.
+See `screenshots/case-audit.png`.
+The takeaway is a complete, tamper evident record of what happened and when.
 
-For an image figure you can run a drawing check.
-A vision model reads the figure and returns a short description, the figure label it sees, every reference numeral it can read with its position, and any drawing problems it can spot under 37 CFR 1.84 and 1.83.
-Pincite turns that into findings.
-It flags a reference numeral that appears in the drawing but is not mentioned anywhere in your specification, a missing figure label, a disclosed component that does not appear, and the model's own observations.
-Each located issue is marked with a red circle on the figure pointing at where it is, numbered to match the list, and pinned to a corpus-validated MPEP section.
-Defects that do not sit at one spot, such as the figure being too small, in color, low in line quality, or missing a label, are flagged too and listed as whole-figure issues without a circle.
-The locations are an approximate vision estimate, so they are labeled to verify rather than trust.
-Because this sends the image to a model, it is restricted to public or synthetic figures until vendor zero data retention is on.
+## 18. Removing a patent, admin only
 
-Figures collect into the drawings portion of the filing package.
+Removing a patent is gated to an admin account, checked on the server, so a regular user never sees the control and cannot delete.
+The takeaway is that destructive actions are restricted and audited.
 
 ---
 
-## Review, the error checking
+## Throughout, the things that are always true
 
-Review runs the validators across your draft and returns findings grouped by process area so you can triage at a glance instead of reading a wall of text.
-The two areas are Claims and Specification, and there are filing readiness and consistency banners above them.
+These are not steps; they hold across the whole product and are worth a sentence each in the script.
 
-Findings use a strict three signal system, and color is never the only signal.
-
-- Red, a solid dot, is a violation.
-- Yellow, an outline dot, is attention or a conditional item.
-- Green, a check, is something that applies and passes.
-
-Each finding carries a severity, whether it is actionable or informational, the offending span, and a rule pin.
-Click any finding and you land on the reasoning beside the governing rule, scrolled to the responsive passage, with the USPTO source linked.
-
-The checks run in tiers, and they are aware of the patent type.
-
-- **Tier 1, structure and format.**
-  For a utility patent this catches a dependent claim that points at a claim that does not exist, a forward reference, a multiple dependent claim that is not in the alternative or that depends on another multiple dependent claim, and claim 1 not being independent (37 CFR 1.75 and 1.16, MPEP 608.01(n)).
-  For a design patent it enforces the single claim and the prescribed ornamental design wording (37 CFR 1.153, MPEP 1503.03), and it skips the utility claim checks.
-- **Tier 2, consistency.**
-  This catches means plus function handling (MPEP 2181) and antecedent basis problems (MPEP 2173.05(e)).
-- **Tier 3, substance.**
-  This catches relative terms (MPEP 2173.05(b)) and runs the subject matter eligibility walkthrough described below.
-- **Filing readiness tier.**
-  This catches unsigned or undated declarations, a missing inventor, a declaration that does not match the ADS, a missing required statement, a wrong form for the applicant type, and ownership and inventorship problems such as a company listed as an inventor or an unrecorded assignment (37 CFR 1.63, 1.76, 1.27, 1.29, 3.81, and MPEP 602, 2109, 302).
-- **Cross reference checks.**
-  These compare the disclosure against the specification, as described above.
-
-The subject matter eligibility walkthrough is the one review feature that uses a model.
-It applies the USPTO Alice and Mayo framework (MPEP 2106) and walks the steps neutrally without deciding whether the claim is eligible.
-It is labeled as the model's read and asks you to verify, and it never reaches the screen without the 2106 pin resolving in the corpus.
-
-Every MPEP pin a finding produces is validated against the ingested corpus before display.
-A pin that does not resolve is dropped and the finding is still shown.
+- Citation discipline.
+  Every MPEP number a check or the model produces is validated against the ingested corpus before display, and unresolved numbers are dropped.
+- Security and cost.
+  Row level security scopes every table to its owner, every paid call is rate limited per user, and account wide budget caps keep BigQuery inside its free tier so it effectively never bills.
+- Confidentiality.
+  Data is stored in a US region with encryption, and real invention text only goes to vendors that do no training or retention.
+  The embeddings vendor is opted out; the generation vendor zero data retention is the last piece to enable, so until then use synthetic or public text for the two features that send text to that model, which are the eligibility walkthrough and the drawing vision.
+- What Pincite does not do.
+  It does not give legal advice, it does not file with the USPTO, and it produces no single novelty or patentability score by design.
 
 ---
 
-## Rules, what applies now and what may apply next
+## Suggested demo order
 
-The Rules step surfaces the rules that govern your project right now, and the ones that may apply soon.
-Rules that apply now show in green.
-Conditional rules show in yellow with the trigger that would make them apply, and they light up once the trigger is met.
-Every surfaced rule is corpus validated and opens in the evidence pane.
-
----
-
-## Stage and lifecycle
-
-Pincite detects which stage your draft is in from what you have filled out, and explains why, and what is missing to advance.
-You can also declare your status directly, from drafting through filed, published, office action, allowed, and granted, along with the application number and filing date once you have them.
-
-Based on the declared status, the Stage step tells you what to do now.
-This covers an office action reply and its three to six month windows and the abandonment risk, the after final options of an RCE or appeal, the non extendable issue fee, the maintenance fees, and publication.
-Each lifecycle action is pinned to its CFR rule and corpus validated MPEP section.
-
----
-
-## Prior art, the similar patents
-
-This step finds public patents that overlap your claims.
-It always works against your claims, so you need at least one drafted claim before either option will run, and the screen tells you so and stays disabled until your claims exist.
-
-There are two ways to find overlaps.
-
-- **Compare a patent.**
-  You paste one patent's text, its claims work best, and Pincite lines up each of your claim limitations against the patent's wording.
-  This path is free and fully local, with no external cost.
-  It matches shared technical terms, with light stemming so trivial word endings like support and supporting or container and containers still line up rather than silently missing.
-  If nothing overlaps, Pincite explains why rather than showing an empty result.
-- **Run search.**
-  This pulls candidate patents from Google's public patent data on BigQuery, ranks them, and shows the overlaps.
-  Candidates are reranked by semantic similarity using legal tuned embeddings.
-
-Results lead with the overlaps, not a verdict.
-Each overlap is pinned to the patent passage and to your own claim element.
-A yellow overlap is a shared passage, and a red overlap reads on a full limitation.
-There is a transparent score that summarizes the overlaps, and there is deliberately no single novelty number, because one number invites over trust.
-
-Every result links out to the patent's public page so you can read the original.
-
----
-
-## Sign, the declaration
-
-A pro se inventor completes the inventor's oath or declaration here.
-This step needs inventors entered first, and it says so if none exist.
-
-Each inventor reviews the application and checks the five statements the USPTO requires under 37 CFR 1.63.
-These cover that the application was authorized, that they believe they are an original inventor, that they reviewed and understand the application, that they are aware of the duty to disclose under 37 CFR 1.56, and that they acknowledge the penalties for willful false statements under 18 U.S.C. 1001.
-They then type their full legal name to record the attestation.
-
-What Pincite records is the attestation, kept as an append only signed entry.
-The legally binding signature is the one you submit to the USPTO, because Pincite never files.
-The filing readiness checks described in Review run here too and flag any defect before you rely on the declaration.
-
----
-
-## Report and export
-
-The export is a real document set, not a generic PDF.
-
-- The Report view prints to PDF and is legible in grayscale, with text labels and filled or outline markers so the color discipline survives black and white printing.
-- A plain text export is available for a quick copy.
-- The specification exports as a DOCX in 37 CFR 1.77 section order, with bracketed paragraph numbering and claims and the abstract each on their own page.
-  Submitting a DOCX also avoids the USPTO non DOCX surcharge.
-- The filing package is a ZIP that adds the ADS data card for the Patent Center web form, the inventor declaration, a transmittal, and a fee summary.
-
-Exports carry only filing documents, never the internal analysis.
-Every export is recorded in the exports table and the audit log.
-
----
-
-## Audit log and version history
-
-Every meaningful action is written to an append only audit log, and there is a filterable viewer for it.
-Section saves keep a full version history, with restore into a new save and branch, and history is never overwritten.
-Together these give a complete, tamper evident record of what happened and when.
-
----
-
-## How the three core capabilities work, briefly
-
-- **Error checking.**
-  Deterministic tiers parse your claims and specification and produce findings, and the substantive eligibility step asks a model to walk the Alice and Mayo framework neutrally.
-  Every MPEP pin is validated against the corpus before display, and unresolved pins are dropped.
-- **Similar patents.**
-  Your claims are split into limitations and key terms, candidates come from a pasted patent or from BigQuery, each limitation is matched to the closest patent passage with light stemming, and the result is shown as pinned overlaps with a transparent decomposed score rather than a single number.
-- **Finding the relevant MPEP.**
-  When a question or a finding names a section number, that exact section loads.
-  Otherwise Pincite runs a semantic search over the embedded MPEP chunks, with a keyword search as the fallback, then highlights the responsive passage and scrolls to it.
-
----
-
-## The citation discipline
-
-The spine of the app is citation validation.
-Every MPEP number that a check or a model produces is looked up in the ingested corpus before it is displayed.
-Numbers that resolve are shown and are openable in the evidence pane.
-Numbers that do not resolve are dropped.
-This is the same reason prior art leads with the spans and refuses a single novelty score.
-
----
-
-## Security and cost controls
-
-- **Row level security.**
-  Every table is scoped to its owner, so a user can only read and write their own rows, and uploads in storage are locked to their owner as well.
-- **Per user rate limits.**
-  Every paid call is throttled per user, server side, before the call is made, so no one can drive up cost by hammering an endpoint.
-- **Account wide budget caps.**
-  A global cap holds BigQuery search inside its monthly free tier so it effectively never bills, and a daily cap bounds the model calls.
-  These fail closed, because a surprise bill is worse than brief downtime.
-- **Append only history and audit.**
-  Saves, versions, declarations, and the audit log are append only, so the record cannot be quietly rewritten.
-
----
-
-## Confidentiality posture
-
-Pincite stores data in a US region with encryption at rest and in transit.
-Real unfiled invention text may only go to vendors that do no training and no retention, because of the confidentiality duty and the foreign filing license risk under 35 U.S.C. 184.
-
-The embeddings vendor retention is opted out.
-The generation vendor zero data retention is the last piece to enable.
-Until it is on, use synthetic or non confidential text for the two features that send text to that model, which are the eligibility walkthrough and the drawing vision analysis.
-The rest of the app runs on real text safely, because it is local or deterministic.
-
----
-
-## What Pincite intentionally does not do
-
-- It does not give legal advice, and it keeps a human in the loop.
-- It does not file anything with the USPTO.
-- It does not produce a single novelty or patentability score, by design, to avoid over trust.
-- It does not analyze the artistic content of design figures beyond the component presence check, which is deferred.
+For a video, the natural path is steps 1 through 17 in order, using the Apple example.
+A tight version is sign in, dashboard, then disclosure, inventors, drawings with the red circle drawing check and the 3D toggle, review with a click into the rule, prior art, sign, and the export.
+That sequence hits every headline feature and ends on the filing ready output.
