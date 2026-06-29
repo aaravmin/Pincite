@@ -10,7 +10,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { describeDrawing } from "@/lib/llm/vision";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
 import type { InventorInput, DeclarationStatements } from "@/lib/filing/types";
@@ -192,6 +192,9 @@ export async function analyzeDrawing(input: {
 
   const rl = await checkRateLimit(supabase, "drawing_vision", 30, 3600);
   if (!rl.allowed) return { error: rl.retryMessage };
+  const budget = await checkGlobalLimit(supabase, "grok_global_day", 300, 86400);
+  if (!budget.allowed)
+    return { error: "The daily AI budget for figure analysis is used up. Please try again tomorrow." };
 
   const { data: blob, error: dlErr } = await createAdminClient()
     .storage.from("project-files")

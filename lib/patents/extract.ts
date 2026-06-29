@@ -27,6 +27,33 @@ export function significantTerms(text: string): string[] {
   return toks.filter((t) => !STOP.has(t));
 }
 
+/**
+ * Light, deterministic stem so overlap matching is not defeated by trivial inflection:
+ * support/supporting, container/containers, rotates/rotate all collapse to one form. Used
+ * only for comparison (match.ts); claimKeywords keeps raw terms for the BigQuery query.
+ */
+function stem(t: string): string {
+  let s = t;
+  if (s.length > 4 && s.endsWith("ies")) {
+    s = s.slice(0, -3) + "y";
+  } else {
+    for (const suf of ["ing", "ed", "es", "s"]) {
+      if (s.length - suf.length >= 3 && s.endsWith(suf)) {
+        s = s.slice(0, -suf.length);
+        break;
+      }
+    }
+  }
+  // Drop a trailing 'e' so rotate/rotates/rotating and couple/coupled/coupling all align.
+  if (s.length >= 4 && s.endsWith("e")) s = s.slice(0, -1);
+  return s;
+}
+
+/** Significant terms, stemmed - the comparison vocabulary used for pinpoint overlap. */
+export function stemmedTerms(text: string): string[] {
+  return significantTerms(text).map(stem);
+}
+
 /** Distinct significant terms across all claims — used to build a candidate query. */
 export function claimKeywords(claimsText: string, limit = 20): string[] {
   const counts = new Map<string, number>();

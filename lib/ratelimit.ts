@@ -37,3 +37,27 @@ export async function checkRateLimit(
   }
   return { allowed: true, retryMessage: "" };
 }
+
+/**
+ * Account-wide (global) budget cap: the same check counted across ALL users for a kind, so
+ * total spend stays bounded even if every user is under their personal limit (used for the
+ * monthly BigQuery free-tier cap and a daily Grok ceiling). The caller supplies a specific
+ * message when blocked. Fails closed.
+ */
+export async function checkGlobalLimit(
+  supabase: SupabaseClient,
+  kind: string,
+  limit: number,
+  windowSecs: number,
+): Promise<RateLimitResult> {
+  const { data, error } = await supabase.rpc("consume_global_limit", {
+    p_kind: kind,
+    p_limit: limit,
+    p_window_secs: windowSecs,
+  });
+  if (error) {
+    console.error(`global budget check failed for ${kind}: ${error.message}`);
+    return { allowed: false, retryMessage: "" };
+  }
+  return { allowed: data === true, retryMessage: "" };
+}

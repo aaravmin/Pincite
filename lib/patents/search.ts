@@ -18,7 +18,7 @@ import { extractLimitations, claimKeywords } from "@/lib/patents/extract";
 import { matchCandidate } from "@/lib/patents/match";
 import { semanticScores } from "@/lib/patents/semantic";
 import { searchCandidates } from "@/lib/patents/bigquery";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
 import type { SpanMatch } from "@/lib/patents/match";
 
 async function requireUser() {
@@ -89,6 +89,13 @@ export async function runPriorArtSearch(
   if (!rlHour.allowed) return { error: rlHour.retryMessage };
   const rlDay = await checkRateLimit(supabase, "prior_art_live_day", 20, 86400);
   if (!rlDay.allowed) return { error: rlDay.retryMessage };
+  // Account-wide monthly cap kept inside BigQuery's 1 TiB/month free tier so it never bills.
+  const budget = await checkGlobalLimit(supabase, "bq_global_month", 7, 2592000);
+  if (!budget.allowed)
+    return {
+      error:
+        "The monthly prior-art search budget is used up (kept within the free tier so it never bills). Use Compare a patent below, which is free, or try again next month.",
+    };
 
   const limitations = extractLimitations(claims);
   const keywords = claimKeywords(claims, 8);

@@ -206,7 +206,8 @@ pnpm install
 #   XAI_API_KEY                      Grok generation
 #   GEMINI_API_KEY                   fallback generation
 #   VOYAGE_API_KEY                   MPEP embeddings
-#   GOOGLE_APPLICATION_CREDENTIALS   path to a BigQuery service account JSON outside the repo
+#   GOOGLE_APPLICATION_CREDENTIALS   local path to a BigQuery service account JSON (outside the repo)
+#   GOOGLE_APPLICATION_CREDENTIALS_JSON  or the full service account JSON inline (production / Vercel)
 #   DEV_LOGIN_SECRET                 development only test login
 
 # Apply the schema, then reload the PostgREST cache.

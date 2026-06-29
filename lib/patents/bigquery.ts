@@ -23,13 +23,42 @@ const MAX_BYTES_BILLED = String(160 * GB);
 
 let _client: BigQuery | null = null;
 function client(): BigQuery {
-  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    throw new Error(
-      "GOOGLE_APPLICATION_CREDENTIALS is not set — configure the BigQuery service-account key.",
-    );
+  if (_client) return _client;
+
+  // Production (e.g. Vercel) has no filesystem for a key file, so accept the whole
+  // service-account JSON in an env var. Locally, fall back to the file path via ADC.
+  const json = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  if (json) {
+    let creds: { project_id?: string; client_email?: string; private_key?: string };
+    try {
+      creds = JSON.parse(json);
+    } catch {
+      throw new Error("GOOGLE_APPLICATION_CREDENTIALS_JSON is set but is not valid JSON.");
+    }
+    if (!creds.client_email || !creds.private_key) {
+      throw new Error(
+        "GOOGLE_APPLICATION_CREDENTIALS_JSON is missing client_email or private_key.",
+      );
+    }
+    _client = new BigQuery({
+      projectId: creds.project_id,
+      credentials: {
+        client_email: creds.client_email,
+        // Tolerate platforms that escape newlines in env values.
+        private_key: creds.private_key.replace(/\\n/g, "\n"),
+      },
+    });
+    return _client;
   }
-  _client ??= new BigQuery();
-  return _client;
+
+  if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    _client = new BigQuery();
+    return _client;
+  }
+
+  throw new Error(
+    "Set GOOGLE_APPLICATION_CREDENTIALS_JSON (production) or GOOGLE_APPLICATION_CREDENTIALS (local file path) for BigQuery.",
+  );
 }
 
 export async function searchCandidates(params: {

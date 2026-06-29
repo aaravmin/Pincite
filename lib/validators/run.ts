@@ -18,7 +18,7 @@ import { validateCitations } from "@/lib/mpep/citation";
 import { loadSection, type MpepSection } from "@/lib/mpep/load";
 import { parseClaims } from "@/lib/patent/claims";
 import { generateText } from "@/lib/llm/generate";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
 import type { EligibilityAnalysis } from "@/lib/validators/types";
 
 async function requireUser() {
@@ -101,6 +101,9 @@ export async function analyzeEligibility(projectId: string): Promise<
 
   const rl = await checkRateLimit(supabase, "eligibility", 30, 3600);
   if (!rl.allowed) return { error: rl.retryMessage };
+  const budget = await checkGlobalLimit(supabase, "grok_global_day", 300, 86400);
+  if (!budget.allowed)
+    return { error: "The daily AI budget for the §101 walkthrough is used up. Please try again tomorrow." };
 
   const system =
     "You are a patent examiner aid applying the USPTO Alice/Mayo subject-matter eligibility framework (MPEP 2106). Do NOT decide whether the claim is eligible or ineligible. Walk the framework concisely and neutrally. Return ONLY a JSON object.";

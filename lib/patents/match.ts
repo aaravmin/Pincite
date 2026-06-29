@@ -6,7 +6,7 @@
  * This deterministic lexical pass works without embeddings; semantic alignment layers on
  * once the Voyage embedding path is enabled.
  */
-import { significantTerms, type Limitation } from "@/lib/patents/extract";
+import { stemmedTerms, type Limitation } from "@/lib/patents/extract";
 
 export type SpanMatch = {
   userSpanStart: number;
@@ -23,7 +23,7 @@ export type CandidateMatch = {
   totalLimitations: number;
 };
 
-const STRONG = 0.5; // term-overlap ratio to count a limitation as overlapping
+const STRONG = 0.4; // term-overlap ratio to count a limitation as overlapping
 const FULL_READ = 0.8; // ratio above which a passage appears to read on the whole limitation
 
 function sentences(text: string): string[] {
@@ -38,13 +38,13 @@ export function matchCandidate(
   candidateText: string,
 ): CandidateMatch {
   const cand = sentences(candidateText);
-  const candTerms = cand.map((s) => new Set(significantTerms(s)));
+  const candTerms = cand.map((s) => new Set(stemmedTerms(s)));
   const spans: SpanMatch[] = [];
   let withOverlap = 0;
   let total = 0;
 
   for (const lim of limitations) {
-    const lt = new Set(significantTerms(lim.text));
+    const lt = new Set(stemmedTerms(lim.text));
     if (lt.size === 0) continue;
     total++;
 

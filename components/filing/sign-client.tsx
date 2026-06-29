@@ -125,7 +125,13 @@ function InventorSign({
               id={`sign-name-${inventor.id}`}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder="First Middle Last"
             />
+            <p className="text-xs text-muted-foreground">
+              Type the inventor&apos;s full legal name to record this attestation. This is Pincite&apos;s
+              record of the declaration; the legally binding signature is the one you submit to the
+              USPTO.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button
@@ -169,6 +175,11 @@ export function SignClient({
   }
   return (
     <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        Each inventor reviews the application and confirms the statements below - the inventor&apos;s
+        oath or declaration the USPTO requires (37 CFR 1.63). Check every statement, then type the
+        inventor&apos;s full legal name to record it.
+      </p>
       {inventors.map((inv) => (
         <InventorSign
           key={inv.id}

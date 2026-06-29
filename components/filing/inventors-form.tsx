@@ -109,6 +109,11 @@ export function InventorsForm({
             Add inventor
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground">
+          List every person who contributed to conceiving the claimed invention - not assistants,
+          funders, or a company. Each inventor signs the declaration later, so use full legal names.
+          This fills the Application Data Sheet (ADS) the USPTO requires.
+        </p>
         {rows.map((row, idx) => (
           <div key={idx} className="rounded-lg border border-border p-4">
             <div className="mb-2 flex items-center justify-between">
@@ -170,6 +175,11 @@ export function InventorsForm({
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-foreground">Applicant &amp; entity</h2>
+        <p className="text-xs text-muted-foreground">
+          The applicant is who is asking for the patent. Usually that is the inventors themselves.
+          Check the company option only if a business owns the invention (for example through an
+          employment assignment), then enter its legal name below.
+        </p>
         <label className="flex items-center gap-2 text-sm text-foreground">
           <input
             type="checkbox"
@@ -198,6 +208,9 @@ export function InventorsForm({
               onChange={(e) => setApplicantName(e.target.value)}
               placeholder="Assignee / applicant legal name"
             />
+            <p className="text-xs text-muted-foreground">
+              The legal name of the company or person that owns the invention and is applying.
+            </p>
           </div>
         )}
         <div className="max-w-xs space-y-1.5">
@@ -217,6 +230,11 @@ export function InventorsForm({
               ))}
             </SelectContent>
           </Select>
+          <p className="text-xs text-muted-foreground">
+            Sets your USPTO fee tier. Most individuals and very small businesses qualify as micro or
+            small entity and pay reduced fees; large entity is the default for bigger companies. If
+            unsure, leave it as large.
+          </p>
         </div>
       </section>
 

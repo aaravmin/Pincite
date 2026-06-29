@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { runPriorArtSearch, compareAgainstCandidate } from "@/lib/patents/search";
 import { patentUrl } from "@/lib/patents/url";
@@ -27,12 +28,18 @@ export function PriorArtClient({
   const [cmpNum, setCmpNum] = useState("");
   const [cmpText, setCmpText] = useState("");
 
+  const hasClaims = claims.trim().length > 0;
+
   function liveSearch() {
     setMsg(null);
     start(async () => {
       const r = await runPriorArtSearch(projectId);
       if ("error" in r) return setMsg(r.error);
-      setMsg(`Found ${r.count} candidate(s). Scanned ${r.scanGB} GB.`);
+      setMsg(
+        r.count === 0
+          ? `Scanned ${r.scanGB} GB but found no public patents that overlap your claims. Try widening the wording in your Claims section, or compare a specific patent below.`
+          : `Found ${r.count} candidate(s). Scanned ${r.scanGB} GB.`,
+      );
       setSelected(0);
       router.refresh();
     });
@@ -49,6 +56,11 @@ export function PriorArtClient({
       if ("error" in r) return setMsg(r.error);
       setShowCompare(false);
       setSelected(0);
+      setMsg(
+        r.count === 0
+          ? "No overlapping wording found. Your claims and this patent may be genuinely different, or may describe the same idea in different words. The comparison matches shared technical terms, so paste the patent's claims (not a summary) and make sure your Claims section is filled in."
+          : `Found ${r.count} pinpoint overlap(s).`,
+      );
       router.refresh();
     });
   }
@@ -59,37 +71,66 @@ export function PriorArtClient({
     <div className="flex h-full flex-col">
       <div className="border-b border-border px-6 py-3">
         <p className="text-xs text-muted-foreground">
-          A similarity hit is a research signal to verify, not a validity or
-          freedom-to-operate opinion.
+          Find public patents that overlap your claims. <strong>Run search</strong> pulls
+          candidates from Google&apos;s public patent data; <strong>Compare a patent</strong> checks
+          your claims against one patent you paste. A similarity hit is a research signal to verify,
+          not a validity or freedom-to-operate opinion.
         </p>
+        {!hasClaims && (
+          <p className="mt-2 rounded-md border border-attention bg-attention-bg px-3 py-2 text-xs text-attention-foreground">
+            Draft at least one claim in the Claims section first. Both options compare against your
+            claims, so there is nothing to match against until your claims exist.
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={liveSearch} disabled={pending}>
+          <Button size="sm" onClick={liveSearch} disabled={pending || !hasClaims}>
             {pending ? "Searching…" : "Run search (BigQuery)"}
           </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => setShowCompare((v) => !v)}
+            disabled={!hasClaims}
           >
             Compare a patent
           </Button>
           {msg && <span className="text-xs text-muted-foreground">{msg}</span>}
         </div>
-        {showCompare && (
+        {showCompare && hasClaims && (
           <div className="mt-3 space-y-2 rounded-md border border-border p-3">
-            <Input
-              data-testid="cmp-number"
-              value={cmpNum}
-              onChange={(e) => setCmpNum(e.target.value)}
-              placeholder="Patent number, e.g. US-1234567-A1"
-            />
-            <Textarea
-              data-testid="cmp-text"
-              value={cmpText}
-              onChange={(e) => setCmpText(e.target.value)}
-              placeholder="Paste the patent's claims or abstract to compare against your claims"
-              className="min-h-[100px]"
-            />
+            <div>
+              <p className="text-xs font-medium text-foreground">Compare against one patent</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Paste a patent number and its text. Its claims work best. Pincite lines up each of
+                your claim limitations against the patent&apos;s wording and shows where they overlap.
+                It matches shared technical terms, so paste the real claim text rather than a summary.
+              </p>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="cmp-number" className="text-xs">
+                Patent number (label only)
+              </Label>
+              <Input
+                id="cmp-number"
+                data-testid="cmp-number"
+                value={cmpNum}
+                onChange={(e) => setCmpNum(e.target.value)}
+                placeholder="e.g. US-1234567-A1"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="cmp-text" className="text-xs">
+                Patent text to compare
+              </Label>
+              <Textarea
+                id="cmp-text"
+                data-testid="cmp-text"
+                value={cmpText}
+                onChange={(e) => setCmpText(e.target.value)}
+                placeholder="Paste the patent's claims (best) or abstract"
+                className="min-h-[100px]"
+              />
+            </div>
             <Button size="sm" onClick={compare} disabled={pending || !cmpText.trim()}>
               Compare
             </Button>
@@ -207,6 +248,13 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Pinpoint overlaps in {match.patent_number}
         </p>
+        {match.spans.length === 0 && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            No pinpoint overlaps were found between your claims and this patent. They may be
+            genuinely different, or use different words for the same idea. Try pasting the
+            patent&apos;s full claims rather than its abstract.
+          </p>
+        )}
         <ul className="mt-1 space-y-2">
           {match.spans.map((s, i) => (
             <li

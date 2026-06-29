@@ -128,8 +128,12 @@ export function StageClient({
               id="appnum"
               value={appNum}
               onChange={(e) => setAppNum(e.target.value)}
-              placeholder="optional"
+              placeholder="e.g. 17/123,456"
             />
+            <p className="text-xs text-muted-foreground">
+              The USPTO assigns this when you file. Leave blank until then; it lets Pincite track
+              your deadlines.
+            </p>
           </div>
           <div className="space-y-1">
             <Label htmlFor="filing">Filing date</Label>
@@ -139,6 +143,9 @@ export function StageClient({
               value={filing}
               onChange={(e) => setFiling(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground">
+              The date the USPTO received your application. Drives the lifecycle deadlines.
+            </p>
           </div>
         </div>
         <div className="mt-3 flex items-center gap-3">

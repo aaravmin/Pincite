@@ -35,3 +35,5 @@ next-env.d.ts
 /playwright/.cache/
 
 # screenshots are kept in-repo for the verification audit trail (do not ignore)
+.vercel
+.env*

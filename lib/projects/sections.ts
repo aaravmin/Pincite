@@ -36,17 +36,28 @@ export const SECTION_LABELS: Record<SectionKey, string> = {
 
 /** Short, neutral guidance shown under each section heading. No legal advice. */
 export const SECTION_HINTS: Partial<Record<SectionKey, string>> = {
-  title: "Short technical title.",
-  cross_reference: "Any provisional or parent application being claimed.",
-  gov_interest: "Present, or state not applicable.",
-  background: "Field of the invention and description of related art.",
-  summary: "High-level statement of the invention.",
-  brief_description_drawings: "One line per figure.",
-  detailed_description: "The body, where reference numerals are introduced.",
-  claims: "One numbered claim per block, each a single sentence.",
-  abstract: "Single paragraph, 150 words max.",
-  drawings_meta: "Figure list, and the reference numerals each figure shows.",
-  office_action: "Paste the examiner's action text, when one has been received.",
+  title:
+    "A short, specific technical name for the invention - what it is, not a brand name. Example: 'Adjustable mount for a display arm'.",
+  cross_reference:
+    "If this builds on an earlier filing you are claiming priority to (a provisional or a parent application), name it and its number. Otherwise write 'Not applicable'.",
+  gov_interest:
+    "If the invention was made with US government funding, name the agency and contract number. Most people write 'Not applicable'.",
+  background:
+    "Describe the field and the problem, what existing solutions do, and why they fall short. Set up the need your invention fills, without arguing that it is patentable.",
+  summary:
+    "A plain, high-level description of what the invention is and does, in a few sentences. It previews the detailed description.",
+  brief_description_drawings:
+    "One short line per figure, e.g. 'FIG. 1 is a perspective view of the container.' Upload your figures on the Drawings step first, then describe each one here.",
+  detailed_description:
+    "The full, enabling description: how to make and use the invention, step by step, introducing each part with a reference numeral (e.g. base 10, arm 12) that matches the drawings.",
+  claims:
+    "The legal definition of what you are protecting. One numbered claim per block, each a single sentence. Claim 1 stands alone; a dependent claim refers back to an earlier claim and adds to it. Draft these after your disclosure and detailed description so they are supported.",
+  abstract:
+    "A single paragraph, 150 words or fewer, summarizing the invention so a reader grasps it quickly. Easiest to write last, once the rest is drafted.",
+  drawings_meta:
+    "List each figure and the reference numerals it shows, so the drawings, description, and claims stay consistent. Needs your drawings and detailed description in place.",
+  office_action:
+    "Only once the USPTO has examined the application and sent an Office action: paste the examiner's text here so Pincite can help you respond.",
 };
 
 /** Sections only relevant once later stages are reached; hidden by default in intake. */

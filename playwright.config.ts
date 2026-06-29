@@ -18,7 +18,10 @@ export default defineConfig({
   retries: 0,
   reporter: [["list"]],
   outputDir: "./test-results",
-  timeout: 60_000,
+  // 120s, not the 60s default: the suite runs single-worker against a dev server, so a spec
+  // that lands on a cold-compiled route can exceed 60s under load even though it passes in
+  // isolation. The headroom keeps the gate from flaking by run order.
+  timeout: 120_000,
   expect: { timeout: 10_000 },
   use: {
     // Pincite runs on a dedicated port (3100) to avoid colliding with other
