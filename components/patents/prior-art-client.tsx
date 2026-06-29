@@ -36,10 +36,14 @@ export function PriorArtClient({
     start(async () => {
       const r = await runPriorArtSearch(projectId);
       if ("error" in r) return setMsg(r.error);
+      const via =
+        r.source === "bigquery"
+          ? `Scanned ${r.scanGB} GB on BigQuery.`
+          : "Searched Google Patents (free, no setup needed).";
       setMsg(
         r.count === 0
-          ? `Scanned ${r.scanGB} GB but found no public patents that overlap your claims. Try widening the wording in your Claims section, or compare a specific patent below.`
-          : `Found ${r.count} candidate(s). Scanned ${r.scanGB} GB.`,
+          ? `Found no public patents that overlap your claims. ${via} Try widening the wording in your Claims section, or compare a specific patent below.`
+          : `Found ${r.count} candidate(s). ${via}`,
       );
       setSelected(0);
       router.refresh();
@@ -85,7 +89,7 @@ export function PriorArtClient({
         )}
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <Button size="sm" onClick={liveSearch} disabled={pending || !hasClaims}>
-            {pending ? "Searching…" : "Run search (BigQuery)"}
+            {pending ? "Searching…" : "Run search"}
           </Button>
           <Button
             size="sm"

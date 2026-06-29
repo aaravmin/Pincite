@@ -8,6 +8,19 @@
  * than silently burning the free tier. One query per search (roadmap guardrail).
  */
 import { BigQuery } from "@google-cloud/bigquery";
+import { existsSync } from "node:fs";
+
+/**
+ * Whether BigQuery can actually run here. True only if inline JSON creds are set
+ * (production), or a key-file path is set AND the file exists. A path pointing at a file
+ * that is not present (e.g. another machine, or after the key moves) returns false, so the
+ * caller degrades to the keyless source instead of throwing on a missing file.
+ */
+export function bigQueryConfigured(): boolean {
+  if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) return true;
+  const path = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  return !!(path && existsSync(path));
+}
 
 export type Candidate = {
   publication_number: string;
