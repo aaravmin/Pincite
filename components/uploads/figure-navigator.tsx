@@ -35,6 +35,7 @@ export function FigureNavigator({
   const [pending, setPending] = useState(false);
   const [checkingAll, setCheckingAll] = useState(false);
   const [allMsg, setAllMsg] = useState<string | null>(null);
+  const [rotating, setRotating] = useState(false);
 
   const i = Math.min(idx, figures.length - 1);
   const sel = figures[i];
@@ -49,6 +50,46 @@ export function FigureNavigator({
     await deleteAttachment({ projectId, attachmentId: sel.id });
     setIdx(0);
     router.refresh();
+  }
+
+  // Rotate an image figure 90° clockwise: redraw it on a canvas (the browser also bakes in
+  // any EXIF orientation), re-upload the corrected bytes, and drop the old one. The stored
+  // image is corrected, so both the display and the vision check see it upright; the new
+  // copy has no analysis yet, which is correct since rotation invalidates the old one.
+  async function rotate() {
+    setRotating(true);
+    try {
+      const blob = await (await fetch(url)).blob();
+      const bmp = await createImageBitmap(blob);
+      const canvas = document.createElement("canvas");
+      canvas.width = bmp.height;
+      canvas.height = bmp.width;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(bmp, -bmp.width / 2, -bmp.height / 2);
+      const out: Blob | null = await new Promise((r) =>
+        canvas.toBlob((b) => r(b), "image/png"),
+      );
+      if (!out) return;
+      const base = sel.filename.replace(/\.[^.]+$/, "");
+      const fd = new FormData();
+      fd.append("file", new File([out], `${base}.png`, { type: "image/png" }));
+      fd.append("kind", sel.kind);
+      fd.append("view", sel.view ?? "");
+      const up = await fetch(`/api/projects/${projectId}/attachments`, {
+        method: "POST",
+        body: fd,
+      });
+      if (up.ok) {
+        await deleteAttachment({ projectId, attachmentId: sel.id });
+        setIdx(0);
+        router.refresh();
+      }
+    } finally {
+      setRotating(false);
+    }
   }
 
   // Run the vision check on every uploaded image figure at once (not PDFs or 3D models).
@@ -154,6 +195,17 @@ export function FigureNavigator({
             >
               Open
             </a>
+            {!threeD && !isPdf && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={rotate}
+                disabled={rotating}
+                title="Rotate this figure 90° to fix a sideways scan"
+              >
+                {rotating ? "Rotating…" : "Rotate"}
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={remove} disabled={pending}>
               Remove
             </Button>

@@ -273,17 +273,21 @@ This is a new application and no office action has issued.
 ## Step 5 - Drawings (uploads)
 
 Upload the figures from e2e/fixtures and tag each with its orientation so they flip as perspectives.
-The files are the patent's own drawing sheets at full resolution:
+The files are the patent's own full-resolution drawing sheets, already turned upright (the patent stored most of them sideways).
+What each file actually shows, with a sensible orientation tag:
 
-apple-container-fig01.png is FIG. 1, view Perspective.
-apple-container-fig02.png is FIG. 2, view Perspective.
-apple-container-fig03.png is FIG. 3, view Sectional.
-apple-container-fig04.png is FIG. 4, view Bottom.
-apple-container-fig05.png is FIG. 5, view Top / plan.
-apple-container-fig06.png is FIG. 6, view Perspective.
-apple-container-fig07.png is FIG. 7, view Front or Left side.
+apple-container-fig01.png shows the open container (base and lid), view Perspective.
+apple-container-fig02.png is FIG. 1, the open container, view Perspective.
+apple-container-fig03.png is FIG. 2, the open container, view Perspective.
+apple-container-fig04.png is FIG. 3, the cross-section with airflow, view Sectional.
+apple-container-fig05.png is FIG. 4, the base exterior, view Bottom.
+apple-container-fig06.png is FIG. 5, the lid exterior, view Top / plan.
+apple-container-fig07.png is FIG. 6, both exterior surfaces, view Perspective.
+apple-container-fig08.png is FIG. 7, the closed profile, view Front or Left side.
 
-(fig08 through fig13 are the nested view, the locking-mechanism close-ups, the hinge detail, the indicia view, and the process flowchart; upload as many as you like.)
+(fig09 through fig12 are the nested stack, the locking-mechanism close-ups, the hinge detail, and the indicia view; fig13 is the process flowchart. Upload as many as you like.)
+
+If you upload your own figure and it comes in sideways, use the Rotate button on that figure to turn it upright; the corrected image is what gets saved and checked.
 
 After uploading, click Check all drawings.
 It runs the vision check on every uploaded figure at once and saves the result, so the flags stay on each figure when you leave and come back.
