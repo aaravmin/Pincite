@@ -13,7 +13,7 @@ export type PatentDetails = {
   number: string;
   title: string | null;
   abstract: string | null;
-  figureUrl: string | null;
+  figureUrls: string[];
   inventors: string[];
   url: string;
 };
@@ -52,7 +52,7 @@ export async function loadPatentDetails(
     number: num,
     title: null,
     abstract: null,
-    figureUrl: null,
+    figureUrls: [],
     inventors: [],
     url,
   };
@@ -76,9 +76,29 @@ export async function loadPatentDetails(
       .replace(/^[A-Z]{2}[A-Z0-9]+\s*-\s*/i, "");
     const title = meta("DC.title") || decode(titleTag) || null;
     const abstract = meta("description") || meta("DC.description");
-    const figureUrl =
-      html.match(/https:\/\/patentimages\.storage\.googleapis\.com\/[^"']+\.png/i)?.[0] ??
-      null;
+    // Every figure sheet (named ...-D0000N.png). Each figure appears as both a thumbnail
+    // and a full-res hash, so dedupe by the figure number, then order by it, so the found
+    // patent's full set of views can be flipped through.
+    const seenFig = new Set<string>();
+    let figureUrls: string[] = [];
+    for (const m of html.matchAll(
+      /https:\/\/patentimages\.storage\.googleapis\.com\/[^"']+-D(\d+)\.png/gi,
+    )) {
+      if (seenFig.has(m[1])) continue;
+      seenFig.add(m[1]);
+      figureUrls.push(m[0]);
+    }
+    figureUrls.sort(
+      (a, b) =>
+        Number(a.match(/-D(\d+)\.png/i)?.[1] ?? 0) -
+        Number(b.match(/-D(\d+)\.png/i)?.[1] ?? 0),
+    );
+    if (figureUrls.length === 0) {
+      const one = html.match(
+        /https:\/\/patentimages\.storage\.googleapis\.com\/[^"']+\.png/i,
+      )?.[0];
+      if (one) figureUrls = [one];
+    }
     const inventors = [
       ...html.matchAll(/<meta name="DC\.contributor"[^>]+content="([^"]+)"/gi),
     ]
@@ -88,7 +108,7 @@ export async function loadPatentDetails(
 
     return {
       ok: true,
-      details: { number: num, title, abstract, figureUrl, inventors, url },
+      details: { number: num, title, abstract, figureUrls, inventors, url },
     };
   } catch {
     return { ok: true, details: blank };

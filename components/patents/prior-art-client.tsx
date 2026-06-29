@@ -2,7 +2,7 @@
 
 import { type ReactNode, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -200,7 +200,7 @@ export function PriorArtClient({
             className="min-w-0 flex-1 overflow-auto px-6 py-5"
             data-testid="overlap-detail"
           >
-            {sel && <MatchDetail claims={claims} match={sel} />}
+            {sel && <MatchDetail key={sel.id} claims={claims} match={sel} />}
           </section>
         </div>
       )}
@@ -211,6 +211,7 @@ export function PriorArtClient({
 function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) {
   const [showClaims, setShowClaims] = useState(false);
   const [details, setDetails] = useState<PatentDetails | null>(null);
+  const [figIdx, setFigIdx] = useState(0);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [loading, startLoad] = useTransition();
   const url = patentUrl(match.patent_number, match.source_url);
@@ -269,38 +270,80 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
             {loading ? "Loading the patent…" : "View the actual patent"}
           </Button>
         ) : (
-          <div className="space-y-2">
-            <div className="flex items-start gap-3">
-              {details.figureUrl && (
-                <a href={details.url} target="_blank" rel="noreferrer" className="shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={details.figureUrl}
-                    alt={`Figure from ${match.patent_number}`}
-                    className="h-28 w-auto rounded border border-border bg-white"
-                  />
-                </a>
-              )}
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">
-                  {details.title ?? match.patent_number}
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {details.title ?? match.patent_number}
+              </p>
+              {details.inventors.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {details.inventors.join(", ")}
                 </p>
-                {details.inventors.length > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    {details.inventors.join(", ")}
-                  </p>
-                )}
+              )}
+              <a
+                href={details.url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-0.5 inline-flex items-center gap-1 text-xs text-foreground underline-offset-2 hover:underline"
+              >
+                Open the full patent
+                <ExternalLink className="size-3" aria-hidden />
+              </a>
+            </div>
+
+            {details.figureUrls.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Previous figure"
+                    disabled={details.figureUrls.length < 2}
+                    onClick={() =>
+                      setFigIdx(
+                        (figIdx - 1 + details.figureUrls.length) %
+                          details.figureUrls.length,
+                      )
+                    }
+                    className="rounded-md border border-border p-1 text-muted-foreground hover:text-foreground disabled:opacity-40"
+                  >
+                    <ChevronLeft className="size-4" aria-hidden />
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    Figure {Math.min(figIdx, details.figureUrls.length - 1) + 1} of{" "}
+                    {details.figureUrls.length} - the patent&apos;s own views
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="Next figure"
+                    disabled={details.figureUrls.length < 2}
+                    onClick={() =>
+                      setFigIdx((figIdx + 1) % details.figureUrls.length)
+                    }
+                    className="rounded-md border border-border p-1 text-muted-foreground hover:text-foreground disabled:opacity-40"
+                  >
+                    <ChevronRight className="size-4" aria-hidden />
+                  </button>
+                </div>
                 <a
                   href={details.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-0.5 inline-flex items-center gap-1 text-xs text-foreground underline-offset-2 hover:underline"
+                  className="mt-2 block"
                 >
-                  Open the full patent
-                  <ExternalLink className="size-3" aria-hidden />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={details.figureUrls[Math.min(figIdx, details.figureUrls.length - 1)]}
+                    alt={`Figure ${Math.min(figIdx, details.figureUrls.length - 1) + 1} of ${match.patent_number}`}
+                    className="max-h-72 w-auto rounded border border-border bg-white"
+                  />
                 </a>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Flip through the patent&apos;s figures and compare them with your own
+                  drawings for drawing-level similarity.
+                </p>
               </div>
-            </div>
+            )}
+
             {details.abstract && (
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -308,12 +351,6 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
                 </p>
                 <p className="text-sm text-muted-foreground">{details.abstract}</p>
               </div>
-            )}
-            {details.figureUrl && (
-              <p className="text-xs text-muted-foreground">
-                The image is the patent&apos;s own drawing. Compare it visually with your
-                figures for drawing-level similarity.
-              </p>
             )}
           </div>
         )}
