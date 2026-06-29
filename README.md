@@ -55,6 +55,12 @@ Compare against a patent you paste or pull candidates from Google BigQuery publi
 
 ![Similar patents](screenshots/case-prior-art.png)
 
+### Checking the drawings
+
+Upload a figure and Pincite reads it for drawing defects under 37 CFR 1.84 and 1.83. Here, on Apple's own FIG. 1, it catches reference numerals that appear in the drawing but were never introduced in the specification, circling each one in red on the figure and pinning it to the rule. The circle positions are an approximate vision estimate, labeled to verify.
+
+![Drawing check](screenshots/case-drawing.png)
+
 ---
 
 ## How it works
