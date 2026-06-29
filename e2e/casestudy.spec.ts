@@ -132,17 +132,24 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   await expect(page.getByTestId("rule-pane")).toContainText(/608\.01/);
   await screenshot(page, "case-evidence");
 
-  // Similar patents, pinpoint overlaps against a public example.
+  // Similar patents: pinpoint overlaps against a real molded-fiber container patent, then
+  // expand it to load the actual patent (its abstract and its own drawing).
   await page.goto(`/projects/${id}/prior-art`);
-  await page.getByTestId("cmp-number").fill("US20090090643A1");
+  await page.getByTestId("cmp-number").fill("US20060213916A1");
   await page
     .getByTestId("cmp-text")
     .fill(
-      "A food container comprising a base with raised ribs that support a food item above an interior surface of the base, and a lid having a plurality of vent openings that allow moisture to escape from the container.",
+      "A container lid formed of molded cellulose fiber for mating with a base container to hold food items. The lid includes a body with a main portion and a perimeter, and a skirt extending substantially around the perimeter to engage the base.",
     );
   await page.getByRole("button", { name: "Compare", exact: true }).click();
-  await expect(page.getByText("US20090090643A1").first()).toBeVisible();
+  await expect(page.getByText("US20060213916A1").first()).toBeVisible();
   await expect(page.getByTestId("overlap-detail")).toBeVisible();
+  await page.getByRole("button", { name: "View the actual patent" }).click();
+  await page
+    .getByText(/Molded fiber lid/i)
+    .first()
+    .waitFor({ timeout: 15_000 })
+    .catch(() => {});
   await page.getByTestId("toggle-claims").click();
   await screenshot(page, "case-prior-art");
 

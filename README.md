@@ -81,7 +81,7 @@ Pincite reads where the draft sits in the lifecycle, explains why, and says what
 
 ### 10. Finding similar patents
 
-Compare against a patent you paste, or pull candidates from Google BigQuery public patents data. Each overlap is pinned to the patent passage and to your own claim element, with a transparent score and a source link. There is no single novelty number, because one number invites over trust.
+Compare against a patent you paste, or pull candidates from Google BigQuery public patents data. Each result carries a similarity score and decomposes what is similar: the description and claims overlaps are pinned to your own claim element, and you can expand any result to load the actual patent - its title, abstract, and its own drawing - to compare drawing to drawing. The score is a similarity signal, not a novelty or validity verdict.
 
 ![Similar patents](screenshots/case-prior-art.png)
 

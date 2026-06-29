@@ -125,10 +125,11 @@ The takeaway is that the tool follows the patent through its whole life, not jus
 
 This step finds public patents that overlap your claims, and it needs at least one drafted claim, so it tells you and stays disabled until then.
 You can compare against one patent you paste, which is free and local, or run a live search that pulls candidates from Google's public patent data on BigQuery.
-Each result leads with the overlaps, pinned to the patent passage and to your own claim element, with a transparent score and a link to the patent.
-There is deliberately no single novelty number, because one number invites over trust.
+Each result carries a similarity score and breaks down what is similar.
+Description and claims similarity shows as overlaps pinned to your own claim element, and you can expand any result to load the actual patent - its title, abstract, and its own drawing - so you can compare drawing to drawing.
+The score is labeled a similarity signal, not a novelty or validity verdict, and there is no single patentability number, because one number invites over trust.
 See `screenshots/case-prior-art.png`.
-The takeaway is decomposed, verifiable overlaps instead of a black box score.
+The takeaway is that a hit opens into the real patent, decomposed into what actually overlaps.
 
 ## 15. Sign the inventor's declaration
 

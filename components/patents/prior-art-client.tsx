@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { runPriorArtSearch, compareAgainstCandidate } from "@/lib/patents/search";
+import { loadPatentDetails, type PatentDetails } from "@/lib/patents/lookup";
 import { patentUrl } from "@/lib/patents/url";
 import type { ResultMatch, ResultSpan } from "@/lib/patents/results";
 
@@ -209,7 +210,21 @@ export function PriorArtClient({
 
 function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) {
   const [showClaims, setShowClaims] = useState(false);
+  const [details, setDetails] = useState<PatentDetails | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const [loading, startLoad] = useTransition();
   const url = patentUrl(match.patent_number, match.source_url);
+  const pct = Math.round((match.overall_score ?? 0) * 100);
+
+  function loadPatent() {
+    setLoadErr(null);
+    startLoad(async () => {
+      const r = await loadPatentDetails(match.patent_number);
+      if ("error" in r) return setLoadErr(r.error);
+      setDetails(r.details);
+    });
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -228,9 +243,13 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
             match.patent_number
           )}
         </h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Score {match.overall_score?.toFixed(2) ?? "—"} from {match.spans.length}{" "}
-          overlap(s). The score summarizes the overlaps below; it is not a verdict.
+        <p className="mt-0.5 text-xs">
+          <span className="font-medium text-foreground">Similarity {pct}%</span>
+          <span className="text-muted-foreground">
+            {" "}
+            from {match.spans.length} overlapping claim element(s). A similarity signal, not a
+            novelty or validity verdict.
+          </span>
         </p>
         <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
@@ -244,9 +263,70 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
         </div>
       </div>
 
+      <div className="rounded-md border border-border p-3">
+        {!details ? (
+          <Button size="sm" variant="outline" onClick={loadPatent} disabled={loading}>
+            {loading ? "Loading the patent…" : "View the actual patent"}
+          </Button>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              {details.figureUrl && (
+                <a href={details.url} target="_blank" rel="noreferrer" className="shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={details.figureUrl}
+                    alt={`Figure from ${match.patent_number}`}
+                    className="h-28 w-auto rounded border border-border bg-white"
+                  />
+                </a>
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">
+                  {details.title ?? match.patent_number}
+                </p>
+                {details.inventors.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {details.inventors.join(", ")}
+                  </p>
+                )}
+                <a
+                  href={details.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-0.5 inline-flex items-center gap-1 text-xs text-foreground underline-offset-2 hover:underline"
+                >
+                  Open the full patent
+                  <ExternalLink className="size-3" aria-hidden />
+                </a>
+              </div>
+            </div>
+            {details.abstract && (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Abstract
+                </p>
+                <p className="text-sm text-muted-foreground">{details.abstract}</p>
+              </div>
+            )}
+            {details.figureUrl && (
+              <p className="text-xs text-muted-foreground">
+                The image is the patent&apos;s own drawing. Compare it visually with your
+                figures for drawing-level similarity.
+              </p>
+            )}
+          </div>
+        )}
+        {loadErr && (
+          <p className="mt-2 text-sm text-violation" role="alert">
+            {loadErr}
+          </p>
+        )}
+      </div>
+
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Pinpoint overlaps in {match.patent_number}
+          Description and claims overlap in {match.patent_number}
         </p>
         {match.spans.length === 0 && (
           <p className="mt-1 text-sm text-muted-foreground">
