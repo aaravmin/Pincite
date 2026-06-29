@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
+import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
@@ -48,6 +49,7 @@ export default async function InventorsPage({
             Inventors &amp; applicant
           </span>
         </div>
+        <HeaderActions projectId={id} />
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
@@ -57,6 +58,7 @@ export default async function StagePage({
             Stage
           </span>
         </div>
+        <HeaderActions projectId={id} />
       </header>
       <main className="flex-1">
         <StageClient

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject } from "@/lib/projects/queries";
@@ -48,6 +49,7 @@ export default async function AuditPage({
             Audit log
           </span>
         </div>
+        <HeaderActions projectId={id} />
       </header>
       <main className="flex-1">
         <AuditClient entries={entries} />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
@@ -63,6 +64,7 @@ export default async function RulesPage({
             Rules
           </span>
         </div>
+        <HeaderActions projectId={id} />
       </header>
       <div className="min-h-0 flex-1">
         <RulesClient appliesNow={clean(appliesNow)} conditional={clean(conditional)} />

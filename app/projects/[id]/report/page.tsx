@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { buildReportData } from "@/lib/export/report";
@@ -41,6 +42,7 @@ export default async function ReportPage({
             Export
           </span>
         </div>
+        <HeaderActions projectId={id} />
       </header>
       <ReportToolbar projectId={id} />
       <ReportView report={report} />

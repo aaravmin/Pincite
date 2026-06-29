@@ -1,22 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState, useTransition } from "react";
+import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { saveSection, saveVersion } from "@/lib/projects/actions";
+import { HeaderActions } from "@/components/projects/header-actions";
+import { saveSection } from "@/lib/projects/actions";
 import {
   SECTION_KEYS,
   SECTION_LABELS,
@@ -37,8 +25,6 @@ export function Workspace({
   project: Project;
   initialSections: Record<string, string>;
 }) {
-  const router = useRouter();
-
   const seed = useCallback((): Record<SectionKey, string> => {
     const out = {} as Record<SectionKey, string>;
     for (const k of SECTION_KEYS) out[k] = initialSections[k] ?? "";
@@ -97,29 +83,6 @@ export function Workspace({
     setActive(next);
   }
 
-  // Save-version dialog state.
-  const [versionOpen, setVersionOpen] = useState(false);
-  const [label, setLabel] = useState("");
-  const [versionMsg, setVersionMsg] = useState<string | null>(null);
-  const [pending, start] = useTransition();
-
-  function doSaveVersion() {
-    setVersionMsg(null);
-    start(async () => {
-      if (state[active] === "unsaved" || timers.current.has(active)) {
-        await commit(active);
-      }
-      const res = await saveVersion({ projectId: project.id, label });
-      if ("error" in res) {
-        setVersionMsg(res.error);
-        return;
-      }
-      setVersionOpen(false);
-      setLabel("");
-      router.refresh();
-    });
-  }
-
   const activeStatus = state[active] ?? "saved";
   const activeWords = wordCount(sections[active]);
   const abstractOver = active === "abstract" && activeWords > ABSTRACT_WORD_LIMIT;
@@ -145,64 +108,7 @@ export function Workspace({
           >
             {statusLabel(activeStatus)}
           </span>
-          <Link
-            href={`/projects/${project.id}/stage`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Stage
-          </Link>
-          <Link
-            href={`/projects/${project.id}/versions`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Version history
-          </Link>
-          <Link
-            href={`/projects/${project.id}/audit`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Audit log
-          </Link>
-          <Dialog open={versionOpen} onOpenChange={setVersionOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">Save version</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Save a version</DialogTitle>
-                <DialogDescription>
-                  Saving appends an immutable snapshot. It never overwrites a
-                  previous save.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-2">
-                <Label htmlFor="version-label">Label (optional)</Label>
-                <Input
-                  id="version-label"
-                  value={label}
-                  onChange={(e) => setLabel(e.target.value)}
-                  placeholder="e.g. First full draft"
-                />
-                {versionMsg && (
-                  <p className="rounded-md bg-muted px-3 py-2 text-sm text-foreground">
-                    {versionMsg}
-                  </p>
-                )}
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setVersionOpen(false)}
-                  disabled={pending}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={doSaveVersion} disabled={pending}>
-                  {pending ? "Saving…" : "Save"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <HeaderActions projectId={project.id} />
         </div>
       </header>
 
@@ -251,6 +157,11 @@ export function Workspace({
             <Textarea
               value={sections[active]}
               onChange={(e) => onChange(active, e.target.value)}
+              onBlur={() => {
+                if (state[active] === "unsaved" || timers.current.has(active)) {
+                  void commit(active);
+                }
+              }}
               spellCheck
               aria-label={SECTION_LABELS[active]}
               className="mt-4 min-h-[420px] resize-y font-mono text-sm leading-relaxed"
