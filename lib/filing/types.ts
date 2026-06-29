@@ -49,3 +49,25 @@ export type Declaration = {
   statements: DeclarationStatements;
   signed_at: string;
 };
+
+/**
+ * A drawing-compliance issue found by the vision analysis. x,y are normalized 0..1 from the
+ * top-left for an on-figure red circle (an approximate vision estimate); both are null when
+ * the issue has no single location (e.g. a missing figure label).
+ */
+export type DrawingFinding = {
+  id: string;
+  title: string;
+  detail: string;
+  cfr: string;
+  mpep: string | null;
+  x: number | null;
+  y: number | null;
+};
+
+export type DrawingReview = {
+  summary: string;
+  figureLabel: string | null;
+  components: { name: string; shown: boolean }[];
+  findings: DrawingFinding[];
+};

@@ -179,8 +179,12 @@ You can upload drawings and supporting documents, as images or PDFs, up to 25 MB
 Files are stored in a private US region storage bucket, encrypted at rest, with per owner row level security so no other user can read them.
 Uploads never go to a model unless you explicitly ask for the vision analysis below.
 
-For an image figure you can run a vision analysis.
-A model describes the figure and checks that each component you disclosed actually appears in it, which is the 37 CFR 1.83 requirement that every claimed feature be shown in the drawings.
+For an image figure you can run a drawing check.
+A vision model reads the figure and returns a short description, the figure label it sees, every reference numeral it can read with its position, and any drawing problems it can spot under 37 CFR 1.84 and 1.83.
+Pincite turns that into findings.
+It flags a reference numeral that appears in the drawing but is not mentioned anywhere in your specification, a missing figure label, a disclosed component that does not appear, and the model's own observations.
+Each located issue is marked with a red circle on the figure pointing at where it is, numbered to match the list, and pinned to a corpus-validated MPEP section.
+The locations are an approximate vision estimate, so they are labeled to verify rather than trust.
 Because this sends the image to a model, it is restricted to public or synthetic figures until vendor zero data retention is on.
 
 Figures collect into the drawings portion of the filing package.

@@ -1,8 +1,10 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { analyzeDrawing } from "@/lib/filing/actions";
+import type { DrawingReview } from "@/lib/filing/types";
 
 export function DrawingAnalysis({
   projectId,
@@ -12,18 +14,30 @@ export function DrawingAnalysis({
   attachmentId: string;
 }) {
   const [pending, start] = useTransition();
-  const [desc, setDesc] = useState<string | null>(null);
-  const [comps, setComps] = useState<{ name: string; shown: boolean }[]>([]);
+  const [review, setReview] = useState<DrawingReview | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   function run() {
     setErr(null);
     start(async () => {
       const r = await analyzeDrawing({ projectId, attachmentId });
-      if ("error" in r) return setErr(r.error);
-      setDesc(r.description);
-      setComps(r.components);
+      if ("error" in r) {
+        setReview(null);
+        return setErr(r.error);
+      }
+      setReview(r);
     });
+  }
+
+  const imgUrl = `/api/projects/${projectId}/attachments/${attachmentId}`;
+
+  // Number the located findings so the on-figure circle matches the list entry.
+  const circleNo = new Map<string, number>();
+  if (review) {
+    let c = 0;
+    for (const f of review.findings) {
+      if (f.x !== null && f.y !== null) circleNo.set(f.id, ++c);
+    }
   }
 
   return (
@@ -35,26 +49,90 @@ export function DrawingAnalysis({
         disabled={pending}
         data-testid="describe-drawing"
       >
-        {pending ? "Reading the figure…" : "Describe & check (vision)"}
+        {pending ? "Reading the figure…" : "Check drawing (vision)"}
       </Button>
       {err && (
         <p className="mt-2 text-sm text-violation" role="alert">
           {err}
         </p>
       )}
-      {desc && (
-        <div className="mt-2 space-y-2 rounded-md border border-border p-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            What the figure shows
-          </p>
-          <p className="text-sm text-muted-foreground">{desc}</p>
-          {comps.length > 0 && (
+
+      {review && (
+        <div className="mt-2 space-y-4 rounded-md border border-border p-3">
+          {/* The figure with red circles on the located issues. */}
+          <div className="relative inline-block max-w-full">
+            <img
+              src={imgUrl}
+              alt="Uploaded figure under review"
+              className="max-h-[460px] w-auto rounded border border-border"
+            />
+            {review.findings.map((f) =>
+              f.x !== null && f.y !== null ? (
+                <span
+                  key={f.id}
+                  style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}
+                  className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-violation bg-background/70 text-[11px] font-semibold text-violation"
+                  aria-hidden
+                >
+                  {circleNo.get(f.id)}
+                </span>
+              ) : null,
+            )}
+          </div>
+
+          {/* The issues. Red circles point to the located ones; the rest are listed plainly. */}
+          {review.findings.length === 0 ? (
+            <p className="flex items-center gap-1.5 text-sm text-pass">
+              <span className="inline-block size-2.5 rounded-full bg-pass" aria-hidden />
+              No drawing issues detected. The figure label and reference numerals look
+              consistent with the specification.
+            </p>
+          ) : (
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Drawing issues ({review.findings.length}) - vision estimate, verify
+              </p>
+              <ul className="mt-1 space-y-2">
+                {review.findings.map((f) => (
+                  <li
+                    key={f.id}
+                    className="flex gap-2 rounded-md border border-violation bg-violation-bg p-2 text-sm"
+                  >
+                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-violation text-[10px] font-semibold text-violation">
+                      {circleNo.get(f.id) ?? "!"}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="font-medium text-foreground">{f.title}</span>
+                      {f.detail && (
+                        <span className="text-muted-foreground"> {f.detail}</span>
+                      )}
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {f.cfr}
+                        {f.mpep ? ` · MPEP ${f.mpep}` : ""}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {review.summary && (
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                What the figure shows
+              </p>
+              <p className="text-sm text-muted-foreground">{review.summary}</p>
+            </div>
+          )}
+
+          {review.components.length > 0 && (
             <div>
               <p className="text-xs text-muted-foreground">
                 Each disclosed component should appear in the drawings (37 CFR 1.83).
               </p>
               <ul className="mt-1 space-y-1">
-                {comps.map((c) => (
+                {review.components.map((c) => (
                   <li key={c.name} className="flex items-center gap-2 text-sm">
                     <span
                       className={

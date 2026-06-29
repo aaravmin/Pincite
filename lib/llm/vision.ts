@@ -1,69 +1,18 @@
 /**
- * Vision for patent drawings. SERVER ONLY. Prefers Gemini multimodal when GEMINI_API_KEY
- * is set, otherwise falls back to Grok vision. CONFIDENTIALITY: a figure sent here is seen
- * by the vendor and neither vendor's ZDR is confirmed on, so use only public or synthetic
- * figures until ZDR is on (docs/business-context.md).
+ * Vision for patent drawings. SERVER ONLY. Uses Grok vision (the active vendor).
+ * CONFIDENTIALITY: a figure sent here is seen by the vendor and ZDR is not confirmed on,
+ * so use only public or synthetic figures until ZDR is on (docs/business-context.md).
  */
-const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
 const GROK_BASE = "https://api.x.ai/v1";
 
-const PROMPT =
-  "You are reviewing a patent figure. Describe in plain words what the drawing shows: the article, its visible parts and components, and any reference numerals or labels. Be concise and factual, and do not speculate beyond what is visible.";
-
-export async function describeDrawing(
+async function grokVision(
+  prompt: string,
   base64: string,
   mimeType: string,
-): Promise<string> {
-  // Grok vision is the active path. Gemini is kept available for if a key is added.
-  if (process.env.VISION_PROVIDER === "gemini" && process.env.GEMINI_API_KEY) {
-    return describeWithGemini(base64, mimeType);
-  }
-  return describeWithGrok(base64, mimeType);
-}
-
-async function describeWithGemini(
-  base64: string,
-  mimeType: string,
-): Promise<string> {
-  const key = process.env.GEMINI_API_KEY!;
-  const model =
-    process.env.GEMINI_VISION_MODEL ??
-    process.env.GEMINI_MODEL ??
-    "gemini-2.5-pro";
-  const res = await fetch(
-    `${GEMINI_BASE}/models/${model}:generateContent?key=${key}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: PROMPT },
-              { inlineData: { mimeType, data: base64 } },
-            ],
-          },
-        ],
-        generationConfig: { temperature: 0, maxOutputTokens: 500 },
-      }),
-    },
-  );
-  if (!res.ok) throw new Error(`Gemini vision ${res.status}: ${await res.text()}`);
-  const json = await res.json();
-  return (
-    json.candidates?.[0]?.content?.parts
-      ?.map((p: { text?: string }) => p.text ?? "")
-      .join("") ?? ""
-  ).trim();
-}
-
-async function describeWithGrok(
-  base64: string,
-  mimeType: string,
+  maxTokens: number,
 ): Promise<string> {
   const key = process.env.XAI_API_KEY;
-  if (!key) throw new Error("No vision model key (GEMINI_API_KEY or XAI_API_KEY)");
+  if (!key) throw new Error("No vision model key (XAI_API_KEY)");
   const model =
     process.env.GROK_VISION_MODEL ?? process.env.GROK_MODEL ?? "grok-4.3";
   const res = await fetch(`${GROK_BASE}/chat/completions`, {
@@ -72,12 +21,12 @@ async function describeWithGrok(
     body: JSON.stringify({
       model,
       temperature: 0,
-      max_tokens: 500,
+      max_tokens: maxTokens,
       messages: [
         {
           role: "user",
           content: [
-            { type: "text", text: PROMPT },
+            { type: "text", text: prompt },
             {
               type: "image_url",
               image_url: { url: `data:${mimeType};base64,${base64}` },
@@ -93,4 +42,80 @@ async function describeWithGrok(
   }
   const json = await res.json();
   return (json.choices?.[0]?.message?.content ?? "").trim();
+}
+
+export type DrawingNumeral = { numeral: string; x: number; y: number };
+export type DrawingVisionIssue = {
+  title: string;
+  detail: string;
+  x: number | null;
+  y: number | null;
+};
+
+/** Structured read of one figure: a description, the figure label, every reference numeral
+ *  with its location, and any drawing problems the model can see. Coordinates are normalized
+ *  0..1 from the top-left and are approximate (a vision estimate). */
+export type DrawingVision = {
+  summary: string;
+  figureLabel: string | null;
+  numerals: DrawingNumeral[];
+  issues: DrawingVisionIssue[];
+};
+
+const ANALYZE_PROMPT = `You are a USPTO patent drawings examiner reviewing ONE figure for compliance defects under 37 CFR 1.84 and 1.83.
+Return ONLY a JSON object (no prose, no markdown fences) with exactly these keys:
+- "summary": one factual sentence describing what the figure shows.
+- "figureLabel": the figure label visible in the drawing such as "FIG. 1", or null if none is present.
+- "numerals": an array of every reference numeral you can read in the drawing, each {"numeral":"12","x":0.0,"y":0.0} where x,y is the approximate center of that numeral as a fraction (0..1) of image width and height from the TOP-LEFT.
+- "issues": an array of drawing problems you can actually see, each {"title":"short label","detail":"one sentence","x":0.0 or null,"y":0.0 or null} where x,y locates the problem when it has a position, else null. Look for: a missing or unclear figure label; a reference numeral with no lead line to a part, or a lead line with no numeral; a visible part that has no reference numeral; numerals that are illegible or overlapping. Do NOT invent problems. Return an empty array if the figure looks compliant.
+All coordinates use the top-left as origin. Output JSON only.`;
+
+function clamp01(n: unknown): number | null {
+  const v = typeof n === "number" ? n : Number(n);
+  return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : null;
+}
+
+export async function analyzeDrawingVision(
+  base64: string,
+  mimeType: string,
+): Promise<DrawingVision> {
+  const text = await grokVision(ANALYZE_PROMPT, base64, mimeType, 1400);
+  const match = text.match(/\{[\s\S]*\}/);
+  let raw: Record<string, unknown> = {};
+  try {
+    raw = match ? JSON.parse(match[0]) : {};
+  } catch {
+    raw = {};
+  }
+
+  const numerals: DrawingNumeral[] = Array.isArray(raw.numerals)
+    ? (raw.numerals as Record<string, unknown>[])
+        .map((r) => ({
+          numeral: String(r.numeral ?? "").trim(),
+          x: clamp01(r.x) ?? 0,
+          y: clamp01(r.y) ?? 0,
+        }))
+        .filter((r) => r.numeral)
+    : [];
+
+  const issues: DrawingVisionIssue[] = Array.isArray(raw.issues)
+    ? (raw.issues as Record<string, unknown>[])
+        .map((r) => ({
+          title: String(r.title ?? "").trim(),
+          detail: String(r.detail ?? "").trim(),
+          x: clamp01(r.x),
+          y: clamp01(r.y),
+        }))
+        .filter((r) => r.title || r.detail)
+    : [];
+
+  return {
+    summary: String(raw.summary ?? "").trim(),
+    figureLabel:
+      raw.figureLabel == null || raw.figureLabel === ""
+        ? null
+        : String(raw.figureLabel).trim(),
+    numerals,
+    issues,
+  };
 }

@@ -9,11 +9,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { describeDrawing } from "@/lib/llm/vision";
+import { analyzeDrawingVision, type DrawingVision } from "@/lib/llm/vision";
 import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
+import { validateCitations } from "@/lib/mpep/citation";
+import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
-import type { InventorInput, DeclarationStatements } from "@/lib/filing/types";
+import type {
+  InventorInput,
+  DeclarationStatements,
+  DrawingFinding,
+  DrawingReview,
+} from "@/lib/filing/types";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -166,17 +173,16 @@ export async function signDeclaration(input: {
 }
 
 /**
- * Describe an uploaded figure with a vision model, then check that each disclosed
- * component appears in it (37 CFR 1.83 requires every claimed feature to be shown in the
- * drawings). Public or synthetic figures only until vendor ZDR is on.
+ * Review an uploaded figure with a vision model for drawing-compliance defects under 37 CFR
+ * 1.84 and 1.83: describe it, check each disclosed component appears, flag reference numerals
+ * that are in the drawing but not the specification, flag a missing figure label, and pass
+ * through any problems the model can see - each with an approximate location for an on-figure
+ * red circle. Public or synthetic figures only until vendor ZDR is on.
  */
 export async function analyzeDrawing(input: {
   projectId: string;
   attachmentId: string;
-}): Promise<
-  | { ok: true; description: string; components: { name: string; shown: boolean }[] }
-  | { error: string }
-> {
+}): Promise<({ ok: true } & DrawingReview) | { error: string }> {
   const { supabase, user } = await requireUser();
 
   const { data: att } = await supabase
@@ -187,7 +193,7 @@ export async function analyzeDrawing(input: {
     .maybeSingle();
   if (!att) return { error: "Attachment not found." };
   if (!att.mime.startsWith("image/")) {
-    return { error: "Only image figures can be described." };
+    return { error: "Only image figures can be reviewed." };
   }
 
   const rl = await checkRateLimit(supabase, "drawing_vision", 30, 3600);
@@ -204,20 +210,23 @@ export async function analyzeDrawing(input: {
   }
   const base64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
 
-  let description: string;
+  let vision: DrawingVision;
   try {
-    description = await describeDrawing(base64, att.mime);
+    vision = await analyzeDrawingVision(base64, att.mime);
   } catch (e) {
     return { error: `Vision model error: ${(e as Error).message}` };
   }
-  if (!description) return { error: "The vision model returned nothing for this figure." };
+  if (!vision.summary && vision.numerals.length === 0 && vision.issues.length === 0) {
+    return { error: "The vision model returned nothing usable for this figure." };
+  }
 
+  // Component presence (37 CFR 1.83): each disclosed component should appear in the figure.
   const { data: disc } = await supabase
     .from("project_disclosure")
     .select("components")
     .eq("project_id", input.projectId)
     .maybeSingle();
-  const lower = description.toLowerCase();
+  const haystack = vision.summary.toLowerCase();
   const components = ((disc?.components as string) ?? "")
     .split(/[\n,;]+/)
     .map((s) => s.trim())
@@ -227,15 +236,88 @@ export async function analyzeDrawing(input: {
       const words = term.split(/\s+/);
       const probe = words[words.length - 1];
       const shown =
-        probe.length >= 3 && (lower.includes(probe) || lower.includes(term));
+        probe.length >= 3 && (haystack.includes(probe) || haystack.includes(term));
       return { name, shown };
     });
+
+  // Patent type selects the governing MPEP for drawings (design vs utility). Pins are
+  // corpus-validated; an unresolved one is dropped to null but the finding still shows.
+  const project = await getProject(input.projectId);
+  const generalMpep = project?.patent_type === "design" ? "1503.02" : "608.02";
+  const numeralMpep = "608.01(g)";
+  const resolved = await validateCitations([generalMpep, numeralMpep]);
+  const pin = (nbr: string) => (resolved.has(nbr) ? nbr : null);
+
+  const findings: DrawingFinding[] = [];
+
+  for (const [i, iss] of vision.issues.entries()) {
+    findings.push({
+      id: `issue-${i}`,
+      title: iss.title || "Drawing issue",
+      detail: iss.detail,
+      cfr: "37 CFR 1.84",
+      mpep: pin(generalMpep),
+      x: iss.x,
+      y: iss.y,
+    });
+  }
+
+  if (!vision.figureLabel) {
+    findings.push({
+      id: "figlabel",
+      title: "No figure label detected",
+      detail:
+        "No label such as FIG. 1 was found. Each view must be numbered (37 CFR 1.84(u)).",
+      cfr: "37 CFR 1.84(u)",
+      mpep: pin(generalMpep),
+      x: null,
+      y: null,
+    });
+  }
+
+  // Reference numerals that appear in the drawing but never in the specification text.
+  const sections = await getSectionContent(input.projectId);
+  const specText = (
+    (sections["detailed_description"] ?? "") +
+    " " +
+    (sections["drawings_meta"] ?? "") +
+    " " +
+    (sections["summary"] ?? "")
+  ).toLowerCase();
+  const inSpec = (numeral: string): boolean => {
+    const esc = numeral.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(^|[^a-z0-9])${esc}([^a-z0-9]|$)`).test(specText);
+  };
+  let nIdx = 0;
+  for (const num of vision.numerals) {
+    if (inSpec(num.numeral)) continue;
+    findings.push({
+      id: `numeral-${nIdx++}`,
+      title: `Reference numeral ${num.numeral} not described`,
+      detail: `Numeral ${num.numeral} appears in the drawing but is not mentioned in the specification (37 CFR 1.84(p)).`,
+      cfr: "37 CFR 1.84(p)",
+      mpep: pin(numeralMpep),
+      x: num.x,
+      y: num.y,
+    });
+  }
 
   await logAudit(supabase, {
     userId: user.id,
     action: "drawing_analyzed",
     projectId: input.projectId,
-    detail: { attachmentId: input.attachmentId },
+    detail: {
+      attachmentId: input.attachmentId,
+      findings: findings.length,
+      numerals: vision.numerals.length,
+    },
   });
-  return { ok: true, description, components };
+
+  return {
+    ok: true,
+    summary: vision.summary,
+    figureLabel: vision.figureLabel,
+    components,
+    findings,
+  };
 }
