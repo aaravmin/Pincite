@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -19,9 +18,7 @@ import {
   setAttachmentView,
 } from "@/lib/filing/actions";
 import { DrawingEditor } from "@/components/uploads/drawing-editor";
-import { ModelViewer } from "@/components/uploads/model-viewer";
 import {
-  is3dModel,
   ATTACHMENT_VIEWS,
   ATTACHMENT_VIEW_LABELS,
   type Attachment,
@@ -30,12 +27,11 @@ import {
 
 function viewLabel(a: Attachment): string {
   if (a.view) return ATTACHMENT_VIEW_LABELS[a.view as AttachmentView] ?? a.view;
-  return is3dModel(a.mime, a.filename) ? "3D model" : "Figure";
+  return "Figure";
 }
 
-/** Flip through every figure (images, PDFs, and 3D models) by perspective in one place.
- *  Each view renders by type: an image gets the vision drawing check, a PDF renders inline,
- *  a 3D model gets the orientation toggle. */
+/** Flip through every figure by perspective in one place. An image gets the vision drawing
+ *  check; a PDF renders inline. */
 export function FigureNavigator({
   projectId,
   figures,
@@ -54,7 +50,6 @@ export function FigureNavigator({
   const i = Math.min(idx, figures.length - 1);
   const sel = figures[i];
   if (!sel) return null;
-  const threeD = is3dModel(sel.mime, sel.filename);
   const isPdf = sel.mime === "application/pdf";
   const url = `/api/projects/${projectId}/attachments/${sel.id}`;
 
@@ -135,10 +130,8 @@ export function FigureNavigator({
     }
   }
 
-  // Run the vision check on every uploaded image figure at once (not PDFs or 3D models).
-  const imageFigures = figures.filter(
-    (f) => !is3dModel(f.mime, f.filename) && f.mime !== "application/pdf",
-  );
+  // Run the vision check on every uploaded image figure at once (not PDFs).
+  const imageFigures = figures.filter((f) => f.mime !== "application/pdf");
   async function checkAll() {
     setCheckingAll(true);
     setAllMsg(null);
@@ -222,10 +215,7 @@ export function FigureNavigator({
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 text-sm">
             <span className="truncate font-medium text-foreground">{sel.filename}</span>
-            <Badge variant="secondary">
-              {threeD ? "3D model" : isPdf ? "PDF" : "Image"}
-            </Badge>
-            {!threeD && !isPdf ? (
+            {!isPdf ? (
               <>
                 <Select
                   value={sel.view || "none"}
@@ -267,7 +257,7 @@ export function FigureNavigator({
             >
               Open
             </a>
-            {!threeD && !isPdf && (
+            {!isPdf && (
               <>
                 <Button
                   variant="outline"
@@ -298,9 +288,7 @@ export function FigureNavigator({
         </div>
 
         <div className="mt-3">
-          {threeD ? (
-            <ModelViewer key={sel.id} src={`${url}?raw=1`} />
-          ) : isPdf ? (
+          {isPdf ? (
             <iframe
               key={sel.id}
               title={sel.filename}

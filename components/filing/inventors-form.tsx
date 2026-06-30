@@ -110,9 +110,8 @@ export function InventorsForm({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          List every person who contributed to conceiving the claimed invention - not assistants,
-          funders, or a company. Each inventor signs the declaration later, so use full legal names.
-          This fills the Application Data Sheet (ADS) the USPTO requires.
+          Everyone who conceived the invention - not helpers, funders, or a company. Use full
+          legal names.
         </p>
         {rows.map((row, idx) => (
           <div key={idx} className="rounded-lg border border-border p-4">
@@ -176,9 +175,8 @@ export function InventorsForm({
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-foreground">Applicant &amp; entity</h2>
         <p className="text-xs text-muted-foreground">
-          The applicant is who is asking for the patent. Usually that is the inventors themselves.
-          Check the company option only if a business owns the invention (for example through an
-          employment assignment), then enter its legal name below.
+          Who is applying. Usually the inventors. Check the company option only if a business
+          owns the invention, then enter its legal name below.
         </p>
         <label className="flex items-center gap-2 text-sm text-foreground">
           <input
@@ -209,7 +207,7 @@ export function InventorsForm({
               placeholder="Assignee / applicant legal name"
             />
             <p className="text-xs text-muted-foreground">
-              The legal name of the company or person that owns the invention and is applying.
+              Legal name of the owner that is applying.
             </p>
           </div>
         )}
@@ -231,9 +229,7 @@ export function InventorsForm({
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
-            Sets your USPTO fee tier. Most individuals and very small businesses qualify as micro or
-            small entity and pay reduced fees; large entity is the default for bigger companies. If
-            unsure, leave it as large.
+            Sets your USPTO fee tier.
           </p>
         </div>
       </section>
