@@ -13,7 +13,12 @@ import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildFigureSvg, imageSize } from "@/lib/export/figure-svg";
-import { buildPatentLatex, buildLatexReadme } from "@/lib/export/latex";
+import {
+  buildPatentLatex,
+  buildLatexReadme,
+  figureDescription,
+} from "@/lib/export/latex";
+import { buildFigurePdf } from "@/lib/export/figure-pdf";
 import { logAudit } from "@/lib/audit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -88,11 +93,11 @@ export async function GET(
     const attachments = await getAttachments(id);
     const admin = createAdminClient();
     const zip = new JSZip();
-    const figures: { file: string; label: string }[] = [];
+    const figures: { file: string; label: string; description: string }[] = [];
     let n = 0;
     for (const a of attachments) {
       if (a.kind !== "drawing") continue;
-      // pdflatex reads PNG and JPEG; skip formats it cannot include.
+      // pdflatex reads PNG, JPEG, and PDF; skip formats it cannot include.
       const ext =
         a.mime === "image/png" ? "png" : a.mime === "image/jpeg" ? "jpg" : null;
       if (!ext) continue;
@@ -101,9 +106,25 @@ export async function GET(
         .download(a.storage_path);
       if (!blob) continue;
       n++;
-      const file = `figures/figure-${String(n).padStart(2, "0")}.${ext}`;
-      zip.file(file, new Uint8Array(await blob.arrayBuffer()));
-      figures.push({ file, label: a.annotations?.figureLabel?.text || `FIG. ${n}` });
+      // Figures are numbered by sequence in the formal document; the page caption supplies the
+      // FIG. label, so the baked image carries only the numerals and lead lines.
+      const stem = `figures/figure-${String(n).padStart(2, "0")}`;
+      const label = `FIG. ${n}`;
+      const description = figureDescription(a.view);
+      const bytes = new Uint8Array(await blob.arrayBuffer());
+      const pdf = await buildFigurePdf({
+        bytes,
+        mime: a.mime,
+        annotations: a.annotations,
+        includeFigureLabel: false,
+      });
+      if (pdf) {
+        zip.file(`${stem}.pdf`, pdf);
+        figures.push({ file: `${stem}.pdf`, label, description });
+      } else {
+        zip.file(`${stem}.${ext}`, bytes);
+        figures.push({ file: `${stem}.${ext}`, label, description });
+      }
     }
     const tex = buildPatentLatex({
       sections,

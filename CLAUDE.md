@@ -233,10 +233,15 @@ the end of each session — but be stringent; trim before it bloats.
     Manual per finding, not a magic wand. Guarded e2e `auto-fix.spec.ts` (AUTOFIX_AI=1). [drawing
     auto-fix + multi-angle F2.3 deferred as optional polish].
 - [x] Real-patent-format export (`?format=latex`, `lib/export/latex.ts`): a ZIP of patent.tex +
-  figures that typesets the application like a published patent (1.77 order, [0001] paragraphs,
-  claims/abstract on own pages, drawings via \includegraphics). User compiles on Overleaf/pdflatex
-  (no server engine; PNG/JPEG figures only). Button on the Submission step; migration 0017 adds
-  'latex' to exports.format. e2e `latex-export.spec.ts`.
+  figures typesetting the application like a published patent, following the Pupalaikis uspatent
+  GUIDE layout (`~/Downloads/PatentApplicationGuide.pdf`) but SELF-CONTAINED over the article class
+  (preamble macros `\psection`/`\ppar`/`\padpara`/`\pclaim`, ulem `\uline`) so it compiles on
+  Overleaf/pdflatex with no special package: 1.77 order, centered underlined headings, [0001]
+  paragraphs, auto Brief Description of the Drawings from each figure's view, "What is claimed is:"
+  + numbered claims, abstract + drawings each own page. Figures are baked into vector PDFs via
+  **pdf-lib** (`lib/export/figure-pdf.ts`: raster + numerals + lead lines, halo'd; FIG. N caption
+  from LaTeX) so the typeset patent shows the EDITED drawings. Button on Submission; migration 0017
+  adds 'latex'. e2e `latex-export.spec.ts`. (No server-side TeX engine; user compiles.)
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
