@@ -25,8 +25,8 @@ test("figure view: explicit label on upload, then correctable per figure", async
   const id = await newProject(page);
   await page.goto(`/projects/${id}/uploads`);
 
-  // Default is Auto-detect; choose an explicit view so this test makes no vision call.
-  await expect(page.getByLabel("Drawing orientation")).toContainText("Auto-detect");
+  // No vision runs on upload; choose an explicit view.
+  await expect(page.getByLabel("Drawing orientation")).toContainText("Not specified");
   await page.getByLabel("Drawing orientation").click();
   await page.getByRole("option", { name: "Front", exact: true }).click();
   await page
@@ -49,22 +49,25 @@ test("figure view: explicit label on upload, then correctable per figure", async
   assertClean(errs);
 });
 
-test("auto-detect assigns a view from the image (vision)", async ({ page }) => {
+test("Detect view assigns a view from the image (vision)", async ({ page }) => {
   test.skip(
     !process.env.ORIENT_VISION,
-    "vision: set ORIENT_VISION=1 to run the live auto-detect check",
+    "vision: set ORIENT_VISION=1 to run the live Detect view check",
   );
   test.setTimeout(120000);
   await loginAsTestUser(page);
   const id = await newProject(page);
   await page.goto(`/projects/${id}/uploads`);
 
-  // Leave Auto-detect selected and upload a clear perspective figure.
+  // Upload without a view, then opt in to detection via the per-figure Detect view button.
   await page
     .getByTestId("upload-input")
     .setInputFiles("e2e/fixtures/apple-container-fig01.png");
   await expect(page.getByRole("heading", { name: /Figures \(1\)/ })).toBeVisible({
+    timeout: 30000,
+  });
+  await page.getByRole("button", { name: "Detect view" }).click();
+  await expect(page.getByLabel("Figure view")).not.toContainText("Not specified", {
     timeout: 90000,
   });
-  await expect(page.getByLabel("Figure view")).not.toContainText("Not specified");
 });

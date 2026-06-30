@@ -15,7 +15,6 @@ import {
   PROJECT_STATUSES,
   PROJECT_STATUS_LABELS,
 } from "@/lib/projects/sections";
-import { nextStep } from "@/lib/projects/next-step";
 import { fmtDate } from "@/lib/format";
 import { PortfolioTable } from "@/components/projects/portfolio-table";
 import { DeleteProjectButton } from "@/components/dashboard/delete-project-button";
@@ -87,11 +86,11 @@ export function DashboardProjects({
       ) : (
         <ul className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border">
           {filtered.map((p) => {
-            const ns = nextStep(p.declared_status);
+            const ns = p.next;
             return (
               <li
                 key={p.id}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-accent/40"
+                className="flex items-center gap-4 px-4 py-3 outline-1 -outline-offset-1 outline-transparent hover:bg-accent/40 hover:outline hover:outline-border"
               >
                 <div className="min-w-0 flex-1">
                   <Link
@@ -106,8 +105,8 @@ export function DashboardProjects({
                     </Badge>
                     <span>{p.stage}</span>
                     <span>· {p.completeness}% complete</span>
-                    {p.openReds > 0 && (
-                      <span className="text-violation">· {p.openReds} to fix</span>
+                    {p.openIssues > 0 && (
+                      <span className="text-violation">· {p.openIssues} to fix</span>
                     )}
                   </div>
                 </div>

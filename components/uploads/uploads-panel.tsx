@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { deleteAttachment, classifyOrientation } from "@/lib/filing/actions";
+import { deleteAttachment } from "@/lib/filing/actions";
 import { FigureNavigator } from "@/components/uploads/figure-navigator";
 import {
   ATTACHMENT_VIEWS,
@@ -37,10 +37,10 @@ export function UploadsPanel({
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [kind, setKind] = useState<AttachmentKind>("drawing");
-  // "auto" = let the vision model assign the view; "none" = leave unlabeled; else an explicit view.
-  const [view, setView] = useState<string>("auto");
+  // "" = not specified; otherwise an explicit view. No vision runs on upload (use Detect view
+  // on the figure for an opt-in detection).
+  const [view, setView] = useState<string>("");
   const [busy, setBusy] = useState(false);
-  const [detecting, setDetecting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
@@ -49,11 +49,10 @@ export function UploadsPanel({
     if (!f) return;
     setErr(null);
     setBusy(true);
-    const explicitView = view === "auto" || view === "none" ? "" : view;
     const fd = new FormData();
     fd.append("file", f);
     fd.append("kind", kind);
-    fd.append("view", kind === "drawing" ? explicitView : "");
+    fd.append("view", kind === "drawing" ? view : "");
     const res = await fetch(`/api/projects/${projectId}/attachments`, {
       method: "POST",
       body: fd,
@@ -64,14 +63,6 @@ export function UploadsPanel({
       const j = await res.json().catch(() => ({}));
       setErr(j.error ?? "Upload failed.");
       return;
-    }
-    const j = await res.json().catch(() => ({}));
-    // Auto-detect the view for image drawings when no explicit one was chosen.
-    const isImage = f.type.startsWith("image/");
-    if (kind === "drawing" && view === "auto" && isImage && j.attachment?.id) {
-      setDetecting(true);
-      await classifyOrientation({ projectId, attachmentId: j.attachment.id });
-      setDetecting(false);
     }
     router.refresh();
   }
@@ -104,18 +95,19 @@ export function UploadsPanel({
         {kind === "drawing" && (
           <div className="space-y-1.5">
             <span className="text-xs font-medium text-muted-foreground">Orientation</span>
-            <Select value={view} onValueChange={setView}>
+            <Select
+              value={view || "none"}
+              onValueChange={(v) => setView(v === "none" ? "" : v)}
+            >
               <SelectTrigger className="w-44" aria-label="Drawing orientation">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="auto">Auto-detect</SelectItem>
-                {ATTACHMENT_VIEWS.filter((v) => v).map((v) => (
-                  <SelectItem key={v} value={v}>
+                {ATTACHMENT_VIEWS.map((v) => (
+                  <SelectItem key={v || "none"} value={v || "none"}>
                     {ATTACHMENT_VIEW_LABELS[v]}
                   </SelectItem>
                 ))}
-                <SelectItem value="none">Leave unlabeled</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -123,9 +115,9 @@ export function UploadsPanel({
         <Button
           type="button"
           onClick={() => fileRef.current?.click()}
-          disabled={busy || detecting}
+          disabled={busy}
         >
-          {busy ? "Uploading…" : detecting ? "Detecting view…" : "Upload file"}
+          {busy ? "Uploading…" : "Upload file"}
         </Button>
         <input
           ref={fileRef}
@@ -140,10 +132,10 @@ export function UploadsPanel({
           Figures upload as PNG, JPEG, GIF, WEBP, or PDF. The USPTO files 2D drawings, so
           these are what go in the package. You can also upload a 3D model (GLB or GLTF) to
           turn and inspect while you draft; it is a visualization aid and is not part of the
-          filing. Pincite auto-detects the view of each figure on upload (top, front, perspective,
-          and so on); you can pick one yourself or correct it on the figure. Up to 25 MB,
-          stored encrypted in the US. Reading a figure sends it to a vision model, so use
-          public or synthetic figures for now.
+          filing. Tag each figure with its view (top, front, perspective, and so on), or use
+          Detect view on the figure to have Pincite read it. Up to 25 MB, stored encrypted in
+          the US. Reading a figure sends it to a vision model, so use public or synthetic
+          figures for now.
         </p>
       </div>
 

@@ -260,7 +260,7 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
           </span>
           <span className="inline-flex items-center gap-1">
             <span className="inline-block size-2 rounded-full bg-violation" />
-            reads on full limitation
+            matches a full claim limitation
           </span>
         </div>
       </div>
@@ -388,7 +388,7 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
               <p className="text-foreground">{s.patent_span_text}</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {s.overlap_type === "claim_limitation"
-                  ? "reads on full limitation"
+                  ? "matches a full claim limitation"
                   : "overlap"}{" "}
                 · confidence {s.element_confidence?.toFixed(2) ?? "-"} · your
                 element: “{claims.slice(s.user_span_start, s.user_span_end).slice(0, 90)}”
@@ -439,7 +439,7 @@ function renderClaims(claims: string, spans: ResultSpan[]): ReactNode[] {
         className={cls}
         aria-label={
           s.overlap_type === "claim_limitation"
-            ? "reads on full limitation"
+            ? "matches a full claim limitation"
             : "overlap"
         }
       >

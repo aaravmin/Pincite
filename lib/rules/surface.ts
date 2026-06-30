@@ -107,7 +107,7 @@ export function surfaceRules(input: RuleInput): {
       add(
         "2181",
         "35 U.S.C. 112(f)",
-        "If a claim uses functional 'means' language, your draft must disclose the corresponding structure.",
+        "If a claim recites a function with 'means for' wording (means-plus-function, 35 U.S.C. 112(f)), your draft must describe the structure that performs that function.",
         claimsReason,
       );
     }
@@ -137,11 +137,12 @@ export function surfaceRules(input: RuleInput): {
       actionable: false,
     },
     {
-      trigger: "If a claim uses 'means for' (or a nonce word) for a function",
+      trigger:
+        "If a claim claims a function with 'means for' wording (or a generic placeholder like 'module for') instead of naming a specific part",
       triggered: hasNonce,
       mpep_section: "2181",
       cfr_ref: "35 U.S.C. 112(f)",
-      note: "§112(f) is invoked; disclose corresponding structure in your draft or the limitation may be indefinite.",
+      note: "This is means-plus-function claiming under 35 U.S.C. 112(f): the claim is read to cover only the structure your specification describes for that function, so describe that structure or the limitation may be held indefinite.",
       actionable: true,
     },
     {

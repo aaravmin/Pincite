@@ -66,3 +66,59 @@ test("phase-v3: role selection + attorney portfolio", async ({ page }) => {
     .eq("user_id", user!.id);
   expect((audit ?? []).map((r) => r.action)).toContain("role_selected");
 });
+
+test("portfolio table: company column and progress-based next step", async ({
+  page,
+}) => {
+  const errs = captureErrors(page);
+  await loginAsTestUser(page);
+  await clearRole();
+  await page.goto("/consent");
+  await page.getByRole("button", { name: /i understand, continue/i }).click();
+  await page.waitForURL("**/role");
+  await page.getByRole("button", { name: /patent attorney or agent/i }).click();
+  await page.waitForURL("**/dashboard");
+
+  await page.getByRole("button", { name: /new project/i }).click();
+  await page.getByLabel("Name").fill("Container");
+  await page.getByLabel("Client").fill("Apple Inc.");
+  await page.getByLabel("Matter no.").fill("APPL-CONTAINER-2026-001");
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.waitForURL("**/projects/**");
+  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+
+  // Seed a complete, clean draft so "next step" must move past Drafting.
+  const a = admin();
+  const seed: Record<string, string> = {
+    title: "A device",
+    cross_reference: "Not applicable.",
+    gov_interest: "Not applicable.",
+    background: "Existing devices are inadequate.",
+    summary: "The invention improves devices.",
+    brief_description_drawings: "FIG. 1 is a perspective view.",
+    detailed_description: "The device has a base.",
+    claims: "1. A device comprising a base.",
+    abstract: "A device with a base.",
+    drawings_meta: "FIG. 1: base.",
+  };
+  await a.from("project_sections").upsert(
+    Object.entries(seed).map(([section_key, content]) => ({
+      project_id: id,
+      section_key,
+      content,
+      word_count: content.split(/\s+/).length,
+    })),
+    { onConflict: "project_id,section_key" },
+  );
+
+  await page.goto("/dashboard");
+  // Flat table: a Company column (not a group header row) and an Issues column.
+  await expect(page.getByRole("columnheader", { name: "Company" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Issues" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Apple Inc." })).toBeVisible();
+  // The draft is complete with no inventors yet, so the next step is no longer "Drafting".
+  await expect(page.getByText("Add inventors")).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Drafting", exact: true })).toHaveCount(0);
+  await screenshot(page, "portfolio-flat-nextstep");
+  assertClean(errs);
+});

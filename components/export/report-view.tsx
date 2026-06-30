@@ -115,7 +115,7 @@ export function ReportView({ report: r }: { report: Report }) {
               {m.spans.map((sp, i) => (
                 <p key={i} className="text-xs text-muted-foreground">
                   {sp.overlap_type === "claim_limitation"
-                    ? "● reads on full limitation"
+                    ? "● matches a full claim limitation"
                     : "○ overlap"}
                   : {sp.patent_span_text.slice(0, 160)}
                 </p>

@@ -127,7 +127,7 @@ export function toText(r: Report): string {
     );
     for (const sp of m.spans)
       L.push(
-        `    ${sp.overlap_type === "claim_limitation" ? "[reads on full limitation]" : "[overlap]"} ${sp.patent_span_text.slice(0, 140)}`,
+        `    ${sp.overlap_type === "claim_limitation" ? "[matches a full claim limitation]" : "[overlap]"} ${sp.patent_span_text.slice(0, 140)}`,
       );
   }
   L.push("");
