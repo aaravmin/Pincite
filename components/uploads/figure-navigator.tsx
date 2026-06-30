@@ -39,11 +39,9 @@ function viewLabel(a: Attachment): string {
 export function FigureNavigator({
   projectId,
   figures,
-  specText,
 }: {
   projectId: string;
   figures: Attachment[];
-  specText: string;
 }) {
   const router = useRouter();
   const [idx, setIdx] = useState(0);
@@ -314,7 +312,6 @@ export function FigureNavigator({
               key={sel.id}
               projectId={projectId}
               attachmentId={sel.id}
-              specText={specText}
               filename={sel.filename}
               initialReview={sel.analysis}
               initialAnnotations={sel.annotations}

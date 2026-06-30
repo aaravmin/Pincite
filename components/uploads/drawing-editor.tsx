@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { analyzeDrawing, saveDrawingAnnotations } from "@/lib/filing/actions";
@@ -14,31 +14,21 @@ function clamp01(n: number): number {
   return Math.min(1, Math.max(0, Number.isFinite(n) ? n : 0));
 }
 
-/** Whether a reference numeral appears in the draft text (same test as the server check). */
-function describedIn(specLower: string, numeral: string): boolean {
-  const esc = numeral.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^a-z0-9])${esc}([^a-z0-9]|$)`).test(specLower);
-}
-
-const isNumeral = (t: string) => /^\d+[a-z]?$/i.test(t.trim());
-
 /**
- * The drawing editor (Feature 2). By default it shows the figure with its errors overlaid.
- * "Edit drawing" turns the reference-numeral labels into movable callouts with adjustable
- * lead lines; the issue list recomputes live as you edit (delete an undescribed numeral, or
- * add the figure label, and that error clears on the spot), then Save persists the layer.
+ * The drawing editor (Feature 2). By default it shows the figure with the saved reference
+ * numerals as movable labels. "Edit drawing" lets you drag them, adjust lead lines, and add or
+ * delete labels, then Save persists the layer. Errors never auto-compute; they appear only
+ * after a manual "Check drawing (vision)".
  */
 export function DrawingEditor({
   projectId,
   attachmentId,
-  specText,
   filename = "figure",
   initialReview = null,
   initialAnnotations = null,
 }: {
   projectId: string;
   attachmentId: string;
-  specText: string;
   filename?: string;
   initialReview?: DrawingReview | null;
   initialAnnotations?: DrawingAnnotations | null;
@@ -59,24 +49,11 @@ export function DrawingEditor({
   // Stream same-origin (?raw=1) so the canvas/SVG export reads the bytes without a
   // cross-origin taint (the default URL redirects to a signed Storage URL).
   const imgUrl = `/api/projects/${projectId}/attachments/${attachmentId}?raw=1`;
-  const specLower = specText.toLowerCase();
 
-  // Numerals on the drawing that the draft never mentions, recomputed from the live layer.
-  const undescribed = useMemo(() => {
-    const set = new Set<string>();
-    for (const l of ann.labels) {
-      const t = l.text.trim();
-      if (isNumeral(t) && !describedIn(specLower, t)) set.add(l.id);
-    }
-    return set;
-  }, [ann.labels, specLower]);
-  const figureMissing = !ann.figureLabel?.text?.trim();
-
-  // Whole-figure / located problems the vision check saw (kept read-only; numeral-not-described
-  // and figure-label issues are derived live above, so we drop them here to avoid double count).
-  const visionIssues = (review?.findings ?? []).filter((f) =>
-    f.id.startsWith("issue-"),
-  );
+  // Errors come only from a manual vision check, never automatically. These are exactly what
+  // the model saw on the last check (so it never falsely claims a missing figure label).
+  const visionIssues = review?.findings ?? [];
+  const hasFigureLabel = !!ann.figureLabel?.text?.trim();
 
   // Drag the selected label, its lead endpoint, or the figure label while in edit mode.
   useEffect(() => {
@@ -276,7 +253,6 @@ export function DrawingEditor({
   }
 
   const editing = mode === "edit";
-  const issueCount = undescribed.size + (figureMissing ? 1 : 0) + visionIssues.length;
 
   return (
     <div>
@@ -308,7 +284,7 @@ export function DrawingEditor({
                 y1={l.y * 100}
                 x2={l.lead.x * 100}
                 y2={l.lead.y * 100}
-                stroke={undescribed.has(l.id) ? "var(--violation)" : "var(--foreground)"}
+                stroke="var(--foreground)"
                 strokeWidth={1}
                 vectorEffect="non-scaling-stroke"
               />
@@ -318,7 +294,6 @@ export function DrawingEditor({
 
         {/* Numeral labels. */}
         {ann.labels.map((l) => {
-          const bad = undescribed.has(l.id);
           const sel = selected === l.id;
           return (
             <button
@@ -333,10 +308,7 @@ export function DrawingEditor({
               }}
               style={{ left: `${l.x * 100}%`, top: `${l.y * 100}%` }}
               className={
-                "absolute flex min-w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 bg-background/80 px-1.5 text-[11px] font-semibold " +
-                (bad
-                  ? "border-violation text-violation"
-                  : "border-foreground text-foreground") +
+                "absolute flex min-w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-foreground bg-background/80 px-1.5 text-[11px] font-semibold text-foreground" +
                 (editing ? " cursor-grab active:cursor-grabbing" : "") +
                 (sel ? " ring-2 ring-foreground ring-offset-1" : "")
               }
@@ -432,7 +404,7 @@ export function DrawingEditor({
             <Button variant="outline" size="sm" onClick={addNumeral} data-testid="add-numeral">
               Add numeral
             </Button>
-            <Button variant="outline" size="sm" onClick={addFigureLabel} disabled={!figureMissing}>
+            <Button variant="outline" size="sm" onClick={addFigureLabel} disabled={hasFigureLabel}>
               Add figure label
             </Button>
             {selected && (
@@ -469,7 +441,7 @@ export function DrawingEditor({
       {editing && (
         <p className="mt-2 text-xs text-muted-foreground">
           Drag a numeral to reposition it. Select one to edit its text, add or move a lead line
-          to the part, or delete it. Issues update as you edit.
+          to the part, or delete it, then Save.
         </p>
       )}
 
@@ -479,91 +451,55 @@ export function DrawingEditor({
         </p>
       )}
 
-      {/* Live issues. */}
-      <div className="mt-3 space-y-3">
-        {issueCount === 0 ? (
-          <p className="flex items-center gap-1.5 text-sm text-pass">
-            <span className="inline-block size-2.5 rounded-full bg-pass" aria-hidden />
-            No drawing issues. The figure label and reference numerals line up with the draft.
-          </p>
-        ) : (
-          <div>
-            <p
-              className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-              data-testid="drawing-issue-count"
-            >
-              Drawing issues ({issueCount})
+      {/* Issues only appear after a manual drawing check, never automatically. */}
+      {review && !editing && (
+        <div className="mt-3 space-y-3">
+          {visionIssues.length === 0 ? (
+            <p className="flex items-center gap-1.5 text-sm text-pass">
+              <span className="inline-block size-2.5 rounded-full bg-pass" aria-hidden />
+              No drawing issues found in the last check.
             </p>
-            <ul className="mt-1 space-y-2">
-              {[...undescribed].map((id) => {
-                const l = ann.labels.find((x) => x.id === id);
-                if (!l) return null;
-                return (
+          ) : (
+            <div>
+              <p
+                className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                data-testid="drawing-issue-count"
+              >
+                Drawing issues ({visionIssues.length})
+              </p>
+              <ul className="mt-1 space-y-2">
+                {visionIssues.map((f) => (
                   <li
-                    key={id}
+                    key={f.id}
                     className="flex gap-2 rounded-md border border-violation bg-violation-bg p-2 text-sm"
                   >
-                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-violation text-[10px] font-semibold text-violation">
-                      {l.text}
+                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-violation text-[10px] font-semibold text-background">
+                      •
                     </span>
                     <span className="min-w-0">
-                      <span className="font-medium text-foreground">
-                        Reference numeral {l.text} not described
-                      </span>
-                      <span className="text-muted-foreground">
-                        {" "}
-                        It is on the drawing but not in your draft. Describe it, or remove it
-                        here (37 CFR 1.84(p)).
+                      <span className="font-medium text-foreground">{f.title}</span>
+                      {f.detail && <span className="text-muted-foreground"> {f.detail}</span>}
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {f.cfr}
+                        {f.mpep ? ` · MPEP ${f.mpep}` : ""}
                       </span>
                     </span>
                   </li>
-                );
-              })}
-              {figureMissing && (
-                <li className="flex gap-2 rounded-md border border-violation bg-violation-bg p-2 text-sm">
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-violation text-[10px] font-semibold text-background">
-                    •
-                  </span>
-                  <span className="min-w-0">
-                    <span className="font-medium text-foreground">No figure label</span>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      Each view must be numbered. Add a label such as FIG. 1 (37 CFR 1.84(u)).
-                    </span>
-                  </span>
-                </li>
-              )}
-              {visionIssues.map((f) => (
-                <li
-                  key={f.id}
-                  className="flex gap-2 rounded-md border border-violation bg-violation-bg p-2 text-sm"
-                >
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-violation text-[10px] font-semibold text-background">
-                    •
-                  </span>
-                  <span className="min-w-0">
-                    <span className="font-medium text-foreground">{f.title}</span>
-                    {f.detail && <span className="text-muted-foreground"> {f.detail}</span>}
-                    <span className="mt-0.5 block text-xs text-muted-foreground">
-                      {f.cfr}
-                      {f.mpep ? ` · MPEP ${f.mpep}` : ""}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+                ))}
+              </ul>
+            </div>
+          )}
 
-        {!editing && review?.summary && (
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              What the figure shows
-            </p>
-            <p className="text-sm text-muted-foreground">{review.summary}</p>
-          </div>
-        )}
-      </div>
+          {review.summary && (
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                What the figure shows
+              </p>
+              <p className="text-sm text-muted-foreground">{review.summary}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
