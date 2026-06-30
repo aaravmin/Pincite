@@ -315,6 +315,7 @@ export function FigureNavigator({
               projectId={projectId}
               attachmentId={sel.id}
               specText={specText}
+              filename={sel.filename}
               initialReview={sel.analysis}
               initialAnnotations={sel.annotations}
             />

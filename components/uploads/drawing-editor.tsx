@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { analyzeDrawing, saveDrawingAnnotations } from "@/lib/filing/actions";
+import { buildFigureSvg } from "@/lib/export/figure-svg";
 import type { DrawingAnnotations, DrawingReview } from "@/lib/filing/types";
 
 const EMPTY: DrawingAnnotations = { labels: [], figureLabel: null };
@@ -31,17 +32,20 @@ export function DrawingEditor({
   projectId,
   attachmentId,
   specText,
+  filename = "figure",
   initialReview = null,
   initialAnnotations = null,
 }: {
   projectId: string;
   attachmentId: string;
   specText: string;
+  filename?: string;
   initialReview?: DrawingReview | null;
   initialAnnotations?: DrawingAnnotations | null;
 }) {
   const router = useRouter();
   const boxRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const dragRef = useRef<{ id: string; kind: "label" | "lead" | "fig" } | null>(null);
 
   const [review, setReview] = useState<DrawingReview | null>(initialReview);
@@ -52,7 +56,9 @@ export function DrawingEditor({
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const imgUrl = `/api/projects/${projectId}/attachments/${attachmentId}`;
+  // Stream same-origin (?raw=1) so the canvas/SVG export reads the bytes without a
+  // cross-origin taint (the default URL redirects to a signed Storage URL).
+  const imgUrl = `/api/projects/${projectId}/attachments/${attachmentId}?raw=1`;
   const specLower = specText.toLowerCase();
 
   // Numerals on the drawing that the draft never mentions, recomputed from the live layer.
@@ -186,6 +192,89 @@ export function DrawingEditor({
     setAnn((p) => ({ ...p, figureLabel: { text: t.trim().slice(0, 40), x: 0.5, y: 0.93 } }));
   }
 
+  const baseName = filename.replace(/\.[^.]+$/, "") || "figure";
+  function downloadBlob(blob: Blob, name: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  // Wait for the figure to be decoded before exporting (it may still be loading after a save).
+  async function readyImage(): Promise<HTMLImageElement | null> {
+    const img = imgRef.current;
+    if (!img) return null;
+    if (!img.complete || !img.naturalWidth) {
+      try {
+        await img.decode();
+      } catch {
+        /* fall through to the naturalWidth check */
+      }
+    }
+    return img.naturalWidth ? img : null;
+  }
+  // Export the figure with the annotation layer baked in. Black on a white halo, since a filed
+  // drawing is black-and-white line art.
+  async function exportPng() {
+    const img = await readyImage();
+    if (!img) return;
+    const W = img.naturalWidth;
+    const H = img.naturalHeight;
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(img, 0, 0, W, H);
+    const font = Math.max(12, Math.round(Math.min(W, H) * 0.03));
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = Math.max(1, font / 12);
+    for (const l of ann.labels) {
+      if (l.lead) {
+        ctx.beginPath();
+        ctx.moveTo(l.x * W, l.y * H);
+        ctx.lineTo(l.lead.x * W, l.lead.y * H);
+        ctx.stroke();
+      }
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const draw = (t: string, x: number, y: number, size: number) => {
+      ctx.font = `bold ${size}px Arial, Helvetica, sans-serif`;
+      ctx.lineWidth = size / 2.5;
+      ctx.strokeStyle = "#ffffff";
+      ctx.strokeText(t, x, y);
+      ctx.fillStyle = "#000000";
+      ctx.fillText(t, x, y);
+    };
+    for (const l of ann.labels) draw(l.text || "?", l.x * W, l.y * H, font);
+    if (ann.figureLabel?.text)
+      draw(ann.figureLabel.text, ann.figureLabel.x * W, ann.figureLabel.y * H, Math.round(font * 1.1));
+    canvas.toBlob((b) => {
+      if (b) downloadBlob(b, `${baseName}.png`);
+    }, "image/png");
+  }
+  async function exportSvg() {
+    const img = await readyImage();
+    if (!img) return;
+    const blob = await (await fetch(imgUrl)).blob();
+    const dataUrl = await new Promise<string>((res) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result as string);
+      fr.readAsDataURL(blob);
+    });
+    const svg = buildFigureSvg({
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+      imageHref: dataUrl,
+      annotations: ann,
+    });
+    downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${baseName}.svg`);
+  }
+
   const editing = mode === "edit";
   const issueCount = undescribed.size + (figureMissing ? 1 : 0) + visionIssues.length;
 
@@ -197,6 +286,7 @@ export function DrawingEditor({
         style={{ touchAction: editing ? "none" : undefined }}
       >
         <img
+          ref={imgRef}
           src={imgUrl}
           alt="Uploaded figure"
           className="max-h-[460px] w-auto rounded border border-border"
@@ -318,6 +408,23 @@ export function DrawingEditor({
               data-testid="edit-drawing"
             >
               Edit drawing
+            </Button>
+            <span className="mx-1 h-5 w-px bg-border" aria-hidden />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportPng}
+              data-testid="export-png"
+            >
+              Export PNG
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportSvg}
+              data-testid="export-svg"
+            >
+              Export SVG
             </Button>
           </>
         ) : (

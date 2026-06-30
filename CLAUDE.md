@@ -219,8 +219,10 @@ the end of each session — but be stringent; trim before it bloats.
     labels draggable (add/edit-text/lead/delete) and the issue list recomputes LIVE vs the draft
     text (delete an undescribed numeral or add the figure label and it clears). `analyzeDrawing`
     seeds the layer from detected numerals; `saveDrawingAnnotations` persists. DONE: F2.1
-    edit/live-clear/persist (e2e `drawing-editor.spec.ts`). TODO: multi-angle capture from a 3D
-    model, PNG/SVG export of edited figures into the package.
+    edit/live-clear/persist; F2.2 export edited figures to PNG/SVG per figure + into the filing
+    package as `drawings/figure-NN.svg` (shared `lib/export/figure-svg.ts` buildFigureSvg/imageSize;
+    overlay drawn BLACK not review-red; editor img uses `?raw=1` same-origin to avoid canvas taint).
+    e2e `drawing-editor`/`drawing-export`. TODO: multi-angle capture from a 3D model.
   - [ ] F3 real signing flow. [ ] F4 guided per-error auto-fix (before/after).
 
 ## Commands

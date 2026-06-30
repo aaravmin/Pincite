@@ -10,7 +10,9 @@ import {
   buildReadme,
 } from "@/lib/export/filing-package";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getDeclarations } from "@/lib/filing/queries";
+import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { buildFigureSvg, imageSize } from "@/lib/export/figure-svg";
 import { logAudit } from "@/lib/audit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -90,6 +92,44 @@ export async function GET(
       buildDeclarationText(project, inventors, declarations, title),
     );
     zip.file("transmittal-and-fees.txt", buildTransmittalAndFeesText(project));
+
+    // Drawings: each image figure with its edited annotation layer baked in (numerals, lead
+    // lines, figure label) as an SVG, so the package matches what the drawing editor shows.
+    // Falls back to the raw bytes when the dimensions can't be read (e.g. WEBP).
+    const attachments = await getAttachments(id);
+    const figures = attachments.filter(
+      (a) => a.kind === "drawing" && a.mime.startsWith("image/"),
+    );
+    if (figures.length > 0) {
+      const admin = createAdminClient();
+      let n = 0;
+      for (const f of figures) {
+        n++;
+        const { data: blob } = await admin.storage
+          .from("project-files")
+          .download(f.storage_path);
+        if (!blob) continue;
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        const dims = imageSize(bytes);
+        const stem = `drawings/figure-${String(n).padStart(2, "0")}`;
+        if (dims) {
+          const dataUrl = `data:${f.mime};base64,${Buffer.from(bytes).toString("base64")}`;
+          zip.file(
+            `${stem}.svg`,
+            buildFigureSvg({
+              width: dims.width,
+              height: dims.height,
+              imageHref: dataUrl,
+              annotations: f.annotations,
+            }),
+          );
+        } else {
+          const ext = (f.filename.split(".").pop() || "img").toLowerCase();
+          zip.file(`${stem}.${ext}`, bytes);
+        }
+      }
+    }
+
     zip.file("README.txt", buildReadme());
     const zipBuf = await zip.generateAsync({ type: "nodebuffer" });
     await record(supabase, user.id, id, "package");
