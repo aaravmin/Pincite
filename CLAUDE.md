@@ -250,6 +250,12 @@ the end of each session — but be stringent; trim before it bloats.
   new save). Name is no longer a link; row keeps table roles (onClick + tabindex, no role
   override). `listProjectVersions` action backs the menu. e2e in `roles.spec.ts`.
 
+- [x] Real signing (Sign step): Download the declaration (37 CFR 1.63) as a per-inventor PDF
+  (`lib/export/declaration-pdf.ts`, pdf-lib; route `/api/projects/[id]/declaration`), sign it
+  off-platform, and Upload the signed copy, kept with the matter (`project_attachments`
+  kind=declaration; migration 0018 adds the enum value; `components/filing/declaration-sign.tsx`).
+  The in-app S-signature stays as the attestation record. e2e `declaration.spec.ts`.
+
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
 - `pnpm verify` — run all Playwright gates.   `pnpm lint` — eslint.

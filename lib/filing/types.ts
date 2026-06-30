@@ -19,7 +19,7 @@ export type InventorInput = {
   citizenship: string;
 };
 
-export type AttachmentKind = "drawing" | "supporting";
+export type AttachmentKind = "drawing" | "supporting" | "declaration";
 
 /** Standard patent drawing views (MPEP 1503 / common practice). "" means not specified. */
 export const ATTACHMENT_VIEWS = [

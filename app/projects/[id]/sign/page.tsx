@@ -3,13 +3,14 @@ import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getDeclarations } from "@/lib/filing/queries";
+import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
 import {
   runFilingChecks,
   resolveFilingPins,
   latestDeclarations,
 } from "@/lib/validators/filing";
 import { SignClient } from "@/components/filing/sign-client";
+import { DeclarationSign } from "@/components/filing/declaration-sign";
 import { FilingReadiness } from "@/components/filing/filing-readiness";
 
 export default async function SignPage({
@@ -35,11 +36,13 @@ export default async function SignPage({
 
   const project = await getProject(id);
   if (!project) notFound();
-  const [inventors, declarations, sections] = await Promise.all([
+  const [inventors, declarations, sections, attachments] = await Promise.all([
     getInventors(id),
     getDeclarations(id),
     getSectionContent(id),
+    getAttachments(id),
   ]);
+  const declarationDocs = attachments.filter((a) => a.kind === "declaration");
   const findings = await resolveFilingPins(
     runFilingChecks({
       project,
@@ -106,10 +109,19 @@ export default async function SignPage({
 
         <section>
           <h2 className="text-sm font-semibold text-foreground">
-            Inventor declarations
+            Inventor attestations
           </h2>
           <div className="mt-3">
             <SignClient projectId={id} inventors={inventors} signed={signed} />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-semibold text-foreground">
+            Signed declaration document
+          </h2>
+          <div className="mt-3">
+            <DeclarationSign projectId={id} signed={declarationDocs} />
           </div>
         </section>
       </main>

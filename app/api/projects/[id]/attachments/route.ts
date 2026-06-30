@@ -28,9 +28,9 @@ export async function POST(
 
   const form = await request.formData();
   const file = form.get("file") as File | null;
-  const kind = String(form.get("kind") ?? "drawing") === "supporting"
-    ? "supporting"
-    : "drawing";
+  const kindRaw = String(form.get("kind") ?? "drawing");
+  const kind =
+    kindRaw === "supporting" || kindRaw === "declaration" ? kindRaw : "drawing";
   const viewRaw = String(form.get("view") ?? "");
   const view =
     viewRaw && (ATTACHMENT_VIEWS as readonly string[]).includes(viewRaw)

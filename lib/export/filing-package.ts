@@ -40,7 +40,7 @@ export function buildAdsText(
   return lines.join("\n");
 }
 
-const DECLARATION_STATEMENTS = [
+export const DECLARATION_STATEMENTS = [
   "This application was made or authorized to be made by me.",
   "I believe I am the original inventor or an original joint inventor of a claimed invention in the application.",
   "I have reviewed and understand the contents of the application, including the claims.",
