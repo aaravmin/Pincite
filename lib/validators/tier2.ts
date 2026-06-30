@@ -79,19 +79,26 @@ export function runTier2(
     // (e.g. "the lid rotates") is not mistaken for a missing element.
     const introduced = new Set<string>();
     const visited = new Set<number>();
-    const collect = (num: number) => {
+    // Parent-claim text precedes this claim entirely, so a noun mentioned in a parent (even
+    // bare) gives basis here.
+    let priorText = "";
+    const collect = (num: number, isParent: boolean) => {
       if (visited.has(num)) return;
       visited.add(num);
       const cl = byNumber.get(num);
       if (!cl) return;
-      for (const a of cl.raw.matchAll(/\b(?:a|an)\s+([a-z]+(?:\s+[a-z]+)?)\b/gi)) {
+      if (isParent) priorText += " " + cl.raw.toLowerCase();
+      // Capture the whole noun phrase after "a"/"an" (up to a few words), so a multi-word
+      // element like "a molded fiber container" introduces "container", not just "molded".
+      // Over-capturing only adds words to the introduced set, which avoids false positives.
+      for (const a of cl.raw.matchAll(/\b(?:a|an)\s+([a-z]+(?:\s+[a-z]+){0,3})\b/gi)) {
         for (const w of a[1].toLowerCase().split(/\s+/)) {
           if (!CONNECTORS.has(w)) introduced.add(w);
         }
       }
-      for (const r of cl.raw.matchAll(/\bclaim\s+(\d+)\b/gi)) collect(Number(r[1]));
+      for (const r of cl.raw.matchAll(/\bclaim\s+(\d+)\b/gi)) collect(Number(r[1]), true);
     };
-    collect(c.number);
+    collect(c.number, false);
 
     for (const m of c.raw.matchAll(/\b(?:the|said)\s+([a-z]+(?:\s+[a-z]+)?)\b/gi)) {
       const words = m[1]
@@ -99,11 +106,16 @@ export function runTier2(
         .split(/\s+/)
         .filter((w) => !CONNECTORS.has(w));
       if (words.length === 0) continue;
-      // Skip boilerplate ("the present invention", "the first ...") and any reference whose
-      // noun was introduced earlier (which also covers the verb-trailing case above).
-      if (words.some((w) => ANTECEDENT_STOP.has(w))) continue;
-      if (words.some((w) => introduced.has(w))) continue;
       const idx = c.raw.toLowerCase().indexOf(m[0].toLowerCase());
+      // A noun has basis if it was introduced with "a"/"an", or it simply appeared earlier
+      // (a parent claim, or this claim before the reference). The latter covers mass nouns
+      // like "moisture" and any bare prior mention, which kept getting falsely flagged.
+      const before = priorText + " " + c.raw.slice(0, idx >= 0 ? idx : 0).toLowerCase();
+      const hasBasis = (w: string) =>
+        introduced.has(w) || new RegExp(`\\b${w}\\b`).test(before);
+      // Skip boilerplate ("the present invention", "the first ...") and anything with basis.
+      if (words.some((w) => ANTECEDENT_STOP.has(w))) continue;
+      if (words.some(hasBasis)) continue;
       out.push({
         section_key: "claims",
         span_start: start + (idx >= 0 ? idx : 0),

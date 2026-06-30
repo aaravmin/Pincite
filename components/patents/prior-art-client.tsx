@@ -25,7 +25,8 @@ export function PriorArtClient({
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
   const [selected, setSelected] = useState(0);
-  const [showCompare, setShowCompare] = useState(matches.length === 0);
+  // Hidden until the user clicks "Compare a patent", so there is one place to start, not two.
+  const [showCompare, setShowCompare] = useState(false);
   const [cmpNum, setCmpNum] = useState("");
   const [cmpText, setCmpText] = useState("");
 
