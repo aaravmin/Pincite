@@ -281,9 +281,12 @@ After uploading, click Check all drawings.
 It runs the vision check on every uploaded figure at once and saves the result, so the flags stay on each figure when you leave and come back.
 The check also flags any reference number that is on a drawing but never described in the draft, which is the basis for three of the planted issues below.
 
+To work on a figure, open Edit drawing. The reference numerals become labels you can drag, each with a lead line to the part, and the issue list updates live as you move, add, or delete them. Detect view reads a figure and sets its orientation. Export PNG and Export SVG save the edited figure on its own, and the figures also flow into the filing export.
+
 ## Step 6. Sign (inventor's declaration)
 
-Enter the legal name Francesco Longoni and check all five statements, then repeat for Mark E. Doutt.
+For each inventor, check all five statements, enter the printed legal name, and sign with an S-signature, which is the name placed between two forward slashes (the USPTO electronic signature).
+Francesco Longoni signs as /Francesco Longoni/, then Mark E. Doutt signs as /Mark E. Doutt/.
 
 ---
 

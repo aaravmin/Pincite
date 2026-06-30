@@ -2,79 +2,85 @@
 
 A timed walkthrough for a screen recording.
 The example is a utility filing for Apple's round pizza box.
-Paste from docs/demo-pizza-box-fields.md so the boxes are already filled and the figures already uploaded before you record, so on camera you navigate a finished matter instead of typing.
+Fill the draft, the disclosure, and the inventors from docs/demo-pizza-box-fields.md and upload the figures before you record, so on camera you navigate a finished matter instead of typing.
 
 Each beat starts with a running time in minute.second form.
 Say is the voiceover. Do is what happens on screen.
-Target run time is about 4 minutes 40 seconds. Beats marked optional can be cut to reach 4 minutes.
-
-Before recording, run the drawing check on at least one figure and run one prior-art search, so both load instantly on camera.
+You stay quiet through the draft, the disclosure, and the inventors except for the claim tree. You start talking at the drawings.
+Target run time is about four minutes forty seconds. Beats marked optional can be cut to reach four minutes.
+Style note for the voiceover. Keep it semi conversational and to the point. No em dashes, no semicolons, no colons.
 
 ---
 
 ### 0.00 Open
 
-Say. "This is Pincite, a patent review workbench. It flags rule problems in a draft, finds similar public patents, and pins every rule it cites to the real MPEP and CFR text. Here is how I run a matter as a patent agent."
+Say. "This is Pincite, a patent review workbench. I paste a patent in section by section and it flags rule problems, pins every rule it cites to the real MPEP and CFR text, finds similar public patents, and walks me to a filing ready package. Here is a real Apple utility filing for a round pizza box."
 
-Do. Land on the dashboard, already signed in as a patent agent. Show the Portfolio view with the matter card.
+Do. Land on the dashboard signed in as a patent agent. Show the portfolio table, one flat row per matter with the company, the next step, the live issue count, and the version count. Open the matter.
 
-### 0.20 The draft
+### 0.20 The overview
 
-Say. "Each matter is one application. The draft is a section by section editor in the standard filing order, and everything autosaves. At the end I open All sections to see the whole thing in one place and save a version, which is an immutable snapshot."
+Say. "Every matter opens here. It tells me where the application stands, the single next thing to do, and a checklist of all nine steps with a live status, so I am never guessing what is left."
 
-Do. Open the project. Click Title, Background, and Claims in the left nav. On the Claims section, point out the claim tree below the editor that shows the three independent claims with their dependents nested. Click All sections, then Save version.
+Do. Show the overview. Point at the stage, the Next step button, the completeness bar, and the checklist with its green checks and red dots.
 
-### 0.55 Invention intake
+### 0.40 Draft, disclosure, and inventors (no voiceover)
 
-Say. "The disclosure uses the same dashboard, so the plain language intake feeds the draft and the duty to disclose. Pincite cross references the two and tells me when something I disclosed never made it into the draft."
+Say. Nothing here. Let the screen move quietly so the viewer sees a finished matter.
 
-Do. Open Disclosure, click a field, then All fields to show the consistency check at the bottom.
+Do. Click through a few Draft sections in the left nav, open the Disclosure, and open the Inventors. Keep it brief. The boxes are already filled, so this is just a look, not typing.
 
-### 1.20 Inventors and applicant
+### 1.05 The claim tree
 
-Say. "Inventors and the applicant go into the ADS data card. Here Apple is the applicant and the two named inventors sign their own declarations later."
+Say. "The one thing I will call out in the draft is the claims. Pincite reads the whole set into a tree under the editor, so I can see the three independent claims and exactly which dependent claim hangs off which. That is how I keep twenty three claims straight, and it is read only, so it never changes my text."
 
-Do. Open Inventors, show the two inventors and the company applicant.
+Do. Open the Claims section. Point at the tree, trace claim 1 down to its dependents, then show claim 8 and claim 17 as the other two independents.
 
 ### 1.35 Drawings
 
-Say. "I upload each figure by orientation, so I can flip through perspectives. The patent drew several sheets sideways, so I straighten one with the rotate control. The drawing check then reads every figure at once and circles problems on the image, including reference numbers that appear on a drawing but are never described in the draft. The flags are saved with the matter, so they are still here when I come back."
+Say. "The figures are already uploaded. The patent drew most sheets sideways, so I straighten one with rotate, and the corrected image is what gets saved and checked. When I open the editor the reference numerals become labels I can drag, with lead lines to the part, and the issue list updates live, so deleting a numeral the draft never describes clears that error on the spot. I can also have Pincite read a figure to set its view, and run the drawing check across every figure at once."
 
-Do. Open Drawings. Use rotate right or rotate left to straighten a sideways figure. Flip between perspectives. Click Check all drawings and let the red circles appear, including the undescribed numbers 16, 28, and 54 on FIG. 1. Navigate away and back to show the flags persisted.
+Do. Rotate a sideways figure upright. Open Edit drawing, drag a numeral, add a lead line, delete one and watch the issue clear, then Save. Click Check all drawings and let the red circles land on the undescribed numbers 16, 28, and 54. Show Export PNG and Export SVG on a figure.
 
-### 2.15 Review, fix, and recheck
+### 2.25 Review, fix, and recheck
 
-Say. "Review runs the rule checks. Each finding is colored by severity, pinned to its source, and shows the exact phrase that triggered it. The part I lean on most is Take me to issue, which jumps to the field that caused it, I make the edit, and Check if fixed re runs that one rule and confirms it. On this real Apple matter it catches an abstract over the word limit, a claim missing its closing period, a vague term like about 360 degrees, and a component I disclosed but never described."
+Say. "Review runs the rule checks. Each finding is colored by severity, pinned to its source, and shows the exact phrase that triggered it. Take me to issue jumps to the field. When I am not sure how to fix something, Auto fix drafts the smallest edit and shows it as a before and after that I accept or reject, like resolving a diff. Check if fixed re runs that one rule. On this real Apple matter it catches an abstract over the word limit, a claim missing its period, a vague term, and a part I disclosed but never described."
 
-Do. Open Review, click Check for issues. Expand a relative-term finding and show the What triggered this phrase. Click Take me to issue, edit the text, return to Review, click Check if fixed, show Looks fixed.
+Do. Open Review, click Check for issues. Expand a finding and show the trigger phrase. On the missing period, click Auto fix, show the before and after, and Accept. On another, click Take me to issue, edit it, then Check if fixed and show Looks fixed.
 
-### 3.05 Subject matter eligibility (optional)
+### 3.10 Eligibility (optional)
 
 Say. "Analyze section 101 walks the eligibility test, and it opens with a plain explanation of what section 101 even is, framed as the model's read to verify rather than a verdict."
 
-Do. Click Analyze section 101, show the What is section 101 explanation and the step by step panel.
+Do. Click Analyze section 101 and show the explanation and the step by step panel.
 
 ### 3.25 Rules and stage
 
-Say. "Rules shows what applies now in green, and each one says why it applies, with the source one click away. It also shows what may apply next in yellow with the trigger. Stage tells me where the application sits and what is missing to advance."
+Say. "Rules shows what applies now in green, each with a why it applies line and the source one click away, and what may apply next in yellow with the trigger, like means plus function claiming when a claim says means for instead of naming a part. Stage tells me where the application sits and what is missing to advance."
 
-Do. Open Rules, point out a Why this applies line. Open Stage briefly.
+Do. Open Rules, point at a why line and a may apply next trigger. Open Stage briefly.
 
 ### 3.45 Prior art
 
-Say. "Prior art finds similar public patents. It runs with no setup on any machine. I get a similarity signal and the specific overlapping language, never a single trust me score, and I can open the actual patent and page through its figures."
+Say. "Prior art finds similar public patents with no setup on any machine. I get a similarity signal and the specific overlapping language, never a single trust me score, and I can open the actual patent and page through its figures. A red flag means the prior art matches a full claim limitation."
 
-Do. Open Prior art, click Run search. The page scrolls so the results and detail have room. Open a result, show the similarity percent and the pinpoint overlaps, and expand View the actual patent to page through its figures.
+Do. Open Prior art, click Run search. Open a result, show the similarity and the pinpoint overlaps, and expand the actual patent to page through its figures.
 
-### 4.20 Sign and export
+### 4.15 Sign
 
-Say. "Each inventor signs the declaration in app, and Pincite checks the signed declaration and the ADS for real filing defects. Then I export a USPTO aligned package, the draft as a compliant DOCX plus the ADS and the declaration."
+Say. "Each inventor signs the declaration with an S signature, their name between forward slashes, which is the USPTO electronic signature. Pincite checks the signed declaration and the ADS for real filing defects before anything leaves."
 
-Do. Open Sign, show a captured declaration. Open the export and trigger the package download.
+Do. Open Sign, show a captured declaration with its S signature and the filing readiness checks.
 
-### 4.40 Settings and close
+### 4.30 Export
 
-Say. "Settings has a dark mode, lets me switch between the attorney and the pro se inventor workflow, and exports my full audit log, since every action in here is recorded."
+Say. "Then I export. A USPTO aligned DOCX of the specification, a full filing package with the ADS and the declaration, and a patent format LaTeX bundle that typesets the whole application, drawings and all, like a published patent."
+
+Do. Open the Submission step, trigger the package download, and point at the patent format option.
+
+### 4.45 Settings and close
+
+Say. "Settings has dark mode, switches between the attorney and the pro se inventor workflow, and exports my full audit log, since every action in here is recorded."
 
 Do. Open Settings, toggle dark mode, show the role switch and Export audit log. End on the dashboard.
 
@@ -82,15 +88,16 @@ Say. "Pincite, from a draft to a filing ready package, with every rule pinned to
 
 ---
 
-## Cut list to reach 4 minutes
+## Cut list to reach four minutes
 
-Drop the 3.05 eligibility beat.
+Drop the 3.10 eligibility beat.
 Drop the Stage half of the 3.25 beat.
-Drop the rotate aside in the 1.35 beat.
+Shorten the drawings beat to rotate, one live error clear, and Check all drawings.
 
 ## Before you record
 
-Fill the project from docs/demo-pizza-box-fields.md, with all figures uploaded and tagged by orientation.
+Fill the draft, the disclosure, and the inventors from docs/demo-pizza-box-fields.md, and upload all figures tagged by orientation, off camera.
 Run Check all drawings once so the saved flags show right away.
 Run one prior-art search so results load instantly.
+Sign at least one declaration so the Sign step shows a captured S signature.
 Pick light or dark mode before you start, since the only place dark mode appears is when you toggle it at the end.
