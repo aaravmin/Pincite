@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signDeclaration } from "@/lib/filing/actions";
-import type { Inventor, DeclarationStatements } from "@/lib/filing/types";
+import {
+  isValidSSignature,
+  type Inventor,
+  type DeclarationStatements,
+} from "@/lib/filing/types";
 
 const STATEMENTS: { key: keyof DeclarationStatements; text: string }[] = [
   {
@@ -46,15 +50,17 @@ function InventorSign({
 }: {
   projectId: string;
   inventor: Inventor;
-  signedInfo?: { legal_name: string; signed_at: string };
+  signedInfo?: { legal_name: string; signed_at: string; s_signature?: string | null };
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(!signedInfo);
   const [name, setName] = useState(inventor.legal_name);
+  const [sig, setSig] = useState("");
   const [st, setSt] = useState<DeclarationStatements>(emptyStatements());
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const allChecked = STATEMENTS.every((s) => st[s.key]);
+  const sigOk = isValidSSignature(sig);
 
   function sign() {
     setErr(null);
@@ -63,11 +69,13 @@ function InventorSign({
         projectId,
         inventorId: inventor.id,
         legalName: name,
+        sSignature: sig,
         statements: st,
       });
       if ("error" in res) return setErr(res.error);
       setOpen(false);
       setSt(emptyStatements());
+      setSig("");
       router.refresh();
     });
   }
@@ -80,13 +88,16 @@ function InventorSign({
             {inventor.legal_name || "Unnamed inventor"}
           </p>
           {signedInfo ? (
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-pass">
+            <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-pass">
               <span
                 className="inline-block size-2.5 rounded-full bg-pass"
                 aria-hidden
               />
-              Signed as {signedInfo.legal_name} on{" "}
-              {new Date(signedInfo.signed_at).toLocaleDateString()}
+              Signed{" "}
+              <span className="font-mono text-foreground">
+                {signedInfo.s_signature || `/${signedInfo.legal_name}/`}
+              </span>{" "}
+              on {new Date(signedInfo.signed_at).toLocaleDateString()}
             </p>
           ) : (
             <p className="mt-0.5 text-xs text-muted-foreground">Not yet signed</p>
@@ -118,25 +129,51 @@ function InventorSign({
             </label>
           ))}
           <div className="max-w-sm space-y-1.5">
-            <Label htmlFor={`sign-name-${inventor.id}`}>
-              Type your full legal name to sign
-            </Label>
+            <Label htmlFor={`sign-name-${inventor.id}`}>Printed full legal name</Label>
             <Input
               id={`sign-name-${inventor.id}`}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="First Middle Last"
             />
+          </div>
+          <div className="max-w-sm space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor={`sign-sig-${inventor.id}`}>S-signature</Label>
+              <button
+                type="button"
+                onClick={() => setSig(`/${name.trim()}/`)}
+                disabled={!name.trim()}
+                className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:opacity-40"
+              >
+                Insert /{name.trim() || "Name"}/
+              </button>
+            </div>
+            <Input
+              id={`sign-sig-${inventor.id}`}
+              value={sig}
+              onChange={(e) => setSig(e.target.value)}
+              placeholder="/First M. Last/"
+              className="font-mono"
+              aria-invalid={sig.length > 0 && !sigOk}
+            />
             <p className="text-xs text-muted-foreground">
-              Type the inventor&apos;s full legal name to record this attestation. This is Pincite&apos;s
-              record of the declaration; the legally binding signature is the one you submit to the
-              USPTO.
+              Sign by inserting your name between two forward slashes, for example
+              {" "}
+              <span className="font-mono">/First M. Last/</span> - the USPTO S-signature
+              (37 CFR 1.4(d)). This records your attestation; the operative signature is the
+              one on the paper you submit to the USPTO.
             </p>
+            {sig.length > 0 && !sigOk && (
+              <p className="text-xs text-violation">
+                Put your name between forward slashes, e.g. /First M. Last/.
+              </p>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={sign}
-              disabled={pending || !name.trim() || !allChecked}
+              disabled={pending || !name.trim() || !allChecked || !sigOk}
             >
               {pending ? "Signing…" : "Sign declaration"}
             </Button>
@@ -164,7 +201,10 @@ export function SignClient({
 }: {
   projectId: string;
   inventors: Inventor[];
-  signed: Record<string, { legal_name: string; signed_at: string }>;
+  signed: Record<
+    string,
+    { legal_name: string; signed_at: string; s_signature?: string | null }
+  >;
 }) {
   if (inventors.length === 0) {
     return (
@@ -177,8 +217,9 @@ export function SignClient({
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
         Each inventor reviews the application and confirms the statements below - the inventor&apos;s
-        oath or declaration the USPTO requires (37 CFR 1.63). Check every statement, then type the
-        inventor&apos;s full legal name to record it.
+        oath or declaration the USPTO requires (37 CFR 1.63). Check every statement, enter the
+        printed legal name, and sign with an S-signature: your name between forward slashes, for
+        example /First M. Last/ (37 CFR 1.4(d)).
       </p>
       {inventors.map((inv) => (
         <InventorSign

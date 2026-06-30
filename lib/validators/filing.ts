@@ -7,10 +7,11 @@
  */
 import type { Severity } from "@/lib/validators/types";
 import type { Project } from "@/lib/projects/types";
-import type {
-  Inventor,
-  Declaration,
-  DeclarationStatements,
+import {
+  isValidSSignature,
+  type Inventor,
+  type Declaration,
+  type DeclarationStatements,
 } from "@/lib/filing/types";
 import type { UserRole } from "@/lib/profile";
 import { validateCitations } from "@/lib/mpep/citation";
@@ -139,6 +140,17 @@ export function runFilingChecks(input: {
         cfr_ref: "37 CFR 1.63",
       });
       return;
+    }
+    if (!isValidSSignature(decl.s_signature ?? "")) {
+      out.push({
+        severity: "violation",
+        actionable: true,
+        title: `Declaration for ${who} is not signed with a valid S-signature`,
+        explanation:
+          "An electronically filed declaration is signed with an S-signature: the signer's name between forward slashes, for example /First M. Last/ (37 CFR 1.4(d)).",
+        mpep_section: "502.02",
+        cfr_ref: "37 CFR 1.4(d)",
+      });
     }
     if (
       inv.legal_name.trim() &&

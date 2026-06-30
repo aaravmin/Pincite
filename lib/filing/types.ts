@@ -107,9 +107,23 @@ export type Declaration = {
   project_id: string;
   inventor_id: string | null;
   legal_name: string;
+  /** The S-signature exactly as entered, e.g. "/John A. Smith/" (37 CFR 1.4(d)(2)). */
+  s_signature: string | null;
   statements: DeclarationStatements;
   signed_at: string;
 };
+
+/**
+ * An S-signature per 37 CFR 1.4(d)(2): the signer personally inserts their name between two
+ * forward slashes. Between the slashes are only letters and Arabic numerals with appropriate
+ * spaces, commas, periods, apostrophes, or hyphens, and at least one letter.
+ */
+export function isValidSSignature(sig: string): boolean {
+  const m = sig.trim().match(/^\/([^/]+)\/$/);
+  if (!m) return false;
+  const inner = m[1].trim();
+  return /[A-Za-z]/.test(inner) && /^[A-Za-z0-9 ,.'-]+$/.test(inner);
+}
 
 /**
  * A drawing-compliance issue found by the vision analysis. x,y are normalized 0..1 from the

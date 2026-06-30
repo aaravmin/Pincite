@@ -50,10 +50,18 @@ export default async function SignPage({
     }),
   );
   const current = latestDeclarations(declarations);
-  const signed: Record<string, { legal_name: string; signed_at: string }> = {};
+  const signed: Record<
+    string,
+    { legal_name: string; signed_at: string; s_signature?: string | null }
+  > = {};
   for (const inv of inventors) {
     const d = current.get(inv.id);
-    if (d) signed[inv.id] = { legal_name: d.legal_name, signed_at: d.signed_at };
+    if (d)
+      signed[inv.id] = {
+        legal_name: d.legal_name,
+        signed_at: d.signed_at,
+        s_signature: d.s_signature,
+      };
   }
 
   return (
@@ -83,8 +91,9 @@ export default async function SignPage({
         ) : (
           <p className="text-sm text-muted-foreground">
             Each inventor personally signs the inventor&apos;s declaration (PTO/AIA/01).
-            Read each statement, then type your full legal name to sign. Pincite records it
-            and checks it for defects before you file.
+            Read each statement, then sign with an S-signature - your name between forward
+            slashes, e.g. /First M. Last/ (37 CFR 1.4(d)). Pincite records it and checks it
+            for defects before you file.
           </p>
         )}
 

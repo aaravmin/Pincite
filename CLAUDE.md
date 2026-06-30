@@ -223,7 +223,15 @@ the end of each session — but be stringent; trim before it bloats.
     package as `drawings/figure-NN.svg` (shared `lib/export/figure-svg.ts` buildFigureSvg/imageSize;
     overlay drawn BLACK not review-red; editor img uses `?raw=1` same-origin to avoid canvas taint).
     e2e `drawing-editor`/`drawing-export`. TODO: multi-angle capture from a 3D model.
-  - [ ] F3 real signing flow. [ ] F4 guided per-error auto-fix (before/after).
+  - [x] F3 real signing: USPTO S-signature (37 CFR 1.4(d)) on the inventor declaration - the
+    signer's name between slashes /First M. Last/ + printed name + the 1.63 statements;
+    `isValidSSignature` (lib/filing/types) shared by the sign action, filing validator (MPEP
+    502.02), and export; migration 0016 `project_declarations.s_signature`. e2e `sign.spec.ts`.
+  - [ ] F4 guided per-error auto-fix (AI proposes a fix per error incl. drawings; before/after
+    diff; accept each manually).
+- [ ] NEXT-UP (user-requested): a "real patent format" export on the Submit/Overview step that
+  typesets the whole application (drawings included) like a published/Google Patents PDF - LaTeX
+  is a candidate engine.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

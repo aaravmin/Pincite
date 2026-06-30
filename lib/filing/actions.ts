@@ -21,6 +21,7 @@ import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
 import {
   ATTACHMENT_VIEWS,
+  isValidSSignature,
   type InventorInput,
   type DeclarationStatements,
   type DrawingFinding,
@@ -151,6 +152,7 @@ export async function signDeclaration(input: {
   projectId: string;
   inventorId: string;
   legalName: string;
+  sSignature: string;
   statements: DeclarationStatements;
 }): Promise<{ ok: true } | { error: string }> {
   const { supabase, user } = await requireUser();
@@ -158,12 +160,20 @@ export async function signDeclaration(input: {
   if (!legalName) {
     return { error: "Enter the inventor's full legal name to sign." };
   }
+  const sSignature = (input.sSignature ?? "").trim();
+  if (!isValidSSignature(sSignature)) {
+    return {
+      error:
+        "Enter a valid S-signature: your name between forward slashes, for example /First M. Last/ (37 CFR 1.4(d)).",
+    };
+  }
 
   // Append-only: each signing inserts a new immutable declaration row.
   const { error } = await supabase.from("project_declarations").insert({
     project_id: input.projectId,
     inventor_id: input.inventorId,
     legal_name: legalName,
+    s_signature: sSignature,
     statements: input.statements,
   });
   if (error) return { error: error.message };

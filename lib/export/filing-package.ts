@@ -68,13 +68,15 @@ export function buildDeclarationText(
   for (const inv of inventors) {
     const d = current.get(inv.id);
     if (d) {
-      lines.push(
-        `  - ${inv.legal_name || "[unnamed]"}: signed as "${d.legal_name}" on ${new Date(
-          d.signed_at,
-        ).toISOString().slice(0, 10)}`,
-      );
+      const date = new Date(d.signed_at).toISOString().slice(0, 10);
+      lines.push(`  Inventor: ${inv.legal_name || "[unnamed]"}`);
+      lines.push(`  Signature: ${d.s_signature || `/${d.legal_name}/`}`);
+      lines.push(`  Name (printed): ${d.legal_name}`);
+      lines.push(`  Date: ${date}`);
+      lines.push("");
     } else {
-      lines.push(`  - ${inv.legal_name || "[unnamed]"}: NOT YET SIGNED`);
+      lines.push(`  Inventor: ${inv.legal_name || "[unnamed]"} - NOT YET SIGNED`);
+      lines.push("");
     }
   }
   lines.push("");

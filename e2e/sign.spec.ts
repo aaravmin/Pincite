@@ -34,9 +34,18 @@ test("phase-v3: inventor declaration signing + filing-readiness checks", async (
     page.getByText(/has not signed the inventor.s declaration/i),
   ).toBeVisible();
 
-  // Check all five statements; sign with a mismatched name to trigger the ADS check.
+  // Check all five statements; sign with a mismatched name to trigger the ADS check, using a
+  // valid S-signature (37 CFR 1.4(d)).
   for (const cb of await page.getByRole("checkbox").all()) await cb.check();
-  await page.getByLabel("Type your full legal name to sign").fill("Dana S.");
+  await page.getByLabel("Printed full legal name").fill("Dana S.");
+  // An S-signature without forward slashes is rejected (37 CFR 1.4(d)).
+  await page.getByLabel("S-signature").fill("Dana S.");
+  await expect(page.getByText(/Put your name between forward slashes/i)).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /sign declaration/i }),
+  ).toBeDisabled();
+  // A valid S-signature signs.
+  await page.getByLabel("S-signature").fill("/Dana S./");
   await page.getByRole("button", { name: /sign declaration/i }).click();
 
   await expect(page.getByText(/does not match the ADS/i)).toBeVisible();
@@ -54,10 +63,11 @@ test("phase-v3: inventor declaration signing + filing-readiness checks", async (
   );
   const { data: decls } = await admin
     .from("project_declarations")
-    .select("legal_name, statements")
+    .select("legal_name, s_signature, statements")
     .eq("project_id", projectId);
   expect((decls ?? []).length).toBe(1);
   expect(decls![0].legal_name).toBe("Dana S.");
+  expect(decls![0].s_signature).toBe("/Dana S./");
 
   const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const user = list.users.find((u) => u.email === process.env.TEST_USER_EMAIL);
