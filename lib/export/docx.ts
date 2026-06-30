@@ -45,6 +45,20 @@ const SPEC_ORDER: SpecEntry[] = [
   { key: "abstract", heading: "ABSTRACT OF THE DISCLOSURE", newPage: true },
 ];
 
+/**
+ * A plain-text rendering of the specification in the same 37 CFR 1.77 order as the DOCX, used
+ * to preview the DOCX (a binary Word file) and the spec inside the filing package.
+ */
+export function specToText(sections: Record<string, string>): string {
+  const blocks: string[] = [];
+  for (const s of SPEC_ORDER) {
+    const content = (sections[s.key] ?? "").trim();
+    if (!content) continue;
+    blocks.push(`${s.heading}\n\n${content}`);
+  }
+  return blocks.join("\n\n\n") || "The specification is empty.";
+}
+
 function heading(text: string, pageBreakBefore?: boolean): Paragraph {
   return new Paragraph({
     children: [new TextRun({ text, allCaps: true })],

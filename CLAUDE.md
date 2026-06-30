@@ -254,7 +254,28 @@ the end of each session — but be stringent; trim before it bloats.
   (`lib/export/declaration-pdf.ts`, pdf-lib; route `/api/projects/[id]/declaration`), sign it
   off-platform, and Upload the signed copy, kept with the matter (`project_attachments`
   kind=declaration; migration 0018 adds the enum value; `components/filing/declaration-sign.tsx`).
-  The in-app S-signature stays as the attestation record. e2e `declaration.spec.ts`.
+
+- [x] Signing rework (Sign step): the in-app S-signature is GONE (a click would not hold up).
+  Inventors `certify` the five 37 CFR 1.63 statements (`sign-client.tsx`, `signDeclaration` no
+  longer takes/validates an s_signature), then download/sign/upload the PDF. Role-aware sign page:
+  attorneys get the power of attorney (`buildPoaPdf` in `declaration-pdf.ts`, route `?doc=poa`,
+  37 CFR 1.32) PLUS each inventor's declaration to collect, and are NOT asked to certify they are
+  the inventor; `DeclarationSign` now takes `downloads[]` + `intro`. Filing-readiness checks moved
+  OFF the Sign step (they stay on `/review`); the S-signature block is removed from
+  `lib/validators/filing.ts`. e2e `sign.spec.ts` (certify) + `declaration.spec.ts`.
+
+- [x] New matters do NOT auto-open: `new-project-dialog` `router.refresh()`es instead of pushing
+  into the matter, so it appears on the dashboard and the user opens it deliberately. All e2e
+  create flows go through a shared `createMatter` helper (`e2e/helpers.ts`) that asserts the matter
+  appears on the dashboard and returns its id; `saveFiling` helper retries the Inventors save to
+  kill a pre-hydration click flake. (No-redirect change touched all 25 create specs.)
+
+- [x] File-output previews (Submission step): each export (filing package, DOCX, LaTeX, review
+  report) previews in a half-screen pane before download. `?preview=1` on the export route returns
+  the text representation as JSON (no `exports` record); `specToText` in `lib/export/docx.ts` renders
+  the spec in 1.77 order. `report-workspace.tsx` keeps the per-format download (testids) + adds a
+  Preview button; when the pane opens the report shifts to the left half so the toolbar stays
+  clickable (a real half-screen split). e2e `export-preview.spec.ts`.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

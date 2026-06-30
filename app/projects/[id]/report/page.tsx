@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { buildReportData } from "@/lib/export/report";
 import { ReportView } from "@/components/export/report-view";
-import { ReportToolbar } from "@/components/export/report-toolbar";
+import { ReportWorkspace } from "@/components/export/report-workspace";
 
 export default async function ReportPage({
   params,
@@ -44,8 +44,9 @@ export default async function ReportPage({
         </div>
         <HeaderActions projectId={id} />
       </header>
-      <ReportToolbar projectId={id} />
-      <ReportView report={report} />
+      <ReportWorkspace projectId={id}>
+        <ReportView report={report} />
+      </ReportWorkspace>
     </div>
   );
 }

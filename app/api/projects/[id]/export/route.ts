@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import JSZip from "jszip";
 import { createClient } from "@/lib/supabase/server";
 import { buildReportData, toText } from "@/lib/export/report";
-import { buildSpecDocx } from "@/lib/export/docx";
+import { buildSpecDocx, specToText } from "@/lib/export/docx";
 import {
   buildAdsText,
   buildDeclarationText,
@@ -44,13 +44,112 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const format = new URL(request.url).searchParams.get("format") ?? "txt";
+  const url = new URL(request.url);
+  const format = url.searchParams.get("format") ?? "txt";
+  const isPreview = url.searchParams.get("preview") === "1";
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return new NextResponse("Unauthorized", { status: 401 });
+
+  // A half-screen preview of a file output: build the text representation of the chosen format
+  // and return it as JSON. A preview is not a download, so it is not recorded in `exports`.
+  if (isPreview) {
+    if (format === "txt") {
+      const report = await buildReportData(id);
+      if (!report) return new NextResponse("Not found", { status: 404 });
+      return NextResponse.json({
+        title: "Review report",
+        filename: `pincite-${id}.txt`,
+        language: "text",
+        content: toText(report),
+      });
+    }
+
+    const project = await getProject(id);
+    if (!project) return new NextResponse("Not found", { status: 404 });
+    const [sections, inventors, declarations, attachments] = await Promise.all([
+      getSectionContent(id),
+      getInventors(id),
+      getDeclarations(id),
+      getAttachments(id),
+    ]);
+    const title = sections["title"] ?? "";
+
+    if (format === "docx") {
+      return NextResponse.json({
+        title: "Specification (DOCX)",
+        filename: `specification-${id}.docx`,
+        language: "text",
+        note: "A Microsoft Word file in 37 CFR 1.77 order. Download to open it in Word. Below is the text it contains.",
+        content: specToText(sections),
+      });
+    }
+
+    if (format === "latex") {
+      const figures: { file: string; label: string; description: string }[] = [];
+      let n = 0;
+      for (const a of attachments) {
+        if (a.kind !== "drawing") continue;
+        const ext =
+          a.mime === "image/png" ? "png" : a.mime === "image/jpeg" ? "jpg" : null;
+        if (!ext) continue;
+        n++;
+        figures.push({
+          file: `figures/figure-${String(n).padStart(2, "0")}.pdf`,
+          label: `FIG. ${n}`,
+          description: figureDescription(a.view),
+        });
+      }
+      const tex = buildPatentLatex({
+        sections,
+        title,
+        inventors: inventors.map((i) => i.legal_name).filter(Boolean),
+        figures,
+      });
+      return NextResponse.json({
+        title: "Patent format (LaTeX)",
+        filename: "patent.tex",
+        language: "latex",
+        note: "The LaTeX source. The download is a .zip with patent.tex plus the figure files; compile it on Overleaf or with pdflatex.",
+        content: tex,
+        files: ["patent.tex", ...figures.map((f) => f.file), "README.txt"],
+      });
+    }
+
+    if (format === "package") {
+      const drawingFiles = attachments
+        .filter((a) => a.kind === "drawing" && a.mime.startsWith("image/"))
+        .map((_, i) => `drawings/figure-${String(i + 1).padStart(2, "0")}.svg`);
+      const files = [
+        "specification.docx",
+        "application-data-sheet.txt",
+        "inventor-declaration.txt",
+        "transmittal-and-fees.txt",
+        ...drawingFiles,
+        "README.txt",
+      ];
+      const content = [
+        `SPECIFICATION (specification.docx)\n\n${specToText(sections)}`,
+        `APPLICATION DATA SHEET (application-data-sheet.txt)\n\n${buildAdsText(project, inventors, title)}`,
+        `INVENTOR DECLARATION (inventor-declaration.txt)\n\n${buildDeclarationText(project, inventors, declarations, title)}`,
+        `TRANSMITTAL AND FEES (transmittal-and-fees.txt)\n\n${buildTransmittalAndFeesText(project)}`,
+        `README (README.txt)\n\n${buildReadme()}`,
+      ].join("\n\n\n");
+      return NextResponse.json({
+        title: "Filing package",
+        filename: `pincite-filing-${id}.zip`,
+        language: "text",
+        note: "Everything in the .zip you would upload to Patent Center. The drawings export as SVG files; the rest is shown below.",
+        content,
+        files,
+      });
+    }
+
+    return new NextResponse("Unknown format", { status: 400 });
+  }
 
   // The analysis report (the user's own review), kept separate from filing documents.
   if (format === "txt") {
