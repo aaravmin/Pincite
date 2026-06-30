@@ -78,6 +78,53 @@ function clamp01(n: unknown): number | null {
   return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : null;
 }
 
+/** The standard patent projections, matching ATTACHMENT_VIEWS in lib/filing/types.ts. */
+export const DRAWING_VIEWS = [
+  "perspective",
+  "top",
+  "bottom",
+  "front",
+  "rear",
+  "left",
+  "right",
+  "section",
+  "exploded",
+] as const;
+
+const VIEW_PROMPT = `You are a USPTO patent drawings examiner identifying the projection of ONE figure.
+Choose the single best label for the viewpoint this drawing shows, from EXACTLY this list:
+- "perspective": a 3D perspective or isometric view showing multiple faces at once.
+- "top": a top or plan view looking straight down.
+- "bottom": a bottom view looking straight up.
+- "front": the front elevation.
+- "rear": the rear elevation.
+- "left": the left-side elevation.
+- "right": the right-side elevation.
+- "section": a sectional or cross-section view (a cut plane, usually with hatching).
+- "exploded": an exploded assembly view with parts separated along axes.
+Use the figure's own caption if it states the view (e.g. "FIG. 2 is a top plan view"). Otherwise judge from the geometry.
+Return ONLY a JSON object: {"view":"<one label from the list>","confidence":0.0}, where confidence is 0..1.
+If you genuinely cannot tell, return {"view":"","confidence":0}. Output JSON only, no prose.`;
+
+/** Classify which standard projection a figure shows, for auto-labeling an uploaded drawing.
+ *  Returns "" when the model is unsure; the caller decides the confidence threshold. */
+export async function classifyDrawingView(
+  base64: string,
+  mimeType: string,
+): Promise<{ view: string; confidence: number }> {
+  const text = await grokVision(VIEW_PROMPT, base64, mimeType, 120);
+  const match = text.match(/\{[\s\S]*\}/);
+  let raw: Record<string, unknown> = {};
+  try {
+    raw = match ? JSON.parse(match[0]) : {};
+  } catch {
+    raw = {};
+  }
+  const v = String(raw.view ?? "").trim().toLowerCase();
+  const view = (DRAWING_VIEWS as readonly string[]).includes(v) ? v : "";
+  return { view, confidence: clamp01(raw.confidence) ?? 0 };
+}
+
 export async function analyzeDrawingVision(
   base64: string,
   mimeType: string,

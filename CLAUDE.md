@@ -206,6 +206,15 @@ the end of each session — but be stringent; trim before it bloats.
       live status and link + a Next-step CTA. Issue/filing counts are computed live by reusing
       detectStage/runTier1-3/runFilingChecks/runCrossRefChecks, so the overview never disagrees
       with the detail screens. Color discipline: red dot = violation only. e2e `overview.spec.ts`.
+- [~] DRAWING EDITOR EPIC (4 features, built one by one):
+  - [x] F1 auto-orientation: uploading a 2D image auto-assigns its view via vision
+    (`classifyDrawingView` in `lib/llm/vision.ts` + `classifyOrientation` action, rate-limited
+    `drawing_classify`, assigns only at confidence >= 0.45). Upload Orientation select defaults
+    to Auto-detect; a wrong label is correctable per figure (`setAttachmentView` dropdown +
+    Detect view re-run in FigureNavigator). e2e `orientation.spec.ts` (deterministic + guarded
+    `ORIENT_VISION`).
+  - [ ] F2 adjustable drawing editor (multi-angle, movable labels/vectors, live error overlay,
+    PNG/SVG export). [ ] F3 real signing flow. [ ] F4 guided per-error auto-fix (before/after).
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

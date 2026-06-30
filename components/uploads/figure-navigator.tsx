@@ -5,11 +5,24 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { deleteAttachment, analyzeDrawing } from "@/lib/filing/actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  deleteAttachment,
+  analyzeDrawing,
+  classifyOrientation,
+  setAttachmentView,
+} from "@/lib/filing/actions";
 import { DrawingAnalysis } from "@/components/uploads/drawing-analysis";
 import { ModelViewer } from "@/components/uploads/model-viewer";
 import {
   is3dModel,
+  ATTACHMENT_VIEWS,
   ATTACHMENT_VIEW_LABELS,
   type Attachment,
   type AttachmentView,
@@ -36,6 +49,7 @@ export function FigureNavigator({
   const [checkingAll, setCheckingAll] = useState(false);
   const [allMsg, setAllMsg] = useState<string | null>(null);
   const [rotating, setRotating] = useState(false);
+  const [viewBusy, setViewBusy] = useState(false);
 
   const i = Math.min(idx, figures.length - 1);
   const sel = figures[i];
@@ -94,6 +108,30 @@ export function FigureNavigator({
       }
     } finally {
       setRotating(false);
+    }
+  }
+
+  // Correct the figure's view by hand, or re-run auto-detection on it.
+  async function changeView(v: string) {
+    setViewBusy(true);
+    try {
+      await setAttachmentView({
+        projectId,
+        attachmentId: sel.id,
+        view: v === "none" ? "" : v,
+      });
+      router.refresh();
+    } finally {
+      setViewBusy(false);
+    }
+  }
+  async function detectView() {
+    setViewBusy(true);
+    try {
+      await classifyOrientation({ projectId, attachmentId: sel.id });
+      router.refresh();
+    } finally {
+      setViewBusy(false);
     }
   }
 
@@ -187,8 +225,37 @@ export function FigureNavigator({
             <Badge variant="secondary">
               {threeD ? "3D model" : isPdf ? "PDF" : "Image"}
             </Badge>
-            {sel.view && (
-              <span className="text-xs text-muted-foreground">{viewLabel(sel)}</span>
+            {!threeD && !isPdf ? (
+              <>
+                <Select
+                  value={sel.view || "none"}
+                  onValueChange={changeView}
+                  disabled={viewBusy}
+                >
+                  <SelectTrigger className="h-7 w-36 text-xs" aria-label="Figure view">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ATTACHMENT_VIEWS.map((v) => (
+                      <SelectItem key={v || "none"} value={v || "none"}>
+                        {ATTACHMENT_VIEW_LABELS[v]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <button
+                  type="button"
+                  onClick={detectView}
+                  disabled={viewBusy}
+                  className="shrink-0 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:opacity-40"
+                >
+                  {viewBusy ? "Detecting…" : "Detect view"}
+                </button>
+              </>
+            ) : (
+              sel.view && (
+                <span className="text-xs text-muted-foreground">{viewLabel(sel)}</span>
+              )
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">

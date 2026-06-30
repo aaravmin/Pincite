@@ -23,6 +23,7 @@ export type AuditAction =
   | "attachment_deleted"
   | "disclosure_saved"
   | "drawing_analyzed"
+  | "drawing_oriented"
   | "project_deleted";
 
 export async function logAudit(

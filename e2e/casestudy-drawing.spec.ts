@@ -63,7 +63,7 @@ test("figures: navigator across views, drawing check, and 3D model", async ({
   // Three views: a perspective figure, a top figure, and the 3D container model.
   await uploadFigure("Perspective", "fig1.png", "apple-container-fig01.png");
   await uploadFigure("Top / plan", "fig6.png", "apple-container-fig05.png");
-  await uploadFigure("Not specified", "container.glb", "sample-model.glb");
+  await uploadFigure("Leave unlabeled", "container.glb", "sample-model.glb");
 
   // The newest upload (the 3D model) is selected first. Snap it to an orientation and shoot.
   await expect(page.getByRole("button", { name: "Top" })).toBeVisible({ timeout: 30_000 });

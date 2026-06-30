@@ -9,17 +9,22 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { analyzeDrawingVision, type DrawingVision } from "@/lib/llm/vision";
+import {
+  analyzeDrawingVision,
+  classifyDrawingView,
+  type DrawingVision,
+} from "@/lib/llm/vision";
 import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 import { validateCitations } from "@/lib/mpep/citation";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
-import type {
-  InventorInput,
-  DeclarationStatements,
-  DrawingFinding,
-  DrawingReview,
+import {
+  ATTACHMENT_VIEWS,
+  type InventorInput,
+  type DeclarationStatements,
+  type DrawingFinding,
+  type DrawingReview,
 } from "@/lib/filing/types";
 
 async function requireUser() {
@@ -333,4 +338,109 @@ export async function analyzeDrawing(input: {
   });
 
   return { ok: true, ...review };
+}
+
+/**
+ * Auto-detect the standard view (top, front, perspective, ...) of an uploaded image figure
+ * with the vision model and store it as the attachment's `view`, so figures get labeled
+ * without the user picking from a dropdown. Best-effort: a low-confidence read or a rate
+ * limit leaves the view unset rather than guessing. Public/synthetic figures only.
+ */
+export async function classifyOrientation(input: {
+  projectId: string;
+  attachmentId: string;
+}): Promise<{ ok: true; view: string } | { error: string }> {
+  const { supabase, user } = await requireUser();
+
+  const { data: att } = await supabase
+    .from("project_attachments")
+    .select("storage_path, mime")
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  if (!att) return { error: "Attachment not found." };
+  if (!att.mime.startsWith("image/")) {
+    return { error: "Only image figures can be classified." };
+  }
+
+  const rl = await checkRateLimit(supabase, "drawing_classify", 60, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
+
+  const { data: blob, error: dlErr } = await createAdminClient()
+    .storage.from("project-files")
+    .download(att.storage_path);
+  if (dlErr || !blob) return { error: dlErr?.message ?? "Could not read the file." };
+  const base64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+
+  let result: { view: string; confidence: number };
+  try {
+    result = await classifyDrawingView(base64, att.mime);
+  } catch (e) {
+    return { error: `Vision model error: ${(e as Error).message}` };
+  }
+
+  // Only assign on a confident read; otherwise leave it blank for the user to set.
+  const view =
+    result.view &&
+    result.confidence >= 0.45 &&
+    (ATTACHMENT_VIEWS as readonly string[]).includes(result.view)
+      ? result.view
+      : "";
+  if (!view) return { ok: true, view: "" };
+
+  // Ownership verified above; project_attachments has no row-update RLS policy, so write
+  // with the admin client (same as the analysis persist above).
+  await createAdminClient()
+    .from("project_attachments")
+    .update({ view })
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId);
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "drawing_oriented",
+    projectId: input.projectId,
+    detail: {
+      attachmentId: input.attachmentId,
+      view,
+      confidence: result.confidence,
+    },
+  });
+
+  return { ok: true, view };
+}
+
+/** Manually set (or clear) a figure's view, to correct an auto-detected label. */
+export async function setAttachmentView(input: {
+  projectId: string;
+  attachmentId: string;
+  view: string;
+}): Promise<{ ok: true } | { error: string }> {
+  const { supabase, user } = await requireUser();
+  const view = (ATTACHMENT_VIEWS as readonly string[]).includes(input.view)
+    ? input.view
+    : "";
+
+  const { data: att } = await supabase
+    .from("project_attachments")
+    .select("id")
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  if (!att) return { error: "Attachment not found." };
+
+  await createAdminClient()
+    .from("project_attachments")
+    .update({ view: view || null })
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId);
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "drawing_oriented",
+    projectId: input.projectId,
+    detail: { attachmentId: input.attachmentId, view, manual: true },
+  });
+
+  return { ok: true };
 }
