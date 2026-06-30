@@ -59,6 +59,24 @@ export function is3dModel(mime: string, filename: string): boolean {
   );
 }
 
+/**
+ * The editable drawing-annotation layer (the drawing editor). A movable reference-numeral
+ * label sits at (x,y) normalized 0..1 from the top-left, with an optional lead line whose
+ * endpoint (the part it points to) is `lead`. Seeded from the vision numerals, then edited.
+ */
+export type DrawingLabel = {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  lead: { x: number; y: number } | null;
+};
+
+export type DrawingAnnotations = {
+  labels: DrawingLabel[];
+  figureLabel: { text: string; x: number; y: number } | null;
+};
+
 export type Attachment = {
   id: string;
   project_id: string;
@@ -71,6 +89,8 @@ export type Attachment = {
   created_at: string;
   /** Persisted vision drawing review, if this figure has been checked (survives reloads). */
   analysis: DrawingReview | null;
+  /** Editable label/lead-line layer for the drawing editor (Feature 2). */
+  annotations: DrawingAnnotations | null;
 };
 
 /** The five 37 CFR 1.63 attestations captured when an inventor signs (PTO/AIA/01). */

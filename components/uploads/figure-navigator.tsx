@@ -18,7 +18,7 @@ import {
   classifyOrientation,
   setAttachmentView,
 } from "@/lib/filing/actions";
-import { DrawingAnalysis } from "@/components/uploads/drawing-analysis";
+import { DrawingEditor } from "@/components/uploads/drawing-editor";
 import { ModelViewer } from "@/components/uploads/model-viewer";
 import {
   is3dModel,
@@ -39,9 +39,11 @@ function viewLabel(a: Attachment): string {
 export function FigureNavigator({
   projectId,
   figures,
+  specText,
 }: {
   projectId: string;
   figures: Attachment[];
+  specText: string;
 }) {
   const router = useRouter();
   const [idx, setIdx] = useState(0);
@@ -308,11 +310,13 @@ export function FigureNavigator({
               className="h-[480px] w-full rounded border border-border"
             />
           ) : (
-            <DrawingAnalysis
+            <DrawingEditor
               key={sel.id}
               projectId={projectId}
               attachmentId={sel.id}
+              specText={specText}
               initialReview={sel.analysis}
+              initialAnnotations={sel.annotations}
             />
           )}
         </div>

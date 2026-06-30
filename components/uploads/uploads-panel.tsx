@@ -28,9 +28,11 @@ function fmtSize(n: number): string {
 export function UploadsPanel({
   projectId,
   initial,
+  specText,
 }: {
   projectId: string;
   initial: Attachment[];
+  specText: string;
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -156,7 +158,11 @@ export function UploadsPanel({
           <h2 className="mb-2 text-sm font-semibold text-foreground">
             Figures ({figures.length})
           </h2>
-          <FigureNavigator projectId={projectId} figures={figures} />
+          <FigureNavigator
+            projectId={projectId}
+            figures={figures}
+            specText={specText}
+          />
         </section>
       )}
 

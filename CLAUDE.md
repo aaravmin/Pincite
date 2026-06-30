@@ -213,8 +213,15 @@ the end of each session — but be stringent; trim before it bloats.
     to Auto-detect; a wrong label is correctable per figure (`setAttachmentView` dropdown +
     Detect view re-run in FigureNavigator). e2e `orientation.spec.ts` (deterministic + guarded
     `ORIENT_VISION`).
-  - [ ] F2 adjustable drawing editor (multi-angle, movable labels/vectors, live error overlay,
-    PNG/SVG export). [ ] F3 real signing flow. [ ] F4 guided per-error auto-fix (before/after).
+  - [~] F2 drawing editor: editable annotation layer (migration 0015
+    `project_attachments.annotations` = movable numeral labels + lead lines + figure label).
+    `DrawingEditor` (replaces DrawingAnalysis) shows errors overlaid by default; Edit drawing makes
+    labels draggable (add/edit-text/lead/delete) and the issue list recomputes LIVE vs the draft
+    text (delete an undescribed numeral or add the figure label and it clears). `analyzeDrawing`
+    seeds the layer from detected numerals; `saveDrawingAnnotations` persists. DONE: F2.1
+    edit/live-clear/persist (e2e `drawing-editor.spec.ts`). TODO: multi-angle capture from a 3D
+    model, PNG/SVG export of edited figures into the package.
+  - [ ] F3 real signing flow. [ ] F4 guided per-error auto-fix (before/after).
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

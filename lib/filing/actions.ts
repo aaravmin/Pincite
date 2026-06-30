@@ -25,6 +25,7 @@ import {
   type DeclarationStatements,
   type DrawingFinding,
   type DrawingReview,
+  type DrawingAnnotations,
 } from "@/lib/filing/types";
 
 async function requireUser() {
@@ -192,7 +193,7 @@ export async function analyzeDrawing(input: {
 
   const { data: att } = await supabase
     .from("project_attachments")
-    .select("storage_path, mime")
+    .select("storage_path, mime, annotations")
     .eq("id", input.attachmentId)
     .eq("project_id", input.projectId)
     .maybeSingle();
@@ -319,10 +320,26 @@ export async function analyzeDrawing(input: {
   };
   // Persist the review so the issues flagged on this figure survive a page leave. Ownership
   // was verified above; use the admin client because project_attachments has no row-update
-  // RLS policy.
+  // RLS policy. Seed the editable annotation layer from the detected numerals the first time,
+  // so the drawing editor opens with movable labels in place; never clobber saved edits.
+  const update: { analysis: DrawingReview; annotations?: DrawingAnnotations } = {
+    analysis: review,
+  };
+  if (att.annotations == null) {
+    update.annotations = {
+      labels: vision.numerals.map((n, i) => ({
+        id: `n${i}`,
+        text: n.numeral,
+        x: n.x,
+        y: n.y,
+        lead: null,
+      })),
+      figureLabel: null,
+    };
+  }
   await createAdminClient()
     .from("project_attachments")
-    .update({ analysis: review })
+    .update(update)
     .eq("id", input.attachmentId)
     .eq("project_id", input.projectId);
 
@@ -440,6 +457,54 @@ export async function setAttachmentView(input: {
     action: "drawing_oriented",
     projectId: input.projectId,
     detail: { attachmentId: input.attachmentId, view, manual: true },
+  });
+
+  return { ok: true };
+}
+
+/** Persist the editable label/lead-line layer for a figure (the drawing editor, Feature 2). */
+export async function saveDrawingAnnotations(input: {
+  projectId: string;
+  attachmentId: string;
+  annotations: DrawingAnnotations;
+}): Promise<{ ok: true } | { error: string }> {
+  const { supabase, user } = await requireUser();
+
+  const { data: att } = await supabase
+    .from("project_attachments")
+    .select("id")
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  if (!att) return { error: "Attachment not found." };
+
+  // Normalize/clamp the incoming layer so stored coordinates are always 0..1.
+  const clamp = (n: number) => Math.min(1, Math.max(0, Number.isFinite(n) ? n : 0));
+  const labels = (input.annotations?.labels ?? []).slice(0, 200).map((l, i) => ({
+    id: String(l.id ?? `l${i}`),
+    text: String(l.text ?? "").slice(0, 40),
+    x: clamp(l.x),
+    y: clamp(l.y),
+    lead: l.lead ? { x: clamp(l.lead.x), y: clamp(l.lead.y) } : null,
+  }));
+  const fl = input.annotations?.figureLabel;
+  const figureLabel =
+    fl && String(fl.text ?? "").trim()
+      ? { text: String(fl.text).slice(0, 40), x: clamp(fl.x), y: clamp(fl.y) }
+      : null;
+  const annotations: DrawingAnnotations = { labels, figureLabel };
+
+  await createAdminClient()
+    .from("project_attachments")
+    .update({ annotations })
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId);
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "drawing_edited",
+    projectId: input.projectId,
+    detail: { attachmentId: input.attachmentId, labels: labels.length },
   });
 
   return { ok: true };

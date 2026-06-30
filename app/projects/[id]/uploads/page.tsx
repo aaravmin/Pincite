@@ -2,7 +2,7 @@ import Link from "next/link";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getProject } from "@/lib/projects/queries";
+import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getAttachments } from "@/lib/filing/queries";
 import { UploadsPanel } from "@/components/uploads/uploads-panel";
 
@@ -27,7 +27,12 @@ export default async function UploadsPage({
 
   const project = await getProject(id);
   if (!project) notFound();
-  const attachments = await getAttachments(id);
+  const [attachments, sections] = await Promise.all([
+    getAttachments(id),
+    getSectionContent(id),
+  ]);
+  // The draft text the live drawing check measures numerals against (matches analyzeDrawing).
+  const specText = `${sections.detailed_description ?? ""} ${sections.drawings_meta ?? ""} ${sections.summary ?? ""}`;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -54,7 +59,7 @@ export default async function UploadsPage({
           sends a figure to a vision model.
         </p>
         <div className="mt-6">
-          <UploadsPanel projectId={id} initial={attachments} />
+          <UploadsPanel projectId={id} initial={attachments} specText={specText} />
         </div>
       </main>
     </div>
