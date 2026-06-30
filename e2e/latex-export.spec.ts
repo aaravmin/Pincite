@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, assertClean } from "./helpers";
+import { captureErrors, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 import JSZip from "jszip";
 
@@ -12,11 +12,7 @@ test("patent-format LaTeX export bundles patent.tex + figures", async ({ page })
   await page.goto("/consent");
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("LaTeX export");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "LaTeX export");
 
   await page.getByRole("button", { name: "Title of the invention", exact: true }).click();
   await page.getByTestId("editor-title").fill("A molded fiber container");

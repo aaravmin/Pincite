@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveFiling } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // 1x1 transparent PNG.
@@ -16,11 +16,7 @@ test("phase-v3: inventors/ADS intake + secure drawing upload", async ({ page }) 
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Synthetic gizmo");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Synthetic gizmo");
 
   // Inventors & applicant (ADS).
   await page.goto(`/projects/${projectId}/inventors`);
@@ -29,8 +25,7 @@ test("phase-v3: inventors/ADS intake + secure drawing upload", async ({ page }) 
   await page
     .getByLabel("Mailing address")
     .fill("1 Test St, Austin, TX 78701");
-  await page.getByTestId("save-filing").click();
-  await expect(page.getByText("Saved")).toBeVisible();
+  await saveFiling(page);
   await expect(page.getByText("Inventors named")).toBeVisible();
   await screenshot(page, "v3-inventors");
 

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 const SPEC: [string, string][] = [
@@ -19,11 +19,7 @@ test("phase-3: stage detection transitions across fill levels and declared statu
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Stage synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Stage synthetic");
 
   // Description sections only, no claims -> Description drafting.
   for (const [label, text] of SPEC) {

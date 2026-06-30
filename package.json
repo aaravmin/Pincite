@@ -8,7 +8,8 @@
     "start": "next start --port 3100",
     "lint": "eslint",
     "verify": "playwright test",
-    "reset:account": "node --env-file=.env.local scripts/reset-account.mjs"
+    "reset:account": "node --env-file=.env.local scripts/reset-account.mjs",
+    "seed:demo": "node --env-file=.env.local scripts/seed-demo-container.mjs"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^8.3.1",

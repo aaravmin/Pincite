@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // Drawing editor (Feature 2): Edit drawing makes the reference-numeral labels movable and the
@@ -14,11 +14,7 @@ test("drawing editor: movable labels persist, no automatic error check", async (
   await page.goto("/consent");
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Drawing editor");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Drawing editor");
 
   // Upload with an explicit view so the test makes no vision call.
   await page.goto(`/projects/${id}/uploads`);

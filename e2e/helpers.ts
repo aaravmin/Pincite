@@ -1,4 +1,5 @@
 import { type Page, expect } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -69,6 +70,51 @@ export function captureErrors(page: Page): CapturedErrors {
   });
 
   return captured;
+}
+
+/**
+ * Create a matter through the New project dialog and return its id. Creating no longer
+ * auto-opens the matter, so this asserts it appears on the dashboard (the feature) and then
+ * opens the draft (so callers keep the same post-create state they had with the old redirect).
+ */
+export async function createMatter(
+  page: Page,
+  opts: string | { name: string; client?: string; matterNo?: string; openDraft?: boolean },
+): Promise<string> {
+  const o = typeof opts === "string" ? { name: opts } : opts;
+  await page.getByRole("button", { name: /new project/i }).click();
+  await page.getByLabel("Name").fill(o.name);
+  if (o.client !== undefined) await page.getByLabel("Client").fill(o.client);
+  if (o.matterNo !== undefined) await page.getByLabel("Matter no.").fill(o.matterNo);
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  // Not auto-opened: the new matter appears on the dashboard.
+  await expect(page.getByText(o.name).first()).toBeVisible({ timeout: 15000 });
+  const db = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } },
+  );
+  const { data } = await db
+    .from("projects")
+    .select("id")
+    .eq("name", o.name)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const id = (data?.[0]?.id as string) ?? "";
+  if (o.openDraft !== false) await page.goto(`/projects/${id}`);
+  return id;
+}
+
+/**
+ * Click the Inventors/applicant Save and wait for the "Saved" indicator, retrying the click so
+ * a click that lands before React hydrates (the onClick handler isn't wired yet) doesn't flake.
+ * The save action is an idempotent upsert, so re-clicking is safe.
+ */
+export async function saveFiling(page: Page): Promise<void> {
+  await expect(async () => {
+    await page.getByTestId("save-filing").click();
+    await expect(page.getByText("Saved")).toBeVisible({ timeout: 3000 });
+  }).toPass({ timeout: 20000 });
 }
 
 export async function screenshot(page: Page, name: string): Promise<string> {

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { createMatter } from "./helpers";
 import AxeBuilder from "@axe-core/playwright";
 import { loginAsTestUser } from "./auth";
 
@@ -16,11 +17,7 @@ test("phase-9: key screens have no serious or critical accessibility violations"
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("A11y synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "A11y synthetic");
 
   // Give the screens content + findings to render.
   await page.getByRole("button", { name: "Claims", exact: true }).click();

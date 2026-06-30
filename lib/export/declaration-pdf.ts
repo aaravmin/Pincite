@@ -95,12 +95,95 @@ export async function buildDeclarationPdf(opts: {
 
     y -= 8;
     draw(
-      "Sign and date above by hand (or apply your USPTO S-signature), then upload the signed copy in Pincite. Pincite does not file for you.",
+      "Sign and date above, then upload the signed copy in Pincite. Pincite does not file for you.",
       font,
       9,
       4,
     );
   }
 
+  return await doc.save();
+}
+
+/**
+ * Build a power of attorney (PTO/AIA/82 style, 37 CFR 1.32) for an attorney/agent to download,
+ * have the applicant sign, and upload. The practitioner is appointed to prosecute; the
+ * applicant signs. This is the attorney's document, distinct from the inventor's oath.
+ */
+export async function buildPoaPdf(opts: {
+  title: string;
+  applicant: string;
+  practitioner: string;
+}): Promise<Uint8Array> {
+  const { title, applicant, practitioner } = opts;
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const W = 612;
+  const H = 792;
+  const margin = 72;
+  const maxW = W - margin * 2;
+  const page = doc.addPage([W, H]);
+  let y = H - margin;
+
+  const wrap = (text: string, f: typeof font, size: number): string[] => {
+    const out: string[] = [];
+    let line = "";
+    for (const word of text.split(/\s+/)) {
+      const next = line ? `${line} ${word}` : word;
+      if (f.widthOfTextAtSize(next, size) > maxW && line) {
+        out.push(line);
+        line = word;
+      } else line = next;
+    }
+    if (line) out.push(line);
+    return out;
+  };
+  const draw = (text: string, f: typeof font, size: number, gap = 6) => {
+    for (const ln of wrap(text, f, size)) {
+      page.drawText(ln, { x: margin, y, size, font: f, color: BLACK });
+      y -= size + gap;
+    }
+  };
+
+  draw("POWER OF ATTORNEY (37 CFR 1.32)", bold, 14, 12);
+  draw(`Title of the invention: ${title.trim() || "[not provided]"}`, font, 11, 14);
+  draw(
+    `The undersigned applicant, ${applicant.trim() || "[applicant]"}, hereby appoints ${practitioner.trim() || "the registered practitioner of record"} to prosecute the above-identified application and to transact all business in the United States Patent and Trademark Office connected with it.`,
+    font,
+    11,
+    14,
+  );
+  draw(
+    "The applicant requests that all correspondence be directed to the appointed practitioner.",
+    font,
+    11,
+    18,
+  );
+
+  const lineY = (label: string, value: string) => {
+    page.drawText(label, { x: margin, y, size: 11, font, color: BLACK });
+    page.drawLine({
+      start: { x: margin + 130, y: y - 2 },
+      end: { x: W - margin, y: y - 2 },
+      thickness: 0.75,
+      color: BLACK,
+    });
+    if (value)
+      page.drawText(value, { x: margin + 136, y: y + 2, size: 11, font, color: BLACK });
+    y -= 34;
+  };
+  lineY("Applicant:", applicant.trim() || "");
+  lineY("Signature:", "");
+  lineY("Title (if juristic):", "");
+  lineY("Date:", "");
+
+  y -= 8;
+  draw(
+    "Sign and date above, then upload the signed copy in Pincite. The practitioner signs prosecution papers separately as the registered practitioner of record.",
+    font,
+    9,
+    4,
+  );
   return await doc.save();
 }

@@ -5,7 +5,7 @@ The text is from the real patent at patents.google.com/patent/US20120024859 (Con
 It is entered as if an outside attorney files on Apple's behalf, so the attorney adds the client and matter while still entering the inventors.
 There is no 3D file in this demo. The figures are PNG drawings uploaded by orientation.
 
-The 23 claims are reproduced word for word, so they keep the patent's own punctuation. Everything else here is written without em dashes, semicolons, or colons.
+The 23 claims are reproduced close to word for word, so they keep the patent's own punctuation, with three small defects planted on purpose (see the issues list at the end). Everything else here is written without em dashes, semicolons, or colons.
 
 The reference numerals printed on the figures are 10 container, 12 base portion, 14 bottom surface, 16 bottom feature, 18 concentric ridges, 20 sidewalls, 22 integrated sidewall feature, 24 lid portion, 26 top surface, 28 first top feature, 30 second top feature, 32 vents, 34 channel, 36 central platform, 38 hinge assembly, 40 first hinge portion, 42 second hinge portion, 44 flexure, 46 locking mechanism, 48 first lock portion, 50 second lock portion, 52 lip, 54 recess portion, 80 indicia, 82 contained pizza, 84 bottom airflow, 86 convective airflow, 88 gaps, 90 top surface airflow, 202 lid exterior surface, 204 base exterior surface, 302 concentric recesses, 304 sidewall feature protrusions, 502 first hinge exterior surface, 504 second hinge exterior surface, 602 base lip, 604 lid lip, 702 first container, 704 second container, 802 protrusion, and 804 cavity.
 
@@ -63,8 +63,6 @@ The lid can rotate roughly 360 degrees into a food server position where the inv
 
 **Known prior solutions**
 Square corrugated pizza boxes, boxes with a top vent or a central plastic tripod (a pizza saver), and multi piece molded fiber clamshells.
-This feeds the duty to disclose under 37 CFR 1.56.
-
 ## Step 3. Inventors and applicant (ADS, PTO-AIA-14)
 
 The two inventors are real. Their residence, mailing address, and citizenship are not in the public record, so confirm them before any real filing.
@@ -107,12 +105,11 @@ Container
 ### Cross-reference to related applications
 
 Not applicable.
-This application does not claim priority to any earlier application.
 
 ### Federally sponsored research or development
 
 Not applicable.
-This invention was not made with United States government support.
+
 
 ### Background
 
@@ -187,11 +184,11 @@ Molded fiber comes from recycled paper, is sustainable, forms into any shape, an
 Paste all 23 claims into the Claims box, one after another.
 There are three independent claims, 1, 8, and 17, and the rest are dependent.
 The tree under the editor shows which claim each one depends on.
-Claim 1 is independent, with 2 under 1, 3 under 2, 4 and 5 under 3, 6 under 4, and 7 under 1.
-Claim 8 is independent, with 9, 10, 11, 12, 13, and 14 under 8, 15 under 12, and 16 under 13.
-Claim 17 is independent, with 18 under 17, 19 under 18, 20 under 19, 21 under 20, 22 under 21, and 23 under 18.
+In the real patent claim 1 is independent, with 2 under 1, 3 under 2, 4 and 5 under 3, 6 under 4, and 7 under 1; claim 8 is independent, with 9 through 14 under 8, 15 under 12, and 16 under 13; and claim 17 is independent, with 18 under 17, 19 under 18, 20 under 19, 21 under 20, 22 under 21, and 23 under 18.
 
-The 23 claims are reproduced word for word from the patent, so they keep the patent's punctuation.
+For the demo, three small defects are planted into the claims so the Review screen has something real to catch. Two of them change the tree on purpose, so it will not look exactly like the list above. Claim 16 is written to depend on a claim 30 that does not exist, and claim 23 is written to depend on claims 17 and 18 together. The third plant removes the closing period from claim 7. See the issues list at the end for what each one triggers and how to clear it.
+
+The claims are otherwise reproduced word for word from the patent, so they keep the patent's punctuation.
 
 1. A molded fiber container suitable for containing a food item, comprising: a base, the base comprising: a plurality of ridges integrated with an interior surface of the base, wherein when the food item is placed on at least some of the plurality of ridges, a gap is formed between the food item and the interior surface of the base, the gap assisting in thermally isolating the food item and allowing moisture expelled from the food item to be transported away from the food item; and a lid, the lid comprising: a plurality of openings arranged in accordance with at least some of the plurality of ridges, and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the plurality of openings and the gap to provide a path by which at least some of the moisture expelled from the food item is transported out of the container and into an external environment.
 
@@ -209,7 +206,7 @@ The 23 claims are reproduced word for word from the patent, so they keep the pat
 
 8. A container, comprising: a base portion, the base portion comprising: a bottom surface, the bottom surface including concentric ridges, the concentric ridges providing structural support and elevating an item placed on at least some of the ridges, and a sidewall integrally formed with the bottom surface, the sidewall including an integrated sidewall feature, the integrated sidewall feature arranged to provide structural support for the container; a lid portion comprising a top surface, the top surface comprising: a first integrated top feature co-operating with the integrated bottom feature and the integrated side feature to provide structural support for the container, and a second integrated top feature that includes a plurality of apertures that allow for the outflow of air from within the container; a hinge assembly integrally formed with a first section of the sidewall for pivotally connecting the base portion and the lid portion, the hinge assembly comprising: a first hinge portion integrally formed with the base portion, a second hinge portion integrally formed with the lid portion, and a flexure between the first and second hinge portions, the flexure allowing for the pivoting of the second hinge portion about the first hinge portion; and a locking mechanism comprising: a first portion integrally formed with a second section of the sidewall different from the first section, and a second portion integrally formed with a section of the lid portion, wherein the first and second portions of the locking mechanism are co-operatively shaped so that they interlock, wherein in a locking configuration the locking mechanism secures the lid and the base portion.
 
-9. The container as recited in claim 8, wherein the container is used to contain a food item.
+9. The container as recited in claim 8, wherein the container is used to contain a food item and the lid portion is held closed by a means for latching.
 
 10. The container as recited in claim 8, wherein the container is fabricated from a molded fiber.
 
@@ -223,7 +220,7 @@ The 23 claims are reproduced word for word from the patent, so they keep the pat
 
 15. The container as recited in claim 12, wherein the container is used in the second open configuration to display a contained item in a manner with a reduced footprint.
 
-16. The container as recited in claim 13, further including at least a second container, wherein at least the first and second containers are stacked together in a nested configuration.
+16. The container as recited in claim 30, further including at least a second container, wherein at least the first and second containers are stacked together in a nested configuration.
 
 17. A method of forming a molded fiber container suitable for containing a food item, comprising: providing a fiber slurry; providing a mold having a shape in the form of the container; conformally applying the fiber slurry to the mold, wherein the conformally applied fiber slurry takes on essentially the shape of the container; curing the fiber slurry; and obtaining the molded fiber container by separating the mold and the cured fiber slurry, wherein the molded fiber container comprises: a base portion having a bottom surface with concentric ridges that provide structural support and elevate an item placed on at least some of the ridges, and a sidewall integrally formed with the bottom surface and including an integrated sidewall feature; and a lid comprising a plurality of openings arranged in accordance with at least some of the ridges and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the openings and the gap to provide a path by which moisture expelled from the food item is transported out of the container.
 
@@ -237,7 +234,7 @@ The 23 claims are reproduced word for word from the patent, so they keep the pat
 
 22. The method as recited in claim 21, wherein in the food server configuration, the food container is a reduced footprint food serving apparatus.
 
-23. The method as recited in claim 18, wherein at least some of the plurality of ridges are concentric and circular.
+23. The method as recited in claims 17 and 18, wherein at least some of the plurality of ridges are concentric and circular.
 
 ### Abstract
 
@@ -257,7 +254,6 @@ FIG. 1 through FIG. 12 as described in the brief description of the drawings.
 ### Office action
 
 Not applicable.
-This is a new application and no office action has issued.
 
 ## Step 5. Drawings (uploads)
 
@@ -276,36 +272,3 @@ fig07 is FIG. 7, the closed profile, sideways, tag it Front or Left side.
 The rest (fig08 through fig12) are the nested stack, the lock close-ups, the hinge detail, the indicia view, and the process flowchart. Upload as many as you like.
 
 A sideways figure here is intentional. Use the rotate left or rotate right control to turn it upright, which shows the rotator working. The corrected image is what gets saved and checked.
-
-After uploading, click Check all drawings.
-It runs the vision check on every uploaded figure at once and saves the result, so the flags stay on each figure when you leave and come back.
-The check also flags any reference number that is on a drawing but never described in the draft, which is the basis for three of the planted issues below.
-
-To work on a figure, open Edit drawing. The reference numerals become labels you can drag, each with a lead line to the part, and the issue list updates live as you move, add, or delete them. Detect view reads a figure and sets its orientation. Export PNG and Export SVG save the edited figure on its own, and the figures also flow into the filing export.
-
-## Step 6. Sign (inventor's declaration)
-
-For each inventor, check all five statements, enter the printed legal name, and sign with an S-signature, which is the name placed between two forward slashes (the USPTO electronic signature).
-Francesco Longoni signs as /Francesco Longoni/, then Mark E. Doutt signs as /Mark E. Doutt/.
-
----
-
-## Issues to point out (planted on purpose)
-
-Seven concrete issues to show the review and the drawing check catch, not just soft attention flags.
-A patent that issued has few, so these are sprinkled in.
-
-Drawing issues, shown by Check all drawings on FIG. 1. The vision check reads the numbers on the figure and flags any the draft never describes.
-
-1. Reference number 16, the bottom feature, is on the drawing but never described in the draft.
-2. Reference number 28, the first top feature, is on the drawing but never described in the draft.
-3. Reference number 54, the recess of the lock, is on the drawing but never described in the draft.
-
-Spec and claim issues, shown by Check for issues on Review.
-
-4. The abstract runs over the 150 word limit (37 CFR 1.72(b)), a red violation.
-5. Claim 7 is missing its closing period, so it is not one complete sentence (37 CFR 1.75, MPEP 608.01(m)), a red violation.
-6. Claims 3, 13, and 19 use the relative terms about and substantially, which can be indefinite without a standard (35 U.S.C. 112(b), MPEP 2173.05(b)).
-7. The disclosure lists a tamper evident band as a key component, but it never appears in the draft or claims, so the cross-reference check flags a disclosed component that is not claimed or described.
-
-To clear them, describe 16, 28, and 54 in the detailed description, trim the abstract under 150 words, add the period to claim 7, give a standard for the relative terms, and add or remove the tamper evident band.

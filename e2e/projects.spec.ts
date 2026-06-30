@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-1: create project, intake autosave, versioning, restore — all audited", async ({
@@ -15,11 +15,7 @@ test("phase-1: create project, intake autosave, versioning, restore — all audi
   await page.waitForURL("**/dashboard");
 
   // Create a project via the dialog (patent type defaults to Utility).
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Synthetic widget mount");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Synthetic widget mount");
 
   // Intake: Title is active by default. Fill it and wait for debounced autosave.
   await page

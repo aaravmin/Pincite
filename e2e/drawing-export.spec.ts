@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 import { readFileSync } from "fs";
 import JSZip from "jszip";
@@ -13,11 +13,7 @@ test("export edited figure to SVG/PNG and into the filing package", async ({ pag
   await page.goto("/consent");
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Drawing export");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Drawing export");
 
   await page.getByRole("button", { name: "Detailed description", exact: true }).click();
   await page

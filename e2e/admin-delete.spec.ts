@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, assertClean } from "./helpers";
+import { captureErrors, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // Removing a patent is admin only (gated on the authenticated email, server side). The
@@ -12,10 +12,7 @@ test("admin gate: a non-admin user sees no remove control", async ({ page }) => 
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Admin gate synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
+  await createMatter(page, { name: "Admin gate synthetic", openDraft: false });
 
   await page.goto("/dashboard");
   await expect(page.getByText("Admin gate synthetic")).toBeVisible();

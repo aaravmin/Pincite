@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-4: validator flags seeded issues with severity colors, the actionable/informational split, and opens the pinned rule", async ({
@@ -12,11 +12,7 @@ test("phase-4: validator flags seeded issues with severity colors, the actionabl
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Validator synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Validator synthetic");
 
   // Seed an over-length abstract (red violation).
   await page.getByRole("button", { name: "Abstract", exact: true }).click();

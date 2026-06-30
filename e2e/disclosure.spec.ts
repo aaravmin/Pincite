@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-v3: invention disclosure + cross-reference consistency", async ({
@@ -12,11 +12,7 @@ test("phase-v3: invention disclosure + cross-reference consistency", async ({
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Disclosure synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Disclosure synthetic");
 
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

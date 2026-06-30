@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveFiling } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // Real signing: the inventor downloads the declaration (37 CFR 1.63) as a PDF, signs it, and
@@ -10,11 +10,7 @@ test("declaration: download to sign and upload the signed copy", async ({ page }
   await page.goto("/consent");
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Sign demo");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Sign demo");
 
   await page.getByRole("button", { name: "Title of the invention", exact: true }).click();
   await page.getByTestId("editor-title").fill("A molded fiber container");
@@ -22,8 +18,7 @@ test("declaration: download to sign and upload the signed copy", async ({ page }
   await page.getByTestId("inventor-name-0").fill("Test Inventor");
   await page.getByLabel("Residence (city, state/country)").fill("Austin, TX");
   await page.getByLabel("Mailing address").fill("1 Test St, Austin, TX 78701");
-  await page.getByTestId("save-filing").click();
-  await expect(page.getByText("Saved")).toBeVisible();
+  await saveFiling(page);
 
   // The generated declaration is a real PDF with one page per inventor.
   const res = await page.request.get(`/api/projects/${id}/declaration`);
@@ -33,7 +28,9 @@ test("declaration: download to sign and upload the signed copy", async ({ page }
 
   // Upload the signed copy on the Sign step.
   await page.goto(`/projects/${id}/sign`);
-  await expect(page.getByText("Signed declaration document")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Signed declaration document" }),
+  ).toBeVisible();
   await page.getByTestId("declaration-input").setInputFiles({
     name: "signed-declaration.pdf",
     mimeType: "application/pdf",

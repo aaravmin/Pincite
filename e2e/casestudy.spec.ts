@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // Generates README screenshots from a real, already-filed example: Apple's molded fiber
@@ -23,11 +23,7 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Apple molded fiber food container");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Apple molded fiber food container");
 
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -76,13 +72,15 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
       "A container is constructed in a preformed manner so no assembly is required. A lid is coupled to the base through a hinge so the container is made from a single piece of material. The base and lid nest with a second container to save storage space. The container can be made from molded fiber. Ridges in the base lift the food and a vented lid carries moisture away to keep the food from getting soggy.",
     claims: CLAIMS,
   };
-  await admin.from("project_sections").insert(
+  // Upsert (idempotent) so seeding works whether or not the matter already has section rows.
+  await admin.from("project_sections").upsert(
     Object.entries(sections).map(([section_key, content]) => ({
       project_id: id,
       section_key,
       content,
       word_count: wc(content),
     })),
+    { onConflict: "project_id,section_key" },
   );
   await admin.from("project_disclosure").upsert(
     {
@@ -109,8 +107,10 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   await expect(page.getByText("Apple molded fiber food container")).toBeVisible();
   await screenshot(page, "case-dashboard");
 
-  // Invention intake with the cross-reference flag (stacking tab not described).
+  // Invention intake with the cross-reference flag (stacking tab not described). The
+  // consistency check lives in the "All fields" view.
   await page.goto(`/projects/${id}/disclosure`);
+  await page.getByRole("button", { name: "All fields", exact: true }).click();
   await expect(
     page.getByText(/Component "carrying handle" .* is not claimed or described/i).first(),
   ).toBeVisible();
@@ -135,6 +135,8 @@ test("case study: Apple molded fiber food container screenshots", async ({ page 
   // Similar patents: pinpoint overlaps against a real molded-fiber container patent, then
   // expand it to load the actual patent (its abstract and its own drawing).
   await page.goto(`/projects/${id}/prior-art`);
+  // The compare form is hidden until "Compare a patent" is clicked.
+  await page.getByRole("button", { name: "Compare a patent", exact: true }).click();
   await page.getByTestId("cmp-number").fill("US20060213916A1");
   await page
     .getByTestId("cmp-text")

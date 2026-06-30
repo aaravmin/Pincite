@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // The per-matter Readiness overview: opening a matter lands here, it assembles stage +
@@ -14,11 +14,7 @@ test("readiness overview: stage, checklist, live issue count, next step", async 
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Synthetic readiness");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Synthetic readiness");
 
   // Some content plus an over-150-word abstract, so the Issues gate goes red from the
   // live deterministic check without any prior manual run.

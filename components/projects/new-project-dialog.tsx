@@ -54,7 +54,9 @@ export function NewProjectDialog({ isAttorney = false }: { isAttorney?: boolean 
       setName("");
       setClientName("");
       setMatterNo("");
-      router.push(`/projects/${res.id}`);
+      // Do not auto-open the new matter; stay on the dashboard so it appears in the list and the
+      // user opens it deliberately.
+      router.refresh();
     });
   }
 

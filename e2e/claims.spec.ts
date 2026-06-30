@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-v3: claim-structure checks (dependency + multiple-dependent)", async ({
@@ -11,11 +11,7 @@ test("phase-v3: claim-structure checks (dependency + multiple-dependent)", async
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Claims synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Claims synthetic");
 
   // Seed claims with deliberate structural defects.
   await page.getByRole("button", { name: "Claims", exact: true }).click();

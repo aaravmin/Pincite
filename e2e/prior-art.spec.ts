@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-7: prior-art pinpoint overlaps render with score and disclaimer (deterministic compare)", async ({
@@ -13,11 +13,7 @@ test("phase-7: prior-art pinpoint overlaps render with score and disclaimer (det
   await page.waitForURL("**/dashboard");
 
   // Create a project and add claims.
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Prior-art synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Prior-art synthetic");
 
   await page.getByRole("button", { name: "Claims", exact: true }).click();
   await page
@@ -29,6 +25,8 @@ test("phase-7: prior-art pinpoint overlaps render with score and disclaimer (det
 
   // Deterministic compare against a synthetic, overlapping candidate (no BigQuery cost).
   await page.goto(`/projects/${projectId}/prior-art`);
+  // The compare form is hidden until "Compare a patent" is clicked (one place to start).
+  await page.getByRole("button", { name: "Compare a patent", exact: true }).click();
   await page.getByTestId("cmp-number").fill("US-0000000-A1");
   await page
     .getByTestId("cmp-text")

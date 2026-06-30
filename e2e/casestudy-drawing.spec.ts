@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
-import { screenshot } from "./helpers";
+import { screenshot, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 /**
@@ -22,11 +22,7 @@ test("figures: navigator across views, drawing check, and 3D model", async ({
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Apple molded fiber food container");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, "Apple molded fiber food container");
 
   // A detailed description that names most reference numerals but omits a few (16, 44, 46),
   // so the drawing check circles only the undescribed ones.
@@ -35,15 +31,19 @@ test("figures: navigator across views, drawing check, and 3D model", async ({
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } },
   );
-  await admin.from("project_sections").insert([
-    {
-      project_id: id,
-      section_key: "detailed_description",
-      content:
-        "The container 10 comprises a lid 12 and a base 24 joined by a hinge 38. The lid 12 carries concentric ridges 14, 18, 20, and 22, an outer rim 26, and a sidewall 28. The base 24 has an interior surface 30, a plurality of vent openings 32, a central hub 34, support recesses 36, and a moisture channeling feature 40 cooperating with channels 42 and a drain 48. A closure tab 50 and a catch 52 hold the lid 12 to the base 24.",
-      word_count: 80,
-    },
-  ]);
+  // Upsert (idempotent) so seeding works whether or not the matter already has section rows.
+  await admin.from("project_sections").upsert(
+    [
+      {
+        project_id: id,
+        section_key: "detailed_description",
+        content:
+          "The container 10 comprises a lid 12 and a base 24 joined by a hinge 38. The lid 12 carries concentric ridges 14, 18, 20, and 22, an outer rim 26, and a sidewall 28. The base 24 has an interior surface 30, a plurality of vent openings 32, a central hub 34, support recesses 36, and a moisture channeling feature 40 cooperating with channels 42 and a drain 48. A closure tab 50 and a catch 52 hold the lid 12 to the base 24.",
+        word_count: 80,
+      },
+    ],
+    { onConflict: "project_id,section_key" },
+  );
 
   await page.goto(`/projects/${id}/uploads`);
 

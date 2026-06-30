@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-6: rule surfacing shows applies-now + conditional rules, and a met trigger lights up", async ({
@@ -12,11 +12,7 @@ test("phase-6: rule surfacing shows applies-now + conditional rules, and a met t
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Rules synthetic");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Rules synthetic");
 
   // A claim with a means-for limitation arms the §112(f) conditional.
   await page.getByRole("button", { name: "Claims", exact: true }).click();
@@ -33,7 +29,7 @@ test("phase-6: rule surfacing shows applies-now + conditional rules, and a met t
 
   // May-apply-next: the means-for conditional, marked "now applies".
   await expect(page.getByText("May apply next")).toBeVisible();
-  await expect(page.getByText(/uses 'means for'/i).first()).toBeVisible();
+  await expect(page.getByText(/'means for' wording/i).first()).toBeVisible();
   await expect(page.getByText(/now applies/i).first()).toBeVisible();
   await expect(page.locator('[data-triggered="true"]').first()).toBeVisible();
   await screenshot(page, "phase-6-rules");

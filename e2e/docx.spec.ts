@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-v3: USPTO-aligned DOCX + filing package export", async ({ page }) => {
@@ -10,11 +10,7 @@ test("phase-v3: USPTO-aligned DOCX + filing package export", async ({ page }) =>
   await page.getByRole("button", { name: /i understand, continue/i }).click();
   await page.waitForURL("**/dashboard");
 
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Synthetic clasp");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const projectId = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const projectId = await createMatter(page, "Synthetic clasp");
 
   await page.getByTestId("editor-title").fill("A synthetic clasp mechanism");
   await expect(page.getByTestId("save-status")).toHaveText("Saved");

@@ -2,16 +2,11 @@ import Link from "next/link";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
+import { getProject } from "@/lib/projects/queries";
 import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
-import {
-  runFilingChecks,
-  resolveFilingPins,
-  latestDeclarations,
-} from "@/lib/validators/filing";
+import { latestDeclarations } from "@/lib/validators/filing";
 import { SignClient } from "@/components/filing/sign-client";
 import { DeclarationSign } from "@/components/filing/declaration-sign";
-import { FilingReadiness } from "@/components/filing/filing-readiness";
 
 export default async function SignPage({
   params,
@@ -31,41 +26,25 @@ export default async function SignPage({
     .eq("id", user.id)
     .maybeSingle();
   if (!profile?.consented_at) redirect("/consent");
-  const role = profile.role ?? null;
-  const isAttorney = role === "attorney";
+  const isAttorney = profile.role === "attorney";
 
   const project = await getProject(id);
   if (!project) notFound();
-  const [inventors, declarations, sections, attachments] = await Promise.all([
+  const [inventors, declarations, attachments] = await Promise.all([
     getInventors(id),
     getDeclarations(id),
-    getSectionContent(id),
     getAttachments(id),
   ]);
   const declarationDocs = attachments.filter((a) => a.kind === "declaration");
-  const findings = await resolveFilingPins(
-    runFilingChecks({
-      project,
-      inventors,
-      declarations,
-      role,
-      title: sections["title"] ?? "",
-    }),
-  );
   const current = latestDeclarations(declarations);
-  const signed: Record<
-    string,
-    { legal_name: string; signed_at: string; s_signature?: string | null }
-  > = {};
+  const signed: Record<string, { legal_name: string; signed_at: string }> = {};
   for (const inv of inventors) {
     const d = current.get(inv.id);
-    if (d)
-      signed[inv.id] = {
-        legal_name: d.legal_name,
-        signed_at: d.signed_at,
-        s_signature: d.s_signature,
-      };
+    if (d) signed[inv.id] = { legal_name: d.legal_name, signed_at: d.signed_at };
   }
+
+  const declHref = `/api/projects/${id}/declaration`;
+  const poaHref = `/api/projects/${id}/declaration?doc=poa`;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -86,44 +65,58 @@ export default async function SignPage({
 
       <main className="mx-auto w-full max-w-3xl flex-1 space-y-8 px-6 py-8">
         {isAttorney ? (
-          <div className="rounded-md border border-border px-4 py-3 text-sm text-muted-foreground">
-            As the practitioner you file a power of attorney (PTO/AIA/82) and sign the
-            prosecution papers. Each inventor still must personally sign their declaration
-            (PTO/AIA/01); record their signed declarations below.
-          </div>
+          <>
+            <p className="text-sm text-muted-foreground">
+              As the practitioner you file a power of attorney and collect each inventor&apos;s
+              signed declaration. You sign prosecution papers as the registered practitioner of
+              record; you do not sign the inventor&apos;s oath, so you are not asked to certify
+              the inventor statements. Download each document, have it signed, and upload the
+              signed copies.
+            </p>
+            <section>
+              <h2 className="text-sm font-semibold text-foreground">Your filing documents</h2>
+              <div className="mt-3">
+                <DeclarationSign
+                  projectId={id}
+                  signed={declarationDocs}
+                  intro="Download the power of attorney for the applicant to sign, and the inventor declarations for each inventor to sign. Upload the signed copies here. Pincite does not verify the signatures."
+                  downloads={[
+                    { href: poaHref, label: "Download power of attorney" },
+                    { href: declHref, label: "Download inventor declarations" },
+                  ]}
+                />
+              </div>
+            </section>
+          </>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            Each inventor personally signs the inventor&apos;s declaration (PTO/AIA/01).
-            Read each statement, then sign with an S-signature - your name between forward
-            slashes, e.g. /First M. Last/ (37 CFR 1.4(d)). Pincite records it and checks it
-            for defects before you file.
-          </p>
+          <>
+            <p className="text-sm text-muted-foreground">
+              Each inventor confirms the declaration statements (37 CFR 1.63), then downloads the
+              declaration, signs it, and uploads the signed copy. The operative signature is the
+              one on that document, which Pincite does not verify.
+            </p>
+            <section>
+              <h2 className="text-sm font-semibold text-foreground">
+                Inventor certification
+              </h2>
+              <div className="mt-3">
+                <SignClient projectId={id} inventors={inventors} signed={signed} />
+              </div>
+            </section>
+            <section>
+              <h2 className="text-sm font-semibold text-foreground">
+                Signed declaration document
+              </h2>
+              <div className="mt-3">
+                <DeclarationSign
+                  projectId={id}
+                  signed={declarationDocs}
+                  downloads={[{ href: declHref, label: "Download declaration to sign" }]}
+                />
+              </div>
+            </section>
+          </>
         )}
-
-        <section>
-          <h2 className="text-sm font-semibold text-foreground">Filing readiness</h2>
-          <div className="mt-3">
-            <FilingReadiness findings={findings} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-sm font-semibold text-foreground">
-            Inventor attestations
-          </h2>
-          <div className="mt-3">
-            <SignClient projectId={id} inventors={inventors} signed={signed} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-sm font-semibold text-foreground">
-            Signed declaration document
-          </h2>
-          <div className="mt-3">
-            <DeclarationSign projectId={id} signed={declarationDocs} />
-          </div>
-        </section>
       </main>
     </div>
   );

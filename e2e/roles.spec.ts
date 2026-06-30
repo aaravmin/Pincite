@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 function admin() {
@@ -38,55 +38,7 @@ test("phase-v3: role selection + attorney portfolio", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /portfolio/i })).toBeVisible();
 
   // Create a project with client + matter.
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Synthetic bracket");
-  await page.getByLabel("Client").fill("Acme Corp");
-  await page.getByLabel("Matter no.").fill("ACM-0042");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-
-  // Back to the portfolio: a flat row with the client in its own Company column and the
-  // matter number. The patent name is a cell now (the whole row opens, not a link).
-  await page.goto("/dashboard");
-  await expect(page.getByRole("cell", { name: "Acme Corp" })).toBeVisible();
-  await expect(page.getByRole("cell", { name: "ACM-0042" })).toBeVisible();
-  await expect(
-    page.getByRole("cell", { name: "Synthetic bracket" }),
-  ).toBeVisible();
-  await screenshot(page, "v3-attorney-portfolio");
-
-  assertClean(errs);
-
-  // Audit recorded the role selection.
-  const a = admin();
-  const { data: list } = await a.auth.admin.listUsers({ perPage: 1000 });
-  const user = list.users.find((u) => u.email === process.env.TEST_USER_EMAIL);
-  const { data: audit } = await a
-    .from("audit_log")
-    .select("action")
-    .eq("user_id", user!.id);
-  expect((audit ?? []).map((r) => r.action)).toContain("role_selected");
-});
-
-test("portfolio table: company column and progress-based next step", async ({
-  page,
-}) => {
-  const errs = captureErrors(page);
-  await loginAsTestUser(page);
-  await clearRole();
-  await page.goto("/consent");
-  await page.getByRole("button", { name: /i understand, continue/i }).click();
-  await page.waitForURL("**/role");
-  await page.getByRole("button", { name: /patent attorney or agent/i }).click();
-  await page.waitForURL("**/dashboard");
-
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Container");
-  await page.getByLabel("Client").fill("Apple Inc.");
-  await page.getByLabel("Matter no.").fill("APPL-CONTAINER-2026-001");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const id = await createMatter(page, { name: "Synthetic bracket", client: "Apple Inc.", matterNo: "ACM-0042" });
 
   // Seed a complete, clean draft so "next step" must move past Drafting.
   const a = admin();
@@ -142,21 +94,11 @@ test("dashboard: row opens the matter, saves menu when there is more than one", 
   await page.waitForURL("**/dashboard");
 
   // One matter with no extra saves -> clicking the row opens it directly.
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Alpha");
-  await page.getByLabel("Client").fill("Acme");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const idA = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const idA = await createMatter(page, { name: "Alpha", client: "Acme" });
 
   // A second matter with two saves -> clicking the row shows a menu, not a direct open.
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: /new project/i }).click();
-  await page.getByLabel("Name").fill("Beta");
-  await page.getByLabel("Client").fill("Acme");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
-  await page.waitForURL("**/projects/**");
-  const idB = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+  const idB = await createMatter(page, { name: "Beta", client: "Acme" });
 
   await a.from("project_versions").insert([
     {

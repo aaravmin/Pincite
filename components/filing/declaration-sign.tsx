@@ -14,9 +14,13 @@ import type { Attachment } from "@/lib/filing/types";
 export function DeclarationSign({
   projectId,
   signed,
+  downloads,
+  intro,
 }: {
   projectId: string;
   signed: Attachment[];
+  downloads: { href: string; label: string }[];
+  intro?: string;
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -55,20 +59,17 @@ export function DeclarationSign({
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        The operative signature is the one on the document you file. Download the declaration,
-        have each inventor sign it, then upload the signed copy here so everything stays in one
-        place.
+        {intro ??
+          "The operative signature is the one on the document you file. Download it, sign it, then upload the signed copy here so everything stays in one place. Pincite does not verify the signature."}
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <Button asChild variant="outline" size="sm">
-          <a
-            href={`/api/projects/${projectId}/declaration`}
-            download
-            data-testid="download-declaration"
-          >
-            Download declaration to sign
-          </a>
-        </Button>
+        {downloads.map((d) => (
+          <Button asChild variant="outline" size="sm" key={d.href}>
+            <a href={d.href} download data-testid="download-declaration">
+              {d.label}
+            </a>
+          </Button>
+        ))}
         <Button
           type="button"
           size="sm"
