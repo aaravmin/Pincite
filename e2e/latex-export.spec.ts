@@ -1,0 +1,61 @@
+import { test, expect } from "@playwright/test";
+import { captureErrors, assertClean } from "./helpers";
+import { loginAsTestUser } from "./auth";
+import JSZip from "jszip";
+
+// Real-patent-format export: a LaTeX bundle (patent.tex + figure files) that typesets the
+// application like a published patent. Deterministic - validates the bundle and .tex structure
+// (compiling to PDF is done by the user via Overleaf / pdflatex).
+test("patent-format LaTeX export bundles patent.tex + figures", async ({ page }) => {
+  const errs = captureErrors(page);
+  await loginAsTestUser(page);
+  await page.goto("/consent");
+  await page.getByRole("button", { name: /i understand, continue/i }).click();
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: /new project/i }).click();
+  await page.getByLabel("Name").fill("LaTeX export");
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.waitForURL("**/projects/**");
+  const id = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+
+  await page.getByRole("button", { name: "Title of the invention", exact: true }).click();
+  await page.getByTestId("editor-title").fill("A molded fiber container");
+  await page.getByRole("button", { name: "Background", exact: true }).click();
+  await page.getByTestId("editor-background").fill("Existing containers leak.");
+  await page.getByRole("button", { name: "Claims", exact: true }).click();
+  await page.getByTestId("editor-claims").fill("1. A container comprising a base.");
+  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+
+  await page.goto(`/projects/${id}/uploads`);
+  await page.getByLabel("Drawing orientation").click();
+  await page.getByRole("option", { name: "Front", exact: true }).click();
+  await page
+    .getByTestId("upload-input")
+    .setInputFiles("e2e/fixtures/apple-container-fig04.png");
+  await expect(page.getByRole("heading", { name: /Figures \(1\)/ })).toBeVisible({
+    timeout: 30000,
+  });
+
+  // The Submission step offers the export; pull it and validate the bundle.
+  await page.goto(`/projects/${id}/report`);
+  await expect(page.getByTestId("download-latex")).toBeVisible();
+
+  const res = await page.request.get(`/api/projects/${id}/export?format=latex`);
+  expect(res.ok()).toBeTruthy();
+  const zip = await JSZip.loadAsync(await res.body());
+  const names = Object.keys(zip.files);
+  expect(names).toContain("patent.tex");
+  expect(names).toContain("figures/figure-01.png");
+  expect(names).toContain("README.txt");
+
+  const tex = await zip.file("patent.tex")!.async("string");
+  expect(tex).toContain("\\documentclass");
+  expect(tex).toContain("\\MakeUppercase{A molded fiber container}");
+  expect(tex).toContain("What is claimed is:");
+  expect(tex).toContain("A container comprising a base.");
+  expect(tex).toContain("[0001]"); // numbered description paragraph
+  expect(tex).toContain("\\includegraphics");
+  expect(tex).toContain("figures/figure-01.png");
+
+  assertClean(errs);
+});

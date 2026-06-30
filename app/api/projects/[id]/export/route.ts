@@ -13,6 +13,7 @@ import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildFigureSvg, imageSize } from "@/lib/export/figure-svg";
+import { buildPatentLatex, buildLatexReadme } from "@/lib/export/latex";
 import { logAudit } from "@/lib/audit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -77,6 +78,47 @@ export async function GET(
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "Content-Disposition": `attachment; filename="specification-${id}.docx"`,
+      },
+    });
+  }
+
+  // Real-patent-format: a LaTeX source bundle (patent.tex + figure files) that typesets the
+  // whole application like a published patent. Compiled by the user (Overleaf / pdflatex).
+  if (format === "latex") {
+    const attachments = await getAttachments(id);
+    const admin = createAdminClient();
+    const zip = new JSZip();
+    const figures: { file: string; label: string }[] = [];
+    let n = 0;
+    for (const a of attachments) {
+      if (a.kind !== "drawing") continue;
+      // pdflatex reads PNG and JPEG; skip formats it cannot include.
+      const ext =
+        a.mime === "image/png" ? "png" : a.mime === "image/jpeg" ? "jpg" : null;
+      if (!ext) continue;
+      const { data: blob } = await admin.storage
+        .from("project-files")
+        .download(a.storage_path);
+      if (!blob) continue;
+      n++;
+      const file = `figures/figure-${String(n).padStart(2, "0")}.${ext}`;
+      zip.file(file, new Uint8Array(await blob.arrayBuffer()));
+      figures.push({ file, label: a.annotations?.figureLabel?.text || `FIG. ${n}` });
+    }
+    const tex = buildPatentLatex({
+      sections,
+      title,
+      inventors: inventors.map((i) => i.legal_name).filter(Boolean),
+      figures,
+    });
+    zip.file("patent.tex", tex);
+    zip.file("README.txt", buildLatexReadme(figures.length));
+    const zipBuf = await zip.generateAsync({ type: "nodebuffer" });
+    await record(supabase, user.id, id, "latex");
+    return new NextResponse(new Uint8Array(zipBuf), {
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="pincite-patent-latex-${id}.zip"`,
       },
     });
   }

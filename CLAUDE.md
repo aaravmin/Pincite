@@ -232,9 +232,11 @@ the end of each session — but be stringent; trim before it bloats.
     Accept runs `applyFix` (replace nearest occurrence + save + recompute), Reject discards.
     Manual per finding, not a magic wand. Guarded e2e `auto-fix.spec.ts` (AUTOFIX_AI=1). [drawing
     auto-fix + multi-angle F2.3 deferred as optional polish].
-- [ ] NEXT-UP (user-requested): a "real patent format" export on the Submit/Overview step that
-  typesets the whole application (drawings included) like a published/Google Patents PDF - LaTeX
-  is a candidate engine.
+- [x] Real-patent-format export (`?format=latex`, `lib/export/latex.ts`): a ZIP of patent.tex +
+  figures that typesets the application like a published patent (1.77 order, [0001] paragraphs,
+  claims/abstract on own pages, drawings via \includegraphics). User compiles on Overleaf/pdflatex
+  (no server engine; PNG/JPEG figures only). Button on the Submission step; migration 0017 adds
+  'latex' to exports.format. e2e `latex-export.spec.ts`.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

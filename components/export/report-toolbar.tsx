@@ -36,6 +36,15 @@ export function ReportToolbar({ projectId }: { projectId: string }) {
       </Button>
       <Button asChild size="sm" variant="outline">
         <a
+          href={`/api/projects/${projectId}/export?format=latex`}
+          download
+          data-testid="download-latex"
+        >
+          Patent format (LaTeX .zip)
+        </a>
+      </Button>
+      <Button asChild size="sm" variant="outline">
+        <a
           href={`/api/projects/${projectId}/export?format=txt`}
           download
           data-testid="download-txt"
