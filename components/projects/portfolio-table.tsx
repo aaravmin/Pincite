@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type { DashboardProject } from "@/lib/projects/queries";
 import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
 import { fmtDate } from "@/lib/format";
 import { DeleteProjectButton } from "@/components/dashboard/delete-project-button";
+import { OpenableRow } from "@/components/dashboard/openable-row";
 
 /**
  * Attorney portfolio: one row per matter with the client as its own Company column (not a
@@ -42,22 +42,18 @@ export function PortfolioTable({
         </thead>
         <tbody>
           {rows.map((p) => (
-            <tr
+            <OpenableRow
               key={p.id}
+              as="tr"
+              projectId={p.id}
+              versionCount={p.versionCount}
               className="border-t border-border outline-1 -outline-offset-1 outline-transparent hover:bg-accent/40 hover:outline hover:outline-border"
             >
               <td className="px-4 py-2 font-medium text-foreground">
                 {p.client_name?.trim() || "Unassigned"}
               </td>
               <td className="px-4 py-2 text-muted-foreground">{p.matter_no || "-"}</td>
-              <td className="px-4 py-2">
-                <Link
-                  href={`/projects/${p.id}/overview`}
-                  className="font-medium text-foreground hover:underline"
-                >
-                  {p.name}
-                </Link>
-              </td>
+              <td className="px-4 py-2 font-medium text-foreground">{p.name}</td>
               <td className="px-4 py-2 text-muted-foreground">
                 {PATENT_TYPE_LABELS[p.patent_type]}
               </td>
@@ -85,11 +81,11 @@ export function PortfolioTable({
                 {fmtDate(p.updated_at)}
               </td>
               {isAdmin && (
-                <td className="px-4 py-2 text-right">
+                <td className="px-4 py-2 text-right" data-no-open>
                   <DeleteProjectButton projectId={p.id} name={p.name} />
                 </td>
               )}
-            </tr>
+            </OpenableRow>
           ))}
         </tbody>
       </table>

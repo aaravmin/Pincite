@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { OpenableRow } from "@/components/dashboard/openable-row";
 import {
   Select,
   SelectContent,
@@ -88,17 +88,15 @@ export function DashboardProjects({
           {filtered.map((p) => {
             const ns = p.next;
             return (
-              <li
+              <OpenableRow
                 key={p.id}
+                as="li"
+                projectId={p.id}
+                versionCount={p.versionCount}
                 className="flex items-center gap-4 px-4 py-3 outline-1 -outline-offset-1 outline-transparent hover:bg-accent/40 hover:outline hover:outline-border"
               >
                 <div className="min-w-0 flex-1">
-                  <Link
-                    href={`/projects/${p.id}/overview`}
-                    className="font-medium text-foreground hover:underline"
-                  >
-                    {p.name}
-                  </Link>
+                  <span className="font-medium text-foreground">{p.name}</span>
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <Badge variant="secondary">
                       {PATENT_TYPE_LABELS[p.patent_type]}
@@ -131,9 +129,11 @@ export function DashboardProjects({
                   </div>
                 </div>
                 {isAdmin && (
-                  <DeleteProjectButton projectId={p.id} name={p.name} />
+                  <span data-no-open>
+                    <DeleteProjectButton projectId={p.id} name={p.name} />
+                  </span>
                 )}
-              </li>
+              </OpenableRow>
             );
           })}
         </ul>

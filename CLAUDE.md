@@ -243,6 +243,13 @@ the end of each session — but be stringent; trim before it bloats.
   from LaTeX) so the typeset patent shows the EDITED drawings. Button on Submission; migration 0017
   adds 'latex'. e2e `latex-export.spec.ts`. (No server-side TeX engine; user compiles.)
 
+- [x] Dashboard rows open on click (`components/dashboard/openable-row.tsx`): both the attorney
+  portfolio and the inventor list make the whole matter row clickable except `[data-no-open]`
+  (delete). 0-1 saves opens the matter overview directly; >1 saves opens a portal menu of the
+  saves (latest opens the matter, an earlier one `restoreVersion`s into the draft, plus Create a
+  new save). Name is no longer a link; row keeps table roles (onClick + tabindex, no role
+  override). `listProjectVersions` action backs the menu. e2e in `roles.spec.ts`.
+
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
 - `pnpm verify` — run all Playwright gates.   `pnpm lint` — eslint.

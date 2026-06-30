@@ -30,10 +30,16 @@ test("readiness overview: stage, checklist, live issue count, next step", async 
   await page.getByTestId("editor-abstract").fill("word ".repeat(180).trim());
   await expect(page.getByTestId("save-status")).toHaveText("Saved");
 
-  // Opening the matter from the dashboard lands on the overview.
+  // Opening the matter from the dashboard lands on the overview. The whole row is clickable
+  // now (one save, so it opens directly), so click the name text and retry until it hydrates.
   await page.goto("/dashboard");
-  await page.getByRole("link", { name: "Synthetic readiness" }).click();
-  await expect(page).toHaveURL(new RegExp(`/projects/${id}/overview$`));
+  await expect(page.getByText("Synthetic readiness")).toBeVisible();
+  await expect(async () => {
+    await page.getByText("Synthetic readiness").click();
+    await expect(page).toHaveURL(new RegExp(`/projects/${id}/overview$`), {
+      timeout: 2000,
+    });
+  }).toPass({ timeout: 20000 });
 
   await expect(page.getByText("Where this stands")).toBeVisible();
   await expect(page.getByText("Checklist", { exact: true })).toBeVisible();

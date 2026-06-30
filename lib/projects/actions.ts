@@ -340,3 +340,16 @@ export async function branchVersion(input: {
 }) {
   return reopenVersion(input.projectId, input.versionId, "branch");
 }
+
+/** The saves for a matter, newest first, for the dashboard "open a save" menu. RLS-scoped. */
+export async function listProjectVersions(
+  projectId: string,
+): Promise<{ id: string; label: string | null; created_at: string }[]> {
+  const { supabase } = await requireUser();
+  const { data } = await supabase
+    .from("project_versions")
+    .select("id, label, created_at")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as { id: string; label: string | null; created_at: string }[];
+}

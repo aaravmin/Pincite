@@ -45,12 +45,13 @@ test("phase-v3: role selection + attorney portfolio", async ({ page }) => {
   await page.getByRole("button", { name: "Create", exact: true }).click();
   await page.waitForURL("**/projects/**");
 
-  // Back to the portfolio: grouped under the client, with the matter number.
+  // Back to the portfolio: a flat row with the client in its own Company column and the
+  // matter number. The patent name is a cell now (the whole row opens, not a link).
   await page.goto("/dashboard");
-  await expect(page.getByText("Acme Corp")).toBeVisible();
-  await expect(page.getByText("ACM-0042")).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Acme Corp" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "ACM-0042" })).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "Synthetic bracket" }),
+    page.getByRole("cell", { name: "Synthetic bracket" }),
   ).toBeVisible();
   await screenshot(page, "v3-attorney-portfolio");
 
@@ -121,4 +122,75 @@ test("portfolio table: company column and progress-based next step", async ({
   await expect(page.getByRole("cell", { name: "Drafting", exact: true })).toHaveCount(0);
   await screenshot(page, "portfolio-flat-nextstep");
   assertClean(errs);
+});
+
+test("dashboard: row opens the matter, saves menu when there is more than one", async ({
+  page,
+}) => {
+  await loginAsTestUser(page);
+  // Clean slate: clear the role and any matters left by earlier tests so the dashboard is
+  // small and hydrates before the row click.
+  const a = admin();
+  const { data } = await a.auth.admin.listUsers({ perPage: 1000 });
+  const user = data.users.find((u) => u.email === process.env.TEST_USER_EMAIL)!;
+  await a.from("projects").delete().eq("user_id", user.id);
+  await a.from("profiles").update({ role: null }).eq("id", user.id);
+  await page.goto("/consent");
+  await page.getByRole("button", { name: /i understand, continue/i }).click();
+  await page.waitForURL("**/role");
+  await page.getByRole("button", { name: /patent attorney or agent/i }).click();
+  await page.waitForURL("**/dashboard");
+
+  // One matter with no extra saves -> clicking the row opens it directly.
+  await page.getByRole("button", { name: /new project/i }).click();
+  await page.getByLabel("Name").fill("Alpha");
+  await page.getByLabel("Client").fill("Acme");
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.waitForURL("**/projects/**");
+  const idA = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+
+  // A second matter with two saves -> clicking the row shows a menu, not a direct open.
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: /new project/i }).click();
+  await page.getByLabel("Name").fill("Beta");
+  await page.getByLabel("Client").fill("Acme");
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.waitForURL("**/projects/**");
+  const idB = page.url().split("/projects/")[1].split(/[/?#]/)[0];
+
+  await a.from("project_versions").insert([
+    {
+      project_id: idB,
+      user_id: user.id,
+      label: "First save",
+      snapshot: { sections: {} },
+      created_at: "2026-06-01T00:00:00Z",
+    },
+    {
+      project_id: idB,
+      user_id: user.id,
+      label: "Second save",
+      snapshot: { sections: {} },
+      created_at: "2026-06-02T00:00:00Z",
+    },
+  ]);
+
+  await page.goto("/dashboard");
+  await expect(page.getByRole("cell", { name: "Beta" })).toBeVisible();
+  // Retry the click until the client row has hydrated and the menu opens.
+  await expect(async () => {
+    await page.getByRole("cell", { name: "Beta" }).click();
+    await expect(page.getByText("Open a save")).toBeVisible({ timeout: 2000 });
+  }).toPass({ timeout: 20000 });
+  await page.getByRole("menuitem", { name: /Second save/ }).click();
+  await expect(page).toHaveURL(new RegExp(`/projects/${idB}/overview`));
+
+  await page.goto("/dashboard");
+  await expect(page.getByRole("cell", { name: "Alpha" })).toBeVisible();
+  await expect(async () => {
+    await page.getByRole("cell", { name: "Alpha" }).click();
+    await expect(page).toHaveURL(new RegExp(`/projects/${idA}/overview`), {
+      timeout: 2000,
+    });
+  }).toPass({ timeout: 20000 });
 });
