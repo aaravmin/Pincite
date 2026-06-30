@@ -227,8 +227,11 @@ the end of each session — but be stringent; trim before it bloats.
     signer's name between slashes /First M. Last/ + printed name + the 1.63 statements;
     `isValidSSignature` (lib/filing/types) shared by the sign action, filing validator (MPEP
     502.02), and export; migration 0016 `project_declarations.s_signature`. e2e `sign.spec.ts`.
-  - [ ] F4 guided per-error auto-fix (AI proposes a fix per error incl. drawings; before/after
-    diff; accept each manually).
+  - [x] F4 guided per-error auto-fix on /review: per actionable finding `proposeFix` (Grok marks
+    the span, returns an exact before/after, rate-limited `grok_autofix`) -> GitHub-style diff ->
+    Accept runs `applyFix` (replace nearest occurrence + save + recompute), Reject discards.
+    Manual per finding, not a magic wand. Guarded e2e `auto-fix.spec.ts` (AUTOFIX_AI=1). [drawing
+    auto-fix + multi-angle F2.3 deferred as optional polish].
 - [ ] NEXT-UP (user-requested): a "real patent format" export on the Submit/Overview step that
   typesets the whole application (drawings included) like a published/Google Patents PDF - LaTeX
   is a candidate engine.

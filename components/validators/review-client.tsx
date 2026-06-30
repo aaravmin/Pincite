@@ -11,6 +11,8 @@ import {
   recheckFinding,
   getRuleSection,
   analyzeEligibility,
+  proposeFix,
+  applyFix,
 } from "@/lib/validators/run";
 import type { MpepSection } from "@/lib/mpep/load";
 import type { FindingRow } from "@/lib/validators/results";
@@ -172,6 +174,12 @@ function FindingItem({
   const router = useRouter();
   const [checking, startCheck] = useTransition();
   const [verdict, setVerdict] = useState<"fixed" | "present" | null>(null);
+  const [proposing, startPropose] = useTransition();
+  const [applying, startApply] = useTransition();
+  const [proposal, setProposal] = useState<
+    { before: string; after: string; note: string } | null
+  >(null);
+  const [fixErr, setFixErr] = useState<string | null>(null);
 
   function recheck() {
     setVerdict(null);
@@ -181,6 +189,43 @@ function FindingItem({
       setVerdict(r.fixed ? "fixed" : "present");
       // When resolved, refresh so it drops out of the list and any new issues appear.
       if (r.fixed) router.refresh();
+    });
+  }
+
+  // Auto-fix: ask the model for the smallest edit, then show it as a before/after diff to
+  // accept or reject. Nothing changes until the user accepts.
+  function autoFix() {
+    setFixErr(null);
+    setProposal(null);
+    setVerdict(null);
+    startPropose(async () => {
+      const r = await proposeFix({
+        projectId,
+        sectionKey: f.section_key,
+        spanStart: f.span_start,
+        spanEnd: f.span_end,
+        title: f.title,
+        explanation: f.explanation,
+        cfrRef: f.cfr_ref,
+      });
+      if ("error" in r) return setFixErr(r.error);
+      setProposal({ before: r.before, after: r.after, note: r.note });
+    });
+  }
+  function acceptFix() {
+    if (!proposal) return;
+    setFixErr(null);
+    startApply(async () => {
+      const r = await applyFix({
+        projectId,
+        sectionKey: f.section_key,
+        before: proposal.before,
+        after: proposal.after,
+        spanStart: f.span_start,
+      });
+      if ("error" in r) return setFixErr(r.error);
+      setProposal(null);
+      router.refresh(); // the finding drops out of the list if resolved
     });
   }
 
@@ -285,6 +330,17 @@ function FindingItem({
                 {checking ? "Checking…" : "Check if fixed"}
               </Button>
             )}
+            {f.actionable && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={autoFix}
+                disabled={proposing || applying}
+                data-testid="auto-fix"
+              >
+                {proposing ? "Drafting fix…" : "Auto-fix"}
+              </Button>
+            )}
             {verdict === "fixed" && (
               <span className="inline-flex items-center gap-1 text-xs font-medium text-pass">
                 <Check className="size-3.5" aria-hidden /> Looks fixed
@@ -296,9 +352,72 @@ function FindingItem({
               </span>
             )}
           </div>
+
+          {fixErr && (
+            <p className="text-xs text-violation" role="alert">
+              {fixErr}
+            </p>
+          )}
+          {proposal && (
+            <FixDiff
+              proposal={proposal}
+              applying={applying}
+              onAccept={acceptFix}
+              onReject={() => setProposal(null)}
+            />
+          )}
         </div>
       )}
     </li>
+  );
+}
+
+/** A GitHub-style before/after for one proposed auto-fix: the removed text, the added text,
+ *  and accept/reject. Color carries a label and a +/- marker too, never color alone. */
+function FixDiff({
+  proposal,
+  applying,
+  onAccept,
+  onReject,
+}: {
+  proposal: { before: string; after: string; note: string };
+  applying: boolean;
+  onAccept: () => void;
+  onReject: () => void;
+}) {
+  return (
+    <div className="space-y-2 rounded-md border border-border p-2" data-testid="fix-diff">
+      {proposal.note && (
+        <p className="text-xs text-muted-foreground">{proposal.note}</p>
+      )}
+      <div className="overflow-hidden rounded border border-border font-mono text-xs">
+        <div className="flex gap-2 border-b border-border bg-violation-bg px-2 py-1">
+          <span className="select-none font-sans font-medium text-violation">- Before</span>
+          <span className="min-w-0 whitespace-pre-wrap break-words text-foreground">
+            {proposal.before}
+          </span>
+        </div>
+        <div className="flex gap-2 bg-pass/10 px-2 py-1">
+          <span className="select-none font-sans font-medium text-pass">+ After</span>
+          <span className="min-w-0 whitespace-pre-wrap break-words text-foreground">
+            {proposal.after}
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          onClick={onAccept}
+          disabled={applying}
+          data-testid="accept-fix"
+        >
+          {applying ? "Applying…" : "Accept edit"}
+        </Button>
+        <Button size="sm" variant="outline" onClick={onReject} disabled={applying}>
+          Reject
+        </Button>
+      </div>
+    </div>
   );
 }
 

@@ -19,6 +19,11 @@ import { loadSection, type MpepSection } from "@/lib/mpep/load";
 import { parseClaims } from "@/lib/patent/claims";
 import { generateText } from "@/lib/llm/generate";
 import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
+import {
+  SECTION_LABELS,
+  wordCount,
+  type SectionKey,
+} from "@/lib/projects/sections";
 import type { EligibilityAnalysis, Finding } from "@/lib/validators/types";
 
 async function requireUser() {
@@ -111,6 +116,144 @@ export async function recheckFinding(
   });
   revalidatePath(`/projects/${projectId}/review`);
   return { ok: true, fixed: !stillPresent, total: findings.length };
+}
+
+/** The occurrence of `needle` in `hay` closest to `near`, or -1. Used to apply a fix to the
+ *  flagged span and not some other identical text elsewhere in the section. */
+function nearestIndex(hay: string, needle: string, near: number): number {
+  let idx = hay.indexOf(needle);
+  if (idx < 0) return -1;
+  let best = idx;
+  let bestDist = Math.abs(idx - near);
+  while ((idx = hay.indexOf(needle, idx + 1)) >= 0) {
+    const d = Math.abs(idx - near);
+    if (d < bestDist) {
+      best = idx;
+      bestDist = d;
+    }
+  }
+  return best;
+}
+
+/**
+ * Guided auto-fix (Feature 4), step 1: ask the model for the smallest edit that resolves ONE
+ * flagged finding, returned as an exact {before, after} substring pair so the UI can show a
+ * before/after diff. Nothing is changed here - the user accepts the edit (applyFix) or rejects
+ * it. Synthetic/public text only until vendor ZDR is on. Rate-limited + budget-capped.
+ */
+export async function proposeFix(input: {
+  projectId: string;
+  sectionKey: string;
+  spanStart: number;
+  spanEnd: number;
+  title: string;
+  explanation: string;
+  cfrRef: string | null;
+}): Promise<
+  { ok: true; before: string; after: string; note: string } | { error: string }
+> {
+  const { supabase } = await requireUser();
+  const rl = await checkRateLimit(supabase, "grok_autofix", 30, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
+  const budget = await checkGlobalLimit(supabase, "grok_global_day", 300, 86400);
+  if (!budget.allowed)
+    return { error: "The daily AI budget is used up. Please try again tomorrow." };
+
+  const sections = await getSectionContent(input.projectId);
+  const content = sections[input.sectionKey as SectionKey] ?? "";
+  if (!content.trim()) return { error: "There is no text in this section to fix." };
+
+  const s = Math.max(0, Math.min(content.length, input.spanStart));
+  const e = Math.max(s, Math.min(content.length, input.spanEnd));
+  // Mark the flagged span so the model fixes the right occurrence; markers are stripped after.
+  const marked = `${content.slice(0, s)}⟦${content.slice(s, e)}⟧${content.slice(e)}`;
+  const label = SECTION_LABELS[input.sectionKey as SectionKey] ?? input.sectionKey;
+
+  const system =
+    "You are a meticulous US patent drafting assistant. You fix exactly one flagged defect with the smallest possible edit and never change anything else.";
+  const prompt = `A defect was flagged in the "${label}" section of a patent application.
+Defect: ${input.title}. ${input.explanation}${input.cfrRef ? ` (${input.cfrRef})` : ""}
+The flagged text is wrapped in ⟦ ⟧ markers in the section below. Fix ONLY that defect.
+
+SECTION:
+"""
+${marked}
+"""
+
+Return ONLY a JSON object: {"before": "<exact contiguous substring of the ORIGINAL section to replace, copied verbatim, WITHOUT the markers>", "after": "<the corrected replacement>", "note": "<one short sentence describing the change>"}.
+Rules:
+- "before" must be an exact substring of the original section text (do not include the ⟦ ⟧ markers).
+- Make the smallest change that fixes only this defect and copy everything else verbatim.
+- Output JSON only, no commentary.`;
+
+  let text: string;
+  try {
+    const r = await generateText({ system, prompt, temperature: 0, maxTokens: 700 });
+    text = r.text;
+  } catch (err) {
+    return { error: `Model error: ${(err as Error).message}` };
+  }
+  const m = text.match(/\{[\s\S]*\}/);
+  let raw: { before?: string; after?: string; note?: string } = {};
+  try {
+    raw = m ? JSON.parse(m[0]) : {};
+  } catch {
+    raw = {};
+  }
+  const before = String(raw.before ?? "").replace(/[⟦⟧]/g, "");
+  const after = String(raw.after ?? "");
+  const note = String(raw.note ?? "").slice(0, 200);
+  if (!before || !content.includes(before)) {
+    return {
+      error: "Could not propose a precise fix. Use Take me to issue to edit it by hand.",
+    };
+  }
+  if (before === after) return { error: "No change was proposed." };
+  return { ok: true, before, after, note };
+}
+
+/**
+ * Guided auto-fix, step 2: apply an accepted {before, after} edit to the section (replacing the
+ * occurrence nearest the flagged span), save it, and recompute findings so the list updates.
+ */
+export async function applyFix(input: {
+  projectId: string;
+  sectionKey: string;
+  before: string;
+  after: string;
+  spanStart: number;
+}): Promise<{ ok: true } | { error: string }> {
+  const { supabase, user } = await requireUser();
+  const sections = await getSectionContent(input.projectId);
+  const content = sections[input.sectionKey as SectionKey] ?? "";
+  const idx = nearestIndex(content, input.before, input.spanStart);
+  if (idx < 0) return { error: "The text has changed since the fix was proposed. Re-run it." };
+
+  const next =
+    content.slice(0, idx) + input.after + content.slice(idx + input.before.length);
+  const now = new Date().toISOString();
+  const { error } = await supabase.from("project_sections").upsert(
+    {
+      project_id: input.projectId,
+      section_key: input.sectionKey,
+      content: next,
+      word_count: wordCount(next),
+      updated_at: now,
+    },
+    { onConflict: "project_id,section_key" },
+  );
+  if (error) return { error: error.message };
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "section_edited",
+    projectId: input.projectId,
+    detail: { section: input.sectionKey, autofix: true },
+  });
+  await computeAndPersistFindings(supabase, input.projectId);
+  revalidatePath(`/projects/${input.projectId}/review`);
+  revalidatePath(`/projects/${input.projectId}`);
+  return { ok: true };
 }
 
 export async function getRuleSection(
