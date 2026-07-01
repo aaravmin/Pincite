@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LayoutDashboard, BookText, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
+import { CommandMenu } from "@/components/command/command-menu";
 
 /**
  * The dashboard sidebar (the spine, per the UI brief). It holds the persistent globally
@@ -40,6 +41,10 @@ export function DashboardSidebar({
     <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border bg-secondary/20 p-3 md:flex">
       <div className="px-2 py-2">
         <Logo className="h-8 w-auto" />
+      </div>
+
+      <div className="mt-3 px-0.5">
+        <CommandMenu variant="sidebar" />
       </div>
 
       <nav aria-label="Main" className="mt-3 space-y-0.5">

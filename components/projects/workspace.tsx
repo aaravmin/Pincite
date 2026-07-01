@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { ClaimTree } from "@/components/projects/claim-tree";
 import { saveSection, saveVersion } from "@/lib/projects/actions";
+import { toast } from "sonner";
 import {
   SECTION_KEYS,
   SECTION_LABELS,
@@ -122,15 +123,18 @@ export function Workspace({
       );
       if (results.some((r) => "error" in r)) {
         setPhase("error");
+        toast.error("Save failed. Nothing was written.");
         return;
       }
       const res = await saveVersion({ projectId: project.id, label: "" });
       if ("error" in res) {
         setPhase("error");
+        toast.error("Save failed. Nothing was written.");
         return;
       }
       setSavedSections(current);
       setVersionSaved(true);
+      toast.success("Saved as a new version");
       router.refresh();
     });
   }

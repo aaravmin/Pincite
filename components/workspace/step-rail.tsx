@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
+import { CommandMenu } from "@/components/command/command-menu";
 
 type Step = { key: string; label: string; path: string; tick?: boolean };
 
@@ -27,6 +29,7 @@ export function StepRail({
   done: Record<string, boolean>;
 }) {
   const pathname = usePathname();
+  const reduce = useReducedMotion();
   const base = `/projects/${projectId}`;
   const steps: Step[] = STEP_DEFS.map((s) => ({
     key: s.key,
@@ -46,6 +49,9 @@ export function StepRail({
       >
         ← Dashboard
       </Link>
+      <div className="mt-2 mb-1">
+        <CommandMenu variant="rail" matterId={projectId} />
+      </div>
       <Link
         href={`${base}/overview`}
         aria-current={pathname === `${base}/overview` ? "page" : undefined}
@@ -64,13 +70,21 @@ export function StepRail({
         {steps.map((s, i) => {
           const active = pathname === s.path;
           return (
-            <li key={s.key}>
+            <li key={s.key} className="relative">
+              {active && (
+                <motion.span
+                  layoutId="rail-active"
+                  className="absolute inset-0 rounded-md bg-accent"
+                  transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }}
+                  aria-hidden
+                />
+              )}
               <Link
                 href={s.path}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm ${
+                className={`relative z-10 flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm ${
                   active
-                    ? "bg-accent font-medium text-foreground"
+                    ? "font-medium text-foreground"
                     : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                 }`}
               >

@@ -59,8 +59,10 @@ test("readiness overview: stage, checklist, live issue count, next step", async 
   await expect(issues).toBeVisible();
   await expect(issues).toContainText("to fix");
 
-  // The next-step CTA routes to the first thing that needs action.
-  await expect(page.getByRole("link", { name: /^Next / })).toBeVisible();
+  // The next-step CTA routes to the first thing that needs action. In the
+  // rebuilt command center this is the "Do this next" card with a Go there link.
+  await expect(page.getByText("Do this next")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Go there/i })).toBeVisible();
 
   await screenshot(page, "overview-readiness");
   assertClean(errs);

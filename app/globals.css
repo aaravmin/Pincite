@@ -30,15 +30,17 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* darkened from 0.556 so small secondary text meets WCAG AA on muted surfaces */
+  --muted-foreground: oklch(0.505 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
 
-  /* Signal: violation (red) */
-  --violation: oklch(0.577 0.245 27.325);
+  /* Signal: violation (red) - darkened so text-violation meets WCAG AA (4.5:1)
+     on both white and the violation-bg tint, like --pass. Still vivid red. */
+  --violation: oklch(0.514 0.218 27.325);
   --violation-foreground: oklch(0.985 0 0);
   --violation-bg: oklch(0.971 0.045 19.8);
 
@@ -125,6 +127,8 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Editorial serif display face (Fraunces). Marketing headlines + big numbers only; UI stays sans. */
+  --font-serif: var(--font-fraunces);
 }
 
 @layer base {
@@ -133,5 +137,18 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Accessibility: honor reduced-motion everywhere. A global safety net on top of the
+   per-component useReducedMotion guards used by the motion/react visuals. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

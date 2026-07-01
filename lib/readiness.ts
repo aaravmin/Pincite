@@ -14,6 +14,7 @@ import { runTier2 } from "@/lib/validators/tier2";
 import { runTier3 } from "@/lib/validators/tier3";
 import { runFilingChecks } from "@/lib/validators/filing";
 import { runCrossRefChecks } from "@/lib/validators/crossref";
+import { lifecycleActions } from "@/lib/lifecycle/actions";
 import {
   SECTION_KEYS,
   ADVANCED_SECTION_KEYS,
@@ -32,12 +33,44 @@ export type Gate = {
   detail: string;
   href: string;
 };
+export type ReadinessMetrics = {
+  /** total red findings across the substantive validators + the filing tier */
+  redIssues: number;
+  /** substantive violations only (tiers 1-3) */
+  toFix: number;
+  /** attention findings (tiers 1-3) */
+  toCheck: number;
+  /** filing-readiness violations */
+  filingFix: number;
+  /** disclosure/draft cross-reference items to reconcile */
+  consistency: number;
+  /** similar public patents found */
+  priorArt: number;
+  /** figures uploaded */
+  drawings: number;
+};
+export type OverviewFinding = {
+  id: string;
+  area: "Claims" | "Specification" | "Filing";
+  severity: "violation" | "attention" | "pass";
+  title: string;
+  explanation: string;
+  mpep_section: string | null;
+  cfr_ref: string | null;
+  /** deep link that opens the issue in context */
+  href: string;
+};
 export type Readiness = {
   project: Project;
   stage: { label: string; signals: string[]; missing: string[] };
   completeness: number;
   gates: Gate[];
   next: { label: string; href: string } | null;
+  metrics: ReadinessMetrics;
+  /** the nearest deadline-bound action for the declared status, if any */
+  nextDeadline: { label: string; detail: string } | null;
+  /** the live findings behind the counts, for the overview triage table */
+  findings: OverviewFinding[];
 };
 
 export async function getReadiness(
@@ -107,6 +140,31 @@ export async function getReadiness(
   });
   const filingFix = filing.filter((f) => f.severity === "violation").length;
   const consistency = runCrossRefChecks(disclosure, sections).length;
+
+  // The live findings behind the counts, shaped for the overview triage table.
+  // Same source as the counts, so the table never disagrees with the KPIs.
+  const overviewFindings: OverviewFinding[] = [
+    ...findings.map((f, i) => ({
+      id: `s${i}-${f.kind}-${f.span_start}`,
+      area: (f.section_key === "claims" ? "Claims" : "Specification") as OverviewFinding["area"],
+      severity: f.severity,
+      title: f.title,
+      explanation: f.explanation,
+      mpep_section: f.mpep_section,
+      cfr_ref: f.cfr_ref,
+      href: `${base}?section=${f.section_key}&from=${f.span_start}&to=${f.span_end}`,
+    })),
+    ...filing.map((f, i) => ({
+      id: `f${i}-${f.severity}`,
+      area: "Filing" as const,
+      severity: f.severity,
+      title: f.title,
+      explanation: f.explanation,
+      mpep_section: f.mpep_section,
+      cfr_ref: f.cfr_ref,
+      href: `${base}/sign`,
+    })),
+  ];
 
   // Per-step completion, mirroring the step rail.
   const required = SECTION_KEYS.filter((k) => !ADVANCED_SECTION_KEYS.has(k));
@@ -230,11 +288,31 @@ export async function getReadiness(
     gates.find((x) => x.status === "attention") ??
     null;
 
+  // The nearest deadline-bound action for a post-filing matter (CFR + corpus
+  // validated in lifecycleActions). Drafting matters have no deadline yet.
+  const deadlineAction = lifecycleActions(project.declared_status, pt).find(
+    (a) => a.deadline,
+  );
+  const nextDeadline = deadlineAction
+    ? { label: deadlineAction.deadline as string, detail: deadlineAction.title }
+    : null;
+
   return {
     project,
     stage,
     completeness,
     gates,
     next: next ? { label: next.label, href: next.href } : null,
+    metrics: {
+      redIssues: toFix + filingFix,
+      toFix,
+      toCheck,
+      filingFix,
+      consistency,
+      priorArt: priorArtCount,
+      drawings: drawingCount,
+    },
+    nextDeadline,
+    findings: overviewFindings,
   };
 }
