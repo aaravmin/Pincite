@@ -172,7 +172,7 @@ export function SectionOnePlace() {
                 </span>
               </div>
               <h3 className="mt-4 text-balance font-rounded text-2xl font-semibold tracking-tight text-foreground">
-                See the exact overlaps, not a score
+                See the exact overlaps
               </h3>
               <div className="mt-5 space-y-3">
                 <AnnotatedEditor

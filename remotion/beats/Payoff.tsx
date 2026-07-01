@@ -17,7 +17,7 @@ import { LINES } from "../theme";
 
 const RECOLOR = [
   "Claim 5 multiple dependent",
-  "Claim 3 relative term",
+  "Claim 4 antecedent basis",
   "Numerals 108, 203, 216, 224",
 ];
 const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "Drawings"];
@@ -82,7 +82,6 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
     easing: Easing.inOut(Easing.cubic),
   });
   const bOut = interpolate(frame, [224, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const pill = interpolate(frame, [152, 170, 182, 196], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const cIn = interpolate(frame, [232, 252], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const logoT = spring({ frame: frame - 234, fps, config: { damping: 200 } });
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
@@ -152,11 +151,6 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
       {/* B: field callback, then zoom into the one green survivor */}
       <AbsoluteFill style={{ opacity: bIn * bOut }}>
         <FieldCallback width={width} height={height} zoom={zoom} />
-        <AbsoluteFill className="items-center justify-end" style={{ paddingBottom: 90, opacity: pill }}>
-          <div className="rounded-full border border-pass bg-pass-bg px-6 py-2.5 text-[22px] font-medium text-pass">
-            One application, filed clean
-          </div>
-        </AbsoluteFill>
       </AbsoluteFill>
 
       {/* the line on the green fill */}

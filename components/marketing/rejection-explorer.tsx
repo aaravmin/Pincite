@@ -2,15 +2,19 @@
 
 // Interactive "where rejections come from" explorer. Every ground an examiner
 // rejects on maps to one of Pincite's checks - the rule check (MPEP and CFR
-// validators), the prior patents check (pinpoint overlap with earlier patents), or
-// the drawing check (figures and reference numerals). Pick a ground on the left,
-// see which check catches it and a preview of the fix on the right.
+// validators), the prior patents check (overlap with earlier patents, exact and by
+// meaning), or the drawing check (figures and reference numerals). Pick a ground on
+// the left, see which check catches it and a preview on the right.
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { BookOpenCheck, Layers, PenLine } from "lucide-react";
 
 type Engine = "rule" | "art" | "drawing";
+
+// A rule-check before/after: each part is [text before the mark, the marked span,
+// text after]. The was-span is the problem, the now-span is the correction.
+type RuleFix = { was: [string, string, string]; now: [string, string, string] };
 
 type Ground = {
   ref: string;
@@ -19,52 +23,69 @@ type Ground = {
   share: number;
   engine: Engine;
   how: string;
+  fix?: RuleFix;
 };
 
 // Ordered most common first. Shares are approximate and overlap, so they do not
-// add up - the point is that a check exists for every one of them.
+// add up - the point is that a check exists for every one of them. Each rule ground
+// carries its own, distinct correction example.
 const GROUNDS: Ground[] = [
   {
     ref: "35 USC 103",
     name: "Obviousness",
     share: 0.85,
     engine: "art",
-    how: "Lined up against earlier patents, one limitation at a time, so what is genuinely new stands out.",
+    how: "Your claims are lined up against earlier patents one limitation at a time, so what is genuinely new is easy to see.",
   },
   {
     ref: "35 USC 112(b)",
     name: "Indefiniteness and antecedent basis",
     share: 0.4,
     engine: "rule",
-    how: "Vague terms and missing antecedents are caught against MPEP 2173, each tied to its passage.",
+    how: "Vague terms and missing antecedent basis are caught against MPEP 2173, each one tied to the exact passage it breaks.",
+    // Antecedent basis: the first mention of a feature needs "a", not "the".
+    fix: {
+      was: ["wherein ", "the openings", " comprise slots"],
+      now: ["wherein ", "a plurality of openings", " comprise slots"],
+    },
   },
   {
     ref: "35 USC 102",
     name: "Novelty",
     share: 0.3,
     engine: "art",
-    how: "Overlap with a single earlier patent is shown limitation by limitation, not as a score.",
+    how: "Any limitation already found in one earlier patent is surfaced side by side, the exact wording and the same idea reworded.",
   },
   {
     ref: "35 USC 112(a)",
     name: "Written description and enablement",
     share: 0.2,
     engine: "rule",
-    how: "Where a claim reaches past what the specification supports, the gap is marked before you file.",
+    how: "Where a claim reaches past what the specification actually supports, the gap is marked so you can narrow it before filing.",
+    // Written description: narrow an overbroad claim to what the spec supports.
+    fix: {
+      was: ["formed from ", "any resilient material", ""],
+      now: ["formed from ", "molded fiber", ""],
+    },
   },
   {
     ref: "37 CFR 1.84",
     name: "Drawings and reference numerals",
     share: 0.2,
     engine: "drawing",
-    how: "Every numeral in a figure is matched to the specification, so a missing one is caught.",
+    how: "Every reference numeral in a figure is matched against the specification, so a number that is missing from the text is caught.",
   },
   {
     ref: "35 USC 101",
     name: "Subject matter eligibility",
     share: 0.15,
     engine: "rule",
-    how: "A plain Alice and Mayo walkthrough tied to MPEP 2106, so you can meet eligibility head on.",
+    how: "Pincite tests whether your claims are eligible subject matter and not just an abstract idea, the way an examiner would under MPEP 2106.",
+    // Eligibility: tie an abstract step to the concrete article that carries it.
+    fix: {
+      was: ["", "a method of choosing", " a ridge layout"],
+      now: ["", "a molded container with", " a ridge layout"],
+    },
   },
 ];
 
@@ -77,7 +98,7 @@ const ENGINES: Record<Engine, { label: string; icon: typeof Layers; blurb: strin
   art: {
     label: "Prior patents check",
     icon: Layers,
-    blurb: "We compare your claims to earlier patents and mark the exact overlaps.",
+    blurb: "We compare your claims to earlier patents, by wording and by meaning.",
   },
   drawing: {
     label: "Drawing check",
@@ -103,28 +124,48 @@ function Mark({ signal, children }: { signal: "red" | "yellow" | "green"; childr
   );
 }
 
-// A small preview of the fix Pincite lands for the selected check. Reuses the same
-// real, public example snippets shown elsewhere on the page.
-function FixPreview({ engine }: { engine: Engine }) {
-  if (engine === "art") {
+// A preview keyed to the selected ground. Rule checks show the correction Pincite
+// proposes; prior-patent and drawing checks show what Pincite points out (it never
+// silently rewrites either of those).
+function Preview({ ground }: { ground: Ground }) {
+  if (ground.engine === "art") {
     return (
-      <div className="rounded-lg border bg-muted/30 p-3 font-mono text-[13px] leading-relaxed">
-        <div className="flex items-center gap-2">
-          <span className="w-14 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">yours</span>
-          <span>
-            <Mark signal="yellow">a plurality of ridges</Mark> on the base
-          </span>
+      <div className="rounded-lg border bg-muted/30 p-3">
+        <div className="font-mono text-[13px] leading-relaxed">
+          <div className="flex items-center gap-2">
+            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">yours</span>
+            <span>
+              <Mark signal="yellow">a plurality of ridges</Mark> on the base
+            </span>
+          </div>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">theirs</span>
+            <span>
+              <Mark signal="red">a plurality of ridges</Mark> on the tray
+            </span>
+          </div>
+          <div className="my-2.5 border-t border-dashed border-border" />
+          <div className="flex items-center gap-2">
+            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">yours</span>
+            <span>
+              <Mark signal="yellow">ridges that isolate the food</Mark>
+            </span>
+          </div>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">theirs</span>
+            <span>
+              <Mark signal="red">ribs that lift the item off the floor</Mark>
+            </span>
+          </div>
         </div>
-        <div className="mt-1.5 flex items-center gap-2">
-          <span className="w-14 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">earlier</span>
-          <span>
-            <Mark signal="red">a plurality of ridges</Mark> on the tray
-          </span>
-        </div>
+        <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
+          The first pair is the same words. The second is the same idea in different words, which a
+          plain text search would miss.
+        </p>
       </div>
     );
   }
-  if (engine === "drawing") {
+  if (ground.engine === "drawing") {
     return (
       <div className="rounded-lg border bg-muted/30 p-3">
         <div className="flex flex-wrap gap-1.5">
@@ -137,23 +178,30 @@ function FixPreview({ engine }: { engine: Engine }) {
             </span>
           ))}
         </div>
-        <p className="mt-2 font-mono text-xs text-muted-foreground">In the figure, never in the specification.</p>
+        <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
+          These numerals are on the figure but never appear in the specification.
+        </p>
       </div>
     );
   }
-  // rule: a multiple dependent claim, corrected from "and" to "or"
+  // rule: the ground's own correction
+  const fix = ground.fix!;
   return (
     <div className="rounded-lg border bg-muted/30 p-3 font-mono text-[13px] leading-relaxed">
-      <div className="flex items-center gap-2">
+      <div className="flex items-baseline gap-2">
         <span className="w-10 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">was</span>
         <span>
-          claims 1 <Mark signal="red">and</Mark> 2
+          {fix.was[0]}
+          <Mark signal="red">{fix.was[1]}</Mark>
+          {fix.was[2]}
         </span>
       </div>
-      <div className="mt-1.5 flex items-center gap-2">
+      <div className="mt-1.5 flex items-baseline gap-2">
         <span className="w-10 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">now</span>
         <span>
-          claims 1 <Mark signal="green">or</Mark> 2
+          {fix.now[0]}
+          <Mark signal="green">{fix.now[1]}</Mark>
+          {fix.now[2]}
         </span>
       </div>
     </div>
@@ -165,13 +213,11 @@ export function RejectionExplorer() {
   const active = GROUNDS[sel];
   const engine = ENGINES[active.engine];
   const EngineIcon = engine.icon;
+  const previewLabel = active.engine === "rule" ? "How Pincite fixes it" : "What Pincite points out";
 
   return (
     <div className="rounded-2xl border bg-card p-6 shadow-sm sm:p-7">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h3 className="text-base font-semibold text-foreground">Where rejections come from</h3>
-        <span className="text-sm text-muted-foreground">Every ground has a check</span>
-      </div>
+      <h3 className="text-base font-semibold text-foreground">Where rejections come from</h3>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* left: the grounds, selectable */}
@@ -221,7 +267,7 @@ export function RejectionExplorer() {
           })}
         </ul>
 
-        {/* right: the check that catches the selected ground, and the fix */}
+        {/* right: the check that catches the selected ground, and the preview */}
         <div className="flex flex-col rounded-xl border bg-background p-5">
           <AnimatePresence mode="wait">
             <motion.div
@@ -244,9 +290,9 @@ export function RejectionExplorer() {
 
               <div className="mt-4">
                 <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  How Pincite fixes it
+                  {previewLabel}
                 </p>
-                <FixPreview engine={active.engine} />
+                <Preview ground={active} />
               </div>
 
               <div className="mt-auto pt-5">

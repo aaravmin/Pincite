@@ -12,8 +12,11 @@ import { KineticText } from "../components/KineticText";
 import { COLORS } from "../colors";
 import { LINES } from "../theme";
 
-const BEFORE = "3. The container of claim 1, wherein the ridges are arranged substantially concentrically.";
-const AFTER = "3. The container of claim 1, wherein the ridges are arranged concentrically.";
+// A harder rule than a single-word deletion: antecedent basis. Claim 1 recites
+// "a plurality of openings", so "said openings" has no proper antecedent - the fix
+// traces the parent claim and supplies the exact element phrase.
+const BEFORE = "4. The container of claim 1, wherein said openings direct moisture away from the food item.";
+const AFTER = "4. The container of claim 1, wherein the plurality of openings direct moisture away from the food item.";
 
 // Renders a diff line with the changed token highlighted.
 function DiffLine({ sign, text, token, color, bg }: { sign: string; text: string; token: string; color: string; bg: string }) {
@@ -67,12 +70,12 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
               <span className="size-2.5 rounded-full bg-muted-foreground/30" />
               <span className="size-2.5 rounded-full bg-muted-foreground/30" />
             </span>
-            <span className="ml-1 font-mono text-sm text-muted-foreground">US 2012 0024859 A1 . Claim 3 . proposed fix</span>
+            <span className="ml-1 font-mono text-sm text-muted-foreground">US 2012 0024859 A1 . Claim 4 . proposed fix</span>
           </div>
           <div className="divide-y">
-            <DiffLine sign="−" text={BEFORE} token="substantially concentrically" color={COLORS.violation} bg={COLORS.violationBg} />
+            <DiffLine sign="−" text={BEFORE} token="said openings" color={COLORS.violation} bg={COLORS.violationBg} />
             <div style={{ opacity: afterT }}>
-              <DiffLine sign="+" text={AFTER} token="concentrically" color={COLORS.pass} bg={COLORS.passBg} />
+              <DiffLine sign="+" text={AFTER} token="the plurality of openings" color={COLORS.pass} bg={COLORS.passBg} />
             </div>
           </div>
 
@@ -80,7 +83,7 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
           <div className="flex items-center justify-between gap-4 border-t px-5 py-4">
             <div className="flex items-center gap-3">
               <span style={{ width: 13, height: 13, borderRadius: 999, background: dot, display: "inline-block" }} />
-              <span className="text-[18px] font-medium text-foreground">Claim 3 uses the relative term substantially</span>
+              <span className="text-[18px] font-medium text-foreground">Claim 4 lacks antecedent basis for said openings</span>
               <span style={{ fontSize: 15, fontWeight: 600, color: interpolateColors(accept, [0, 1], [COLORS.mutedForeground, COLORS.pass]) }}>
                 {accept > 0.5 ? "Resolved" : ""}
               </span>
