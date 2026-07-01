@@ -48,7 +48,7 @@ export function SectionTrust() {
             Trust
           </p>
           <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            What Pincite does, and what it does not.
+            What Pincite does, and what it does not
           </h2>
         </BlurFade>
 

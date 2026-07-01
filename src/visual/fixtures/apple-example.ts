@@ -51,6 +51,22 @@ export const APPLE_FULL_SPANS: VisualSpan[] = [
   spanOf(APPLE_CLAIMS_FULL, "claims 1 and 2", "red", "multi-dependent"),
 ];
 
+// Claims 1 to 5 with claim 4 corrected to reference an existing earlier claim
+// (claim 3), so the ONLY finding shown is the multiple dependent claim - claim 5
+// joins "claims 1 and 2" with "and" instead of "or" (35 U.S.C. 112(e)). Verbatim
+// public claim text otherwise; claim 1 truncated before its colon like the hero set.
+export const APPLE_MULTI_CLAIMS =
+  "1. A molded fiber container suitable for containing a food item …\n" +
+  "2. The container of claim 1, wherein the base and the lid are integrally formed from a single piece of molded fiber connected by a hinge.\n" +
+  "3. The container of claim 1, wherein the plurality of ridges are arranged substantially concentrically about a center of the base.\n" +
+  "4. The container of claim 3, wherein the plurality of openings comprise a plurality of slots.\n" +
+  "5. The container of claims 1 and 2, wherein the base and the lid are shaped to nest with a second container.";
+
+/** The single red flag for the multiple dependent claim finding. */
+export const APPLE_MULTI_SPANS: VisualSpan[] = [
+  spanOf(APPLE_MULTI_CLAIMS, "claims 1 and 2", "red", "multi-dependent"),
+];
+
 export type StaticFinding = {
   id: string;
   title: string;

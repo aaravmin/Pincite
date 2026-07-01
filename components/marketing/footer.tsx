@@ -13,7 +13,7 @@ export function MarketingFooter() {
           <div className="max-w-sm">
             <Logo className="h-7 w-auto" />
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              An active patent review workbench. It flags rule violations in your draft, finds
+              An active patent review dashboard. It catches rule violations in your draft, finds
               similar public patents, and pins every rule it cites to real MPEP and CFR text.
             </p>
           </div>
@@ -31,7 +31,7 @@ export function MarketingFooter() {
         </div>
         <p className="mt-10 max-w-2xl text-xs leading-relaxed text-muted-foreground">
           A legal research aid, not legal advice. You are responsible for the confidentiality of
-          anything you enter. Verify anything time sensitive.
+          anything you enter.
         </p>
       </div>
     </footer>

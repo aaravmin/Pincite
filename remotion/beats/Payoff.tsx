@@ -16,8 +16,8 @@ import { COLORS } from "../colors";
 import { LINES } from "../theme";
 
 const RECOLOR = [
-  "Claim 4 refers to claim 6",
-  "Claim 5 dependency form",
+  "Claim 5 multiple dependent",
+  "Claim 3 relative term",
   "Numerals 108, 203, 216, 224",
 ];
 const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "Drawings"];

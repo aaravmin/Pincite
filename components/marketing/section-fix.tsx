@@ -1,9 +1,8 @@
 "use client";
 
 // A payoff for the trace: the same real finding (claim 4 pointing at a claim that
-// does not exist) resolving. Drag the handle to wipe from the flagged draft to the
-// filing ready version. Red marks the violation, green marks the pass - the only
-// place the palette earns those colors on this page.
+// does not exist) resolving. Drag the handle to wipe from the draft with the issue
+// to the filing ready version. Red marks the violation, green marks the pass.
 
 import { BlurFade } from "@/components/ui/blur-fade";
 import { CompareSlider } from "@/components/ui/compare-slider";
@@ -28,18 +27,18 @@ export function SectionFix() {
       <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
         <BlurFade inView>
           <h2 className="max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            From flagged to filing ready, one drag away.
+            Watch a finding resolve
           </h2>
           <p className="mt-5 max-w-2xl text-pretty text-xl leading-relaxed text-muted-foreground">
-            Every fix is yours to review before it lands. Drag the handle to watch a real finding
-            resolve.
+            Every fix is yours to review before it lands. Drag the handle to compare the draft
+            before and after.
           </p>
         </BlurFade>
 
         <BlurFade inView delay={0.15}>
           <div className="mx-auto mt-12 max-w-3xl rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
             <div className="mb-4 flex items-center justify-between">
-              <SignalBadge signal="red">Flagged</SignalBadge>
+              <SignalBadge signal="red">Needs a fix</SignalBadge>
               <SignalBadge signal="green">Filing ready</SignalBadge>
             </div>
 

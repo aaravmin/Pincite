@@ -5,9 +5,7 @@ import { MarketingMotion } from "@/components/marketing/motion-provider";
 import { MarketingFooter } from "@/components/marketing/footer";
 import { Hero } from "@/components/marketing/hero";
 import { SectionStake } from "@/components/marketing/section-stake";
-import { SectionTrace } from "@/components/marketing/section-trace";
 import { SectionFix } from "@/components/marketing/section-fix";
-import { CitationMarquee } from "@/components/marketing/citation-marquee";
 import { SectionOnePlace } from "@/components/marketing/section-one-place";
 import { SectionWorkflow } from "@/components/marketing/section-workflow";
 import { SectionTrust } from "@/components/marketing/section-trust";
@@ -30,9 +28,7 @@ export default async function Home() {
         <main className="flex-1">
           <Hero />
           <SectionStake />
-          <SectionTrace />
           <SectionFix />
-          <CitationMarquee />
           <SectionOnePlace />
           <SectionWorkflow />
           <SectionTrust />

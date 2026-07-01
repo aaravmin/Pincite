@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "How Pincite collects, uses, and protects your information.",
 };
 
-const CONTACT_EMAIL = "aarav.minocha@gmail.com";
+const CONTACT_EMAIL = "aaravmin@pincite.net";
 const UPDATED = "June 29, 2026";
 
 export default function PrivacyPage() {
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         <div className="mt-8 space-y-8 text-sm leading-7 text-foreground">
           <section className="space-y-3">
             <p>
-              Pincite is an active patent review workbench. It flags rule violations in a draft,
+              Pincite is an active patent review dashboard. It catches rule violations in a draft,
               surfaces applicable rules, and finds similar public patents, each pinned to its source.
               This policy explains what we collect, why, and how we protect it. Pincite is a research
               and review aid, not legal advice and not a filing service.
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
               <li>
                 <span className="font-medium">Content you enter.</span> The patent text, application
                 details, inventor and applicant information, and any documents or drawings you upload
-                so the workbench can review them.
+                so the dashboard can review them.
               </li>
               <li>
                 <span className="font-medium">Usage and audit records.</span> Timestamps, the actions

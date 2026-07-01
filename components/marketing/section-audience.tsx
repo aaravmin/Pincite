@@ -1,6 +1,6 @@
 "use client";
 
-// Who it is for, plus the call to action. Two audiences, one workbench.
+// Who it is for, plus the call to action. Two audiences, one dashboard.
 
 import Link from "next/link";
 import { User, Briefcase, ArrowRight, Check } from "lucide-react";
@@ -56,7 +56,7 @@ export function SectionAudience() {
         <BlurFade inView delay={0.15}>
           <div className="mt-14 overflow-hidden rounded-2xl border bg-card px-6 py-12 text-center shadow-sm">
             <h2 className="mx-auto max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-              Catch every problem before you file.
+              Catch every problem before you file
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
               Start a review, open each flag to its exact rule, and export a filing ready set.
@@ -70,7 +70,7 @@ export function SectionAudience() {
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
               <a
-                href="#trace"
+                href="#one-place"
                 className="inline-flex items-center rounded-md border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent"
               >
                 See how it works

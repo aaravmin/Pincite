@@ -17,9 +17,9 @@ import type { VisualSpan } from "@visual/types";
 const CHECKS = [
   { name: "Claim numbering", ok: true },
   { name: "Antecedent basis", ok: true },
-  { name: "Dependency form", ok: false },
+  { name: "Dependency form", ok: true },
   { name: "Multiple dependent", ok: false },
-  { name: "Indefinite terms", ok: true },
+  { name: "Indefinite terms", ok: false },
   { name: "Eligibility 101", ok: true },
 ];
 
@@ -38,17 +38,17 @@ function Mark({ ok }: { ok: boolean }) {
 }
 
 const CLAIMS =
-  "3. The container of claim 1, wherein the ridges are arranged concentrically.\n" +
-  "4. The container of claim 6, wherein the openings comprise a plurality of slots.\n" +
+  "3. The container of claim 1, wherein the ridges are arranged substantially concentrically.\n" +
+  "4. The container of claim 1, wherein the openings comprise a plurality of slots.\n" +
   "5. The container of claims 1 and 2, wherein the base and the lid nest with a second container.";
-const s6 = CLAIMS.indexOf("claim 6");
+const sSub = CLAIMS.indexOf("substantially");
 const s12 = CLAIMS.indexOf("claims 1 and 2");
 const SPANS: VisualSpan[] = [
-  { start: s6, end: s6 + 7, signal: "red", flagId: "c6" },
+  { start: sSub, end: sSub + "substantially".length, signal: "red", flagId: "rel" },
   { start: s12, end: s12 + "claims 1 and 2".length, signal: "red", flagId: "md" },
 ];
 const FINDINGS = [
-  { area: "Claims", title: "Claim 4 refers to claim 6, which does not exist" },
+  { area: "Claims", title: "Claim 3 uses the relative term substantially, which is indefinite" },
   { area: "Claims", title: "Claim 5 multiple dependent claim must be in the alternative" },
 ];
 
@@ -77,7 +77,7 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
             <AnnotatedEditor
               text={CLAIMS}
               spans={SPANS}
-              activeFlagId={frame > 46 ? "md" : "c6"}
+              activeFlagId={frame > 46 ? "md" : "rel"}
               progress={1}
               caption="US 2012 0024859 A1 . Claims"
               className="shadow-lg"

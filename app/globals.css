@@ -131,18 +131,6 @@
   --font-serif: var(--font-fraunces);
   /* Rounded display face (Baloo 2) for marketing headlines - matches the wordmark. */
   --font-rounded: var(--font-baloo);
-
-  /* Marquee (Magic UI style). Reduced motion is handled by the component, which
-     renders a static row instead of relying on the global animation override. */
-  --animate-marquee: marquee var(--duration, 40s) linear infinite;
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(calc(-100% - var(--gap, 1rem)));
-    }
-  }
 }
 
 @layer base {

@@ -12,12 +12,13 @@ import { CitationStack } from "@visual/citation-stack";
 import { SignalBadge } from "@visual/signal";
 import { useReveal } from "@visual/reveal";
 import {
-  APPLE_HERO_CLAIMS,
-  APPLE_HERO_SPANS,
+  APPLE_MULTI_CLAIMS,
+  APPLE_MULTI_SPANS,
   APPLE_META,
-  CLAIM6_FINDING,
-  CLAIM6_FLAG_ID,
+  MULTI_DEPENDENT_FINDING,
 } from "@visual/fixtures/apple-example";
+
+const FLAG_ID = "multi-dependent";
 
 export function Hero() {
   return (
@@ -43,7 +44,7 @@ export function Hero() {
             once
             className="mt-5 text-balance font-rounded text-4xl font-semibold leading-[1.03] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
           >
-            Nine in ten applications get rejected the first time.
+            Nine in ten applications get rejected the first time
           </TextAnimate>
 
           <BlurFade delay={0.35} inView>
@@ -67,13 +68,15 @@ export function Hero() {
           </BlurFade>
 
           <BlurFade delay={0.65} inView>
-            <div className="mt-9 flex flex-wrap items-center gap-2.5">
-              <SignalBadge signal="red">Violation</SignalBadge>
-              <SignalBadge signal="yellow">Attention</SignalBadge>
-              <SignalBadge signal="green">Pass</SignalBadge>
-              <span className="text-xs text-muted-foreground">
-                Every violation carries a citation that resolves to real text.
-              </span>
+            <div className="mt-9">
+              <p className="text-xs font-medium text-muted-foreground">
+                We only ever tell you three things
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2.5">
+                <SignalBadge signal="red">Violation</SignalBadge>
+                <SignalBadge signal="yellow">Attention</SignalBadge>
+                <SignalBadge signal="green">Pass</SignalBadge>
+              </div>
             </div>
           </BlurFade>
         </div>
@@ -88,18 +91,18 @@ export function Hero() {
 function HeroDemo() {
   const { ref, progress } = useReveal({ amount: 0.15, duration: 1100 });
   // Default the flag open so the value reads instantly; hover keeps control.
-  const [active, setActive] = useState<string | null>(CLAIM6_FLAG_ID);
-  const finding = CLAIM6_FINDING;
+  const [active, setActive] = useState<string | null>(FLAG_ID);
+  const finding = MULTI_DEPENDENT_FINDING;
 
   return (
     <div ref={ref as React.Ref<HTMLDivElement>} className="relative">
       <AnnotatedEditor
-        text={APPLE_HERO_CLAIMS}
-        spans={APPLE_HERO_SPANS}
+        text={APPLE_MULTI_CLAIMS}
+        spans={APPLE_MULTI_SPANS}
         activeFlagId={active}
         progress={progress}
         caption={APPLE_META.claimsCaption}
-        onActivateFlag={(id) => setActive(id ?? CLAIM6_FLAG_ID)}
+        onActivateFlag={(id) => setActive(id ?? FLAG_ID)}
         className="shadow-md"
       />
 

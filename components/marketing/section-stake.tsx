@@ -2,7 +2,7 @@
 
 // The stake, quantified. Real, sourced statistics counting up on scroll, then the
 // interactive map of where rejections come from - every ground routed to the
-// Pincite check that catches it. Only "about" framing, no invented precision.
+// Pincite check that catches it. Figures are rounded, sourced from USPTO reporting.
 
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { BlurFade } from "@/components/ui/blur-fade";
@@ -22,7 +22,6 @@ function Stat({
   return (
     <div>
       <div className="text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-        <span className="text-2xl font-normal text-muted-foreground">about </span>
         <NumberTicker value={value} decimalPlaces={decimals} className="text-foreground" />
         {suffix ? <span>{suffix}</span> : null}
       </div>
@@ -40,12 +39,12 @@ export function SectionStake() {
             The stake
           </p>
           <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Rejection is the default.
+            Rejection is the default
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Most applications do not sail through. The average one waits about two years and picks
-            up at least one rejection along the way. Many of those rejections trace back to rules a
-            careful review would have caught.
+            Most applications do not sail through. The average one waits two years and picks up at
+            least one rejection along the way. Many of those rejections trace back to rules a careful
+            review would have caught.
           </p>
         </BlurFade>
 

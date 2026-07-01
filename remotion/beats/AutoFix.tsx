@@ -12,8 +12,8 @@ import { KineticText } from "../components/KineticText";
 import { COLORS } from "../colors";
 import { LINES } from "../theme";
 
-const BEFORE = "4. The container of claim 6, wherein the plurality of openings comprise a plurality of slots.";
-const AFTER = "4. The container of claim 1, wherein the plurality of openings comprise a plurality of slots.";
+const BEFORE = "3. The container of claim 1, wherein the ridges are arranged substantially concentrically.";
+const AFTER = "3. The container of claim 1, wherein the ridges are arranged concentrically.";
 
 // Renders a diff line with the changed token highlighted.
 function DiffLine({ sign, text, token, color, bg }: { sign: string; text: string; token: string; color: string; bg: string }) {
@@ -67,12 +67,12 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
               <span className="size-2.5 rounded-full bg-muted-foreground/30" />
               <span className="size-2.5 rounded-full bg-muted-foreground/30" />
             </span>
-            <span className="ml-1 font-mono text-sm text-muted-foreground">US 2012 0024859 A1 . Claim 4 . proposed fix</span>
+            <span className="ml-1 font-mono text-sm text-muted-foreground">US 2012 0024859 A1 . Claim 3 . proposed fix</span>
           </div>
           <div className="divide-y">
-            <DiffLine sign="−" text={BEFORE} token="claim 6" color={COLORS.violation} bg={COLORS.violationBg} />
+            <DiffLine sign="−" text={BEFORE} token="substantially concentrically" color={COLORS.violation} bg={COLORS.violationBg} />
             <div style={{ opacity: afterT }}>
-              <DiffLine sign="+" text={AFTER} token="claim 1" color={COLORS.pass} bg={COLORS.passBg} />
+              <DiffLine sign="+" text={AFTER} token="concentrically" color={COLORS.pass} bg={COLORS.passBg} />
             </div>
           </div>
 
@@ -80,7 +80,7 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
           <div className="flex items-center justify-between gap-4 border-t px-5 py-4">
             <div className="flex items-center gap-3">
               <span style={{ width: 13, height: 13, borderRadius: 999, background: dot, display: "inline-block" }} />
-              <span className="text-[18px] font-medium text-foreground">Claim 4 refers to claim 6, which does not exist</span>
+              <span className="text-[18px] font-medium text-foreground">Claim 3 uses the relative term substantially</span>
               <span style={{ fontSize: 15, fontWeight: 600, color: interpolateColors(accept, [0, 1], [COLORS.mutedForeground, COLORS.pass]) }}>
                 {accept > 0.5 ? "Resolved" : ""}
               </span>

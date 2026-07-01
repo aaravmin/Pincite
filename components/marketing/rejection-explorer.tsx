@@ -1,16 +1,16 @@
 "use client";
 
 // Interactive "where rejections come from" explorer. Every ground an examiner
-// rejects on maps to one of Pincite's two checks - the rule check (MPEP and CFR
-// validators) or the prior art check (pinpoint overlap with earlier patents). Pick
-// a ground on the left, see which check catches it on the right. Neutrals only:
-// these are informational categories, not live signals on a draft, so no red.
+// rejects on maps to one of Pincite's checks - the rule check (MPEP and CFR
+// validators), the prior patents check (pinpoint overlap with earlier patents), or
+// the drawing check (figures and reference numerals). Pick a ground on the left,
+// see which check catches it and a preview of the fix on the right.
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { BookOpenCheck, Layers } from "lucide-react";
+import { BookOpenCheck, Layers, PenLine } from "lucide-react";
 
-type Engine = "rule" | "art";
+type Engine = "rule" | "art" | "drawing";
 
 type Ground = {
   ref: string;
@@ -29,52 +29,135 @@ const GROUNDS: Ground[] = [
     name: "Obviousness",
     share: 0.85,
     engine: "art",
-    how: "Your claims are lined up against real prior patents, limitation by limitation, so you can see what is genuinely non obvious before an examiner does.",
+    how: "Lined up against earlier patents, one limitation at a time, so what is genuinely new stands out.",
   },
   {
     ref: "35 USC 112(b)",
     name: "Indefiniteness and antecedent basis",
     share: 0.4,
     engine: "rule",
-    how: "Ambiguous claim terms and missing antecedent basis are flagged against MPEP 2173, each one pinned to the passage it breaks.",
+    how: "Vague terms and missing antecedents are caught against MPEP 2173, each tied to its passage.",
   },
   {
     ref: "35 USC 102",
     name: "Novelty",
     share: 0.3,
     engine: "art",
-    how: "Exact limitation overlaps with a single earlier patent are surfaced as pinpoint matches, never hidden behind a black box score.",
+    how: "Overlap with a single earlier patent is shown limitation by limitation, not as a score.",
   },
   {
     ref: "35 USC 112(a)",
     name: "Written description and enablement",
     share: 0.2,
     engine: "rule",
-    how: "Gaps between what a claim recites and what the specification actually supports are flagged while the draft is still open.",
+    how: "Where a claim reaches past what the specification supports, the gap is marked before you file.",
   },
   {
-    ref: "Formalities",
-    name: "Drawings and claim form",
+    ref: "37 CFR 1.84",
+    name: "Drawings and reference numerals",
     share: 0.2,
-    engine: "rule",
-    how: "Drawing and claim form defects are checked against 37 CFR 1.84 and 1.75, right down to a reference numeral that never appears in the text.",
+    engine: "drawing",
+    how: "Every numeral in a figure is matched to the specification, so a missing one is caught.",
   },
   {
     ref: "35 USC 101",
     name: "Subject matter eligibility",
     share: 0.15,
     engine: "rule",
-    how: "A neutral Alice and Mayo walkthrough pinned to MPEP 2106, so you can address eligibility head on instead of guessing.",
+    how: "A plain Alice and Mayo walkthrough tied to MPEP 2106, so you can meet eligibility head on.",
   },
 ];
 
 const ENGINES: Record<Engine, { label: string; icon: typeof Layers; blurb: string }> = {
-  rule: { label: "Rule check", icon: BookOpenCheck, blurb: "MPEP and CFR validators, each finding pinned to real text" },
-  art: { label: "Prior art check", icon: Layers, blurb: "Pinpoint overlap against earlier patents, decomposed not scored" },
+  rule: {
+    label: "Rule check",
+    icon: BookOpenCheck,
+    blurb: "We read your draft against the rulebook and show the exact rule it breaks.",
+  },
+  art: {
+    label: "Prior patents check",
+    icon: Layers,
+    blurb: "We compare your claims to earlier patents and mark the exact overlaps.",
+  },
+  drawing: {
+    label: "Drawing check",
+    icon: PenLine,
+    blurb: "We match every figure and its reference numerals against the specification.",
+  },
 };
 
 function pct(share: number) {
   return Math.round(share * 100);
+}
+
+function Mark({ signal, children }: { signal: "red" | "yellow" | "green"; children: React.ReactNode }) {
+  const map = {
+    red: "bg-violation-bg text-violation decoration-violation",
+    yellow: "bg-attention-bg text-attention-foreground decoration-attention",
+    green: "bg-pass-bg text-pass decoration-pass",
+  } as const;
+  return (
+    <mark className={`rounded-[3px] px-0.5 underline decoration-2 underline-offset-2 ${map[signal]}`}>
+      {children}
+    </mark>
+  );
+}
+
+// A small preview of the fix Pincite lands for the selected check. Reuses the same
+// real, public example snippets shown elsewhere on the page.
+function FixPreview({ engine }: { engine: Engine }) {
+  if (engine === "art") {
+    return (
+      <div className="rounded-lg border bg-muted/30 p-3 font-mono text-[13px] leading-relaxed">
+        <div className="flex items-center gap-2">
+          <span className="w-14 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">yours</span>
+          <span>
+            <Mark signal="yellow">a plurality of ridges</Mark> on the base
+          </span>
+        </div>
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className="w-14 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">earlier</span>
+          <span>
+            <Mark signal="red">a plurality of ridges</Mark> on the tray
+          </span>
+        </div>
+      </div>
+    );
+  }
+  if (engine === "drawing") {
+    return (
+      <div className="rounded-lg border bg-muted/30 p-3">
+        <div className="flex flex-wrap gap-1.5">
+          {["108", "203", "216", "224"].map((n) => (
+            <span
+              key={n}
+              className="rounded-md border border-violation bg-violation-bg px-2 py-0.5 font-mono text-sm font-medium text-violation"
+            >
+              {n}
+            </span>
+          ))}
+        </div>
+        <p className="mt-2 font-mono text-xs text-muted-foreground">In the figure, never in the specification.</p>
+      </div>
+    );
+  }
+  // rule: a multiple dependent claim, corrected from "and" to "or"
+  return (
+    <div className="rounded-lg border bg-muted/30 p-3 font-mono text-[13px] leading-relaxed">
+      <div className="flex items-center gap-2">
+        <span className="w-10 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">was</span>
+        <span>
+          claims 1 <Mark signal="red">and</Mark> 2
+        </span>
+      </div>
+      <div className="mt-1.5 flex items-center gap-2">
+        <span className="w-10 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">now</span>
+        <span>
+          claims 1 <Mark signal="green">or</Mark> 2
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export function RejectionExplorer() {
@@ -90,7 +173,7 @@ export function RejectionExplorer() {
         <span className="text-sm text-muted-foreground">Every ground has a check</span>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1fr]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* left: the grounds, selectable */}
         <ul className="space-y-1.5">
           {GROUNDS.map((g, i) => {
@@ -112,19 +195,17 @@ export function RejectionExplorer() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-mono text-sm font-medium text-foreground">{g.ref}</span>
-                    <span className="tabular-nums text-xs text-muted-foreground">about {pct(g.share)}%</span>
+                    <span className="w-12 shrink-0 text-right tabular-nums text-xs text-muted-foreground">
+                      {pct(g.share)}%
+                    </span>
                   </div>
                   <div className="mt-1 flex items-center justify-between gap-3">
                     <span className="truncate text-sm text-muted-foreground">{g.name}</span>
-                    <span
-                      className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-muted-foreground"
-                      title={gEngine.label}
-                    >
+                    <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-muted-foreground">
                       <GIcon className="size-3.5" aria-hidden />
                       {gEngine.label}
                     </span>
                   </div>
-                  {/* neutral share bar */}
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                     <div
                       className={
@@ -140,7 +221,7 @@ export function RejectionExplorer() {
           })}
         </ul>
 
-        {/* right: the check that catches the selected ground */}
+        {/* right: the check that catches the selected ground, and the fix */}
         <div className="flex flex-col rounded-xl border bg-background p-5">
           <AnimatePresence mode="wait">
             <motion.div
@@ -155,14 +236,23 @@ export function RejectionExplorer() {
                 <EngineIcon className="size-4" aria-hidden />
                 {engine.label}
               </span>
-              <div className="mt-4 font-mono text-2xl font-medium text-foreground">{active.ref}</div>
-              <p className="mt-1 text-sm text-muted-foreground">{active.name}</p>
-              <p className="mt-4 text-pretty text-[15px] leading-relaxed text-foreground/90">{active.how}</p>
+              <div className="mt-4 flex items-baseline gap-3">
+                <span className="font-mono text-2xl font-medium text-foreground">{active.ref}</span>
+                <span className="text-sm text-muted-foreground">{active.name}</span>
+              </div>
+              <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/90">{active.how}</p>
+
+              <div className="mt-4">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  How Pincite fixes it
+                </p>
+                <FixPreview engine={active.engine} />
+              </div>
 
               <div className="mt-auto pt-5">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Share of office actions</span>
-                  <span className="tabular-nums">about {pct(active.share)}%</span>
+                  <span>How often it comes up in rejections</span>
+                  <span className="tabular-nums">{pct(active.share)}%</span>
                 </div>
                 <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
@@ -170,7 +260,7 @@ export function RejectionExplorer() {
                     style={{ width: `${pct(active.share)}%` }}
                   />
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">{engine.blurb}.</p>
+                <p className="mt-3 text-xs text-muted-foreground">{engine.blurb}</p>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -179,7 +269,7 @@ export function RejectionExplorer() {
 
       <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
         Grounds overlap, so shares do not add up. Sources USPTO filing and pendency reporting and
-        published rejection basis data. Figures use about language, not exact counts.
+        published rejection basis data.
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "The terms that govern your use of Pincite.",
 };
 
-const CONTACT_EMAIL = "aarav.minocha@gmail.com";
+const CONTACT_EMAIL = "aaravmin@pincite.net";
 const UPDATED = "June 29, 2026";
 
 export default function TermsPage() {
