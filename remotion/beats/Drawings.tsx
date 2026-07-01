@@ -4,6 +4,8 @@ import {
   useVideoConfig,
   spring,
   interpolate,
+  interpolateColors,
+  Easing,
 } from "remotion";
 import { Scene } from "../components/Scene";
 import { KineticText } from "../components/KineticText";
@@ -44,14 +46,151 @@ const FLAGGED = [
 
 const G = COLORS.mutedForeground;
 
+// The other half of the rule, the written description itself. The scan sweeps
+// the real paragraph text, each described numeral lights green as it is matched,
+// and the four drawing-only numerals come back never mentioned.
+// Each numeral is INTRODUCED in a different paragraph so the tally keeps
+// climbing across the whole sweep, and the parts carrying the four flagged
+// numerals (ball check, inlet, seals, bracket) are described with no numeral.
+const SPEC_PARAS = [
+  {
+    tag: "[0012]",
+    text: "Referring to FIG. 2, the dispenser comprises a housing 100 having an inner wall 102 that together enclose a working chamber.",
+  },
+  {
+    tag: "[0013]",
+    text: "A piston 104 is slidably received within the housing 100 and is biased by a coil spring 106 seated beneath it.",
+  },
+  {
+    tag: "[0014]",
+    text: "As the piston 104 advances against the spring 106, fluid in the chamber is urged upward and leaves the dispenser through an outlet nozzle 110.",
+  },
+  {
+    tag: "[0015]",
+    text: "Fluid enters through an inlet formed in the base, past a ball check, and the inner wall 102 carries seals that ride against the piston 104. A mounting bracket secures the housing 100 to a supporting surface.",
+  },
+];
+const SPEC_TOTAL = SPEC_PARAS.reduce((n, p) => n + p.text.length, 0);
+const SCAN_START = 100;
+const SCAN_END = 168;
+
+function SpecCrossCheck() {
+  const frame = useCurrentFrame();
+  const panelIn = interpolate(frame, [30, 52], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const scanP = interpolate(frame, [SCAN_START, SCAN_END], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const missT = interpolate(frame, [SCAN_END + 4, SCAN_END + 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // walk the text once, lighting each numeral as the scan passes its position
+  let offset = 0;
+  let firstLit: number | null = null;
+  const litValues = new Set<string>();
+  const paras = SPEC_PARAS.map((p) => {
+    const nodes = p.text.split(/(\d{3})/).map((tok, i) => {
+      const at = offset;
+      offset += tok.length;
+      if (!/^\d{3}$/.test(tok)) return <span key={i}>{tok}</span>;
+      // scaled slightly ahead of the scan so the last numeral lights fully
+      const pos = (at / SPEC_TOTAL) * 0.92;
+      const lit = interpolate(scanP, [pos, pos + 0.05], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+      if (firstLit === null) firstLit = lit;
+      if (lit > 0.5) litValues.add(tok);
+      return (
+        <span
+          key={i}
+          style={{
+            background: `rgba(234,245,238,${lit})`,
+            borderBottom: `2px solid rgba(28,122,69,${lit})`,
+            color: interpolateColors(lit, [0, 1], [COLORS.foreground, COLORS.pass]),
+            fontWeight: lit > 0.5 ? 600 : 400,
+            borderRadius: 3,
+            padding: "0 1px",
+          }}
+        >
+          {tok}
+        </span>
+      );
+    });
+    return { tag: p.tag, nodes };
+  });
+
+  return (
+    <div
+      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-card"
+      style={{ opacity: panelIn, transform: `translateY(${interpolate(panelIn, [0, 1], [16, 0])}px)` }}
+    >
+      <div className="flex items-center justify-between border-b bg-muted/40 px-4 py-2.5">
+        <span className="font-mono text-xs text-muted-foreground">Specification . Detailed Description</span>
+        <span className="font-mono text-[11px] text-muted-foreground">cross checked against FIG. 2</span>
+      </div>
+      <div className="flex-1 overflow-hidden px-4 py-4">
+        {/* the band tracks the text block, not the stretched panel body */}
+        <div className="relative">
+          {/* the reading scan */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              height: 40,
+              top: `calc(${scanP * 100}% - 20px)`,
+              background: "linear-gradient(180deg, transparent, rgba(230,184,0,0.18), transparent)",
+              opacity: interpolate(scanP, [0, 0.04, 0.92, 1], [0, 1, 1, 0]),
+            }}
+          />
+          {paras.map((p) => (
+            <p
+              key={p.tag}
+              className="mb-3 whitespace-pre-wrap font-mono text-[15px] leading-relaxed text-foreground/90"
+              style={{ fontFamily: "var(--font-geist-mono)" }}
+            >
+              <span className="text-muted-foreground">{p.tag} </span>
+              {p.nodes}
+            </p>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center justify-between border-t px-4 py-3.5">
+        {/* rides the first numeral's own highlight so a green mark never sits
+            beside a zero tally */}
+        <div className="flex items-center gap-2" style={{ opacity: firstLit ?? 0 }}>
+          <SignalMark signal="green" />
+          <span className="text-[15px] font-medium text-foreground">{litValues.size} of 5 matched in the description</span>
+        </div>
+        <div className="flex items-center gap-2" style={{ opacity: missT }}>
+          <SignalMark signal="red" />
+          <span className="text-[15px] font-medium text-violation">4 never mentioned</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Beat 3 - the drawing check. A patent figure with several reference numerals the
 // specification never introduces, each circled in red. It reads your drawings too.
-export function Drawings({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Drawings() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
   return (
-    <Scene>
+    <Scene
+      // headline, onto the figure as the circles draw, up to the findings, then
+      // down to the specification as the scan reads it
+      hue={[
+        { f: 0, x: 50, y: 14 },
+        { f: 20, x: 50, y: 14 },
+        { f: 52, x: 30, y: 52 },
+        { f: 96, x: 30, y: 56 },
+        { f: 118, x: 72, y: 30 },
+        { f: 140, x: 72, y: 32 },
+        { f: 170, x: 74, y: 66 },
+        { f: 215, x: 74, y: 66 },
+      ]}
+    >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 100px" }}>
         <div className="text-center">
           <KineticText
@@ -117,8 +256,8 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
             </svg>
           </div>
 
-          {/* the findings */}
-          <div style={{ flex: 0.85 }}>
+          {/* the findings + the description they were checked against */}
+          <div style={{ flex: 0.85, display: "flex", flexDirection: "column", gap: 20 }}>
             <div className="rounded-xl border bg-card p-5">
               <div className="flex items-center gap-2">
                 <SignalMark signal="green" />
@@ -146,7 +285,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
                 They appear in the drawing but are never described
               </p>
               <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {FLAGGED.map((f, i) => {
+                {FLAGGED.map((f) => {
                   const sp = spring({ frame: frame - (f.delay + 16), fps, config: { damping: 200 } });
                   return (
                     <span
@@ -168,6 +307,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
                 </p>
               </div>
             </div>
+            <SpecCrossCheck />
           </div>
         </div>
       </AbsoluteFill>

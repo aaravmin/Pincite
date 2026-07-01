@@ -347,7 +347,7 @@ the end of each session — but be stringent; trim before it bloats.
   (href placeholder - wire to the video). Contact email -> `aaravmin@pincite.net`. `tsc`/eslint
   clean, landing e2e green, 0 console errors, no overflow 390-1440.
 
-- [x] REMOTION DEMO (`remotion/`, `remotion.config.ts`): a silent ~45s **16:9** (1920x1080) film,
+- [x] REMOTION DEMO (`remotion/`, `remotion.config.ts`): a ~49s **16:9** (1920x1080) film,
   one theme ("Nine out of ten patents are rejected."), SIX beats - hook (wide field of markers,
   macro-to-micro into the Apple draft), the catch (review + issue counter), the receipts (citation
   trace, 3-column hero), the drawing check (a detailed synthetic patent figure with FOUR planted
@@ -367,6 +367,9 @@ the end of each session — but be stringent; trim before it bloats.
   muted). Single composition `PinciteDemo` (1920x1080). Node 24; `esbuild` in `allowBuilds` (pnpm
   gotcha). Render: `pnpm remotion:render` -> `out/pincite-demo-16x9.mp4` (gitignored); `pnpm
   remotion:studio` to preview.
+  Music: Bensound "By My Side" (`public/bensound-bymyside.mp3`) under the whole film, faded in/out and trimmed to the last frame, never past the video.
+  The warm hue travels per beat via `Scene` `hue` waypoints (dwells on each beat's focal content, mirrored counterweight glow; keep the finale off dead-center or the two glows stack).
+  The drawing beat's right column carries a Specification cross-check panel (a scan band reads the description, numerals light green with a live tally whose first occurrences are spread across all four paragraphs so it climbs the whole sweep, then "4 never mentioned"); Review and Payoff sit on shared rails/edges.
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

@@ -27,12 +27,12 @@ export function RemotionRoot() {
       />
 
       {/* Individual beats, for iteration. */}
-      <Composition id="Hook" component={Hook} durationInFrames={BEAT.hook} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
-      <Composition id="Review" component={Review} durationInFrames={BEAT.review} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
-      <Composition id="Trace" component={Trace} durationInFrames={BEAT.trace} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
-      <Composition id="AutoFix" component={AutoFix} durationInFrames={BEAT.autofix} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
-      <Composition id="Drawings" component={Drawings} durationInFrames={BEAT.drawings} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
-      <Composition id="PriorArt" component={PriorArt} durationInFrames={BEAT.priorart} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
+      <Composition id="Hook" component={Hook} durationInFrames={BEAT.hook} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={{ width: SIZE.width }} />
+      <Composition id="Review" component={Review} durationInFrames={BEAT.review} fps={FPS} width={SIZE.width} height={SIZE.height} />
+      <Composition id="Trace" component={Trace} durationInFrames={BEAT.trace} fps={FPS} width={SIZE.width} height={SIZE.height} />
+      <Composition id="AutoFix" component={AutoFix} durationInFrames={BEAT.autofix} fps={FPS} width={SIZE.width} height={SIZE.height} />
+      <Composition id="Drawings" component={Drawings} durationInFrames={BEAT.drawings} fps={FPS} width={SIZE.width} height={SIZE.height} />
+      <Composition id="PriorArt" component={PriorArt} durationInFrames={BEAT.priorart} fps={FPS} width={SIZE.width} height={SIZE.height} />
       <Composition id="Payoff" component={Payoff} durationInFrames={BEAT.payoff} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={P} />
     </>
   );

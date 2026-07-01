@@ -27,7 +27,7 @@ const HL_END = MPEP_TEXT.indexOf("same application.") + "same application.".leng
 
 // Beat 2 - the receipts (hero beat, landscape three columns). The flag, the real
 // MPEP text, and the Law/Rule/Guidance stack, side by side. Nothing is guessed.
-export function Trace({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Trace() {
   const frame = useCurrentFrame();
   const f = CLAIM6_FINDING;
 
@@ -43,7 +43,23 @@ export function Trace({ width = 1920, height = 1080 }: { width?: number; height?
   });
 
   return (
-    <Scene>
+    <Scene
+      // headline, then across the three columns as each takes its turn - the
+      // flag as the columns slide in, the MPEP text while the highlight lands
+      // (58-84), the citation stack while it fills (80-158), then down to the
+      // closing line
+      hue={[
+        { f: 0, x: 50, y: 16 },
+        { f: 14, x: 50, y: 16 },
+        { f: 34, x: 22, y: 50 },
+        { f: 54, x: 22, y: 50 },
+        { f: 66, x: 50, y: 52 },
+        { f: 86, x: 50, y: 52 },
+        { f: 104, x: 78, y: 52 },
+        { f: 158, x: 78, y: 52 },
+        { f: 178, x: 52, y: 74 },
+      ]}
+    >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 90px" }}>
         <div className="text-center">
           <KineticText

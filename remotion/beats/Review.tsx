@@ -54,7 +54,7 @@ const FINDINGS = [
 
 // Beat 1 - the catch (landscape, filled frame). The two real red violations slide
 // in beside a large draft, a big counter ticks the issues. Pincite finds them first.
-export function Review({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Review() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const count = Math.round(
@@ -63,7 +63,17 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
   const trackerT = interpolate(frame, [68, 90], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
-    <Scene>
+    <Scene
+      // headline, over to the issue counter as it ticks, down to the checks grid
+      hue={[
+        { f: 0, x: 50, y: 16 },
+        { f: 22, x: 50, y: 16 },
+        { f: 50, x: 66, y: 34 },
+        { f: 82, x: 66, y: 34 },
+        { f: 116, x: 50, y: 74 },
+        { f: 165, x: 50, y: 72 },
+      ]}
+    >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>
         <KineticText
           text={LINES.catch}
@@ -72,7 +82,9 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
           style={{ fontSize: 74, fontWeight: 700, color: COLORS.foreground }}
         />
 
-        <div style={{ marginTop: 44, display: "flex", gap: 48, alignItems: "center", width: "100%" }}>
+        {/* same 1560 rail as the checks grid below, top edges shared, so the
+            editor lines up with everything else in the scene */}
+        <div style={{ marginTop: 44, display: "flex", gap: 48, alignItems: "flex-start", width: "100%", maxWidth: 1560 }}>
           <div style={{ flex: 1.1 }}>
             <AnnotatedEditor
               text={CLAIMS}

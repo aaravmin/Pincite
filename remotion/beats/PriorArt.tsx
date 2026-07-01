@@ -39,7 +39,7 @@ const MATCHES = [
 // Beat 4 - the prior art. Your limitation stacked over the prior patent that
 // already discloses it, the overlap highlighted, then a plain-language reason it
 // matters (no vague pill). A ranked list shows where else you overlap.
-export function PriorArt({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function PriorArt() {
   const frame = useCurrentFrame();
 
   const leftIn = interpolate(frame, [18, 62], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
@@ -49,7 +49,19 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
   const barProgress = interpolate(frame, [104, 196], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
-    <Scene>
+    <Scene
+      // headline, onto your claim, down to the prior patent as it lands, then
+      // over to the ranked overlap list as the bars fill
+      hue={[
+        { f: 0, x: 50, y: 14 },
+        { f: 24, x: 50, y: 14 },
+        { f: 58, x: 34, y: 42 },
+        { f: 92, x: 34, y: 58 },
+        { f: 130, x: 76, y: 50 },
+        { f: 172, x: 76, y: 52 },
+        { f: 205, x: 62, y: 48 },
+      ]}
+    >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "44px 90px" }}>
         <div className="w-full text-center">
           <KineticText

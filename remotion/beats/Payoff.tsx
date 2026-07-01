@@ -90,7 +90,21 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
 
   return (
-    <Scene>
+    <Scene
+      // headline, onto the recoloring findings, over to the filing-ready
+      // document, then up top so the logo lands on clean white (dead center
+      // would stack the glow and its mirrored counterweight on the logo)
+      hue={[
+        { f: 0, x: 50, y: 14 },
+        { f: 24, x: 50, y: 14 },
+        { f: 56, x: 28, y: 48 },
+        { f: 90, x: 28, y: 52 },
+        { f: 122, x: 68, y: 50 },
+        { f: 152, x: 68, y: 52 },
+        { f: 200, x: 50, y: 24 },
+        { f: 255, x: 50, y: 24 },
+      ]}
+    >
       {/* A: recolor + the real filing-ready document */}
       <AbsoluteFill className="flex-col justify-center" style={{ opacity: aOut, padding: "40px 90px" }}>
         <div className="text-center">
@@ -102,8 +116,11 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
           />
           <p className="mt-3 text-[24px] text-muted-foreground">Every document formatted automatically</p>
         </div>
-        <div style={{ marginTop: 36, display: "flex", gap: 48, alignItems: "center" }}>
-          <div style={{ flex: 0.82, display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* the left column stretches to the document's height, first row on its
+            top edge and the docs grid on its bottom edge, so the two halves
+            read as one composed block */}
+        <div style={{ marginTop: 36, display: "flex", gap: 48, alignItems: "stretch" }}>
+          <div style={{ flex: 0.82, display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 14 }}>
             {RECOLOR.map((t, i) => {
               const rt = interpolate(frame, [18 + i * 12, 18 + i * 12 + 20], [0, 1], {
                 extrapolateLeft: "clamp",
@@ -111,26 +128,26 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
               });
               const dot = interpolateColors(rt, [0, 1], [COLORS.violation, COLORS.pass]);
               return (
-                <div key={i} className="flex items-center gap-3 rounded-xl border bg-card p-3.5">
+                <div key={i} className="flex items-center gap-3 rounded-xl border bg-card p-5">
                   <span style={{ width: 13, height: 13, borderRadius: 999, background: dot, display: "inline-block" }} />
-                  <span className="flex-1 text-[17px] font-medium text-foreground">{t}</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: interpolateColors(rt, [0, 1], [COLORS.mutedForeground, COLORS.pass]) }}>
+                  <span className="flex-1 text-[19px] font-medium text-foreground">{t}</span>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: interpolateColors(rt, [0, 1], [COLORS.mutedForeground, COLORS.pass]) }}>
                     {rt > 0.5 ? "Resolved" : "Violation"}
                   </span>
                 </div>
               );
             })}
-            <div style={{ marginTop: 10 }} className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-3">
               {DOCS.map((d, i) => {
                 const sp = spring({ frame: frame - (46 + i * 6), fps, config: { damping: 200 } });
                 return (
                   <div
                     key={d}
                     style={{ opacity: sp, transform: `translateX(${interpolate(sp, [0, 1], [30, 0])}px)` }}
-                    className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2.5"
+                    className="flex items-center gap-2 rounded-lg border bg-background px-3.5 py-3.5"
                   >
                     <span style={{ color: COLORS.pass, fontWeight: 700 }}>✓</span>
-                    <span className="text-[15px] text-muted-foreground">{d}</span>
+                    <span className="text-[16px] text-muted-foreground">{d}</span>
                   </div>
                 );
               })}
@@ -142,11 +159,12 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
               flex: 1.18,
               display: "flex",
               justifyContent: "center",
+              alignItems: "center",
               opacity: docT,
               transform: `translateX(${interpolate(docT, [0, 1], [60, 0])}px) scale(${interpolate(docT, [0, 1], [0.94, 0.98])})`,
             }}
           >
-            <PatentDoc />
+            <PatentDoc style={{ width: 620 }} />
           </div>
         </div>
       </AbsoluteFill>

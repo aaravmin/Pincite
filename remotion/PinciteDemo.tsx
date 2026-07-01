@@ -19,7 +19,6 @@ export const TOTAL_FRAMES =
 // Bensound "By My Side" bed plays under the whole film and is trimmed to the last
 // frame (the composition ends, so the audio ends), with brief fade in and out.
 export function PinciteDemo({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
-  const p = { width, height };
   const xfade = () => (
     <TransitionSeries.Transition presentation={fade()} timing={linearTiming({ durationInFrames: XFADE })} />
   );
@@ -36,31 +35,31 @@ export function PinciteDemo({ width = 1920, height = 1080 }: { width?: number; h
       />
       <TransitionSeries>
       <TransitionSeries.Sequence durationInFrames={BEAT.hook}>
-        <Hook {...p} />
+        <Hook width={width} />
       </TransitionSeries.Sequence>
       {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.review}>
-        <Review {...p} />
+        <Review />
       </TransitionSeries.Sequence>
       {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.trace}>
-        <Trace {...p} />
+        <Trace />
       </TransitionSeries.Sequence>
       {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.autofix}>
-        <AutoFix {...p} />
+        <AutoFix />
       </TransitionSeries.Sequence>
       {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.drawings}>
-        <Drawings {...p} />
+        <Drawings />
       </TransitionSeries.Sequence>
       {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.priorart}>
-        <PriorArt {...p} />
+        <PriorArt />
       </TransitionSeries.Sequence>
       {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.payoff}>
-        <Payoff {...p} />
+        <Payoff width={width} height={height} />
       </TransitionSeries.Sequence>
       </TransitionSeries>
     </>

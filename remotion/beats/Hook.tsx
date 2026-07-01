@@ -42,7 +42,7 @@ const isGreen = (r: number, c: number) => (r * COLS + c + r * 3) % 10 === 4;
 // most are rejected (red), about one in ten accepted (green), and ours is the hole
 // in the middle. The camera pushes in as ours grows, rounds, and whitens into the
 // draft, then the field flies out - the draft is left floating with its flag.
-export function Hook({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Hook({ width = 1920 }: { width?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -78,7 +78,20 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
   const editorProgress = interpolate(frame, [196, 232], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
-    <Scene>
+    <Scene
+      // headline, down into the field as it flips in, up to the draft as the
+      // survivor morphs, then down to the sublines
+      hue={[
+        { f: 0, x: 50, y: 20 },
+        { f: 26, x: 50, y: 20 },
+        { f: 62, x: 50, y: 54 },
+        { f: 104, x: 50, y: 54 },
+        { f: 156, x: 50, y: 40 },
+        { f: 196, x: 50, y: 38 },
+        { f: 228, x: 50, y: 60 },
+        { f: 300, x: 50, y: 62 },
+      ]}
+    >
       {/* the field of applications - dots flip in on a diagonal wave */}
       <AbsoluteFill style={{ opacity: fieldOpacity, transform: `scale(${fieldScale})`, transformOrigin: `${survX}px ${survY}px` }}>
         <div style={{ position: "absolute", left: left0, top: top0, width: gridW, height: gridH }}>

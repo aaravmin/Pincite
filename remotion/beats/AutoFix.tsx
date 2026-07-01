@@ -35,7 +35,7 @@ function DiffLine({ sign, text, token, color, bg }: { sign: string; text: string
 
 // Beat 3 - the auto fix. Pincite proposes the exact before and after, and you
 // accept it. Review and apply, never a silent rewrite.
-export function AutoFix({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function AutoFix() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -51,7 +51,19 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
   const clickScale = interpolate(frame, [145, 150, 157], [1, 0.82, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
-    <Scene>
+    <Scene
+      // headline, onto the diff as it appears, over to the Accept corner as the
+      // cursor lands, back to the applied card
+      hue={[
+        { f: 0, x: 50, y: 16 },
+        { f: 22, x: 50, y: 16 },
+        { f: 54, x: 50, y: 46 },
+        { f: 90, x: 50, y: 46 },
+        { f: 128, x: 70, y: 58 },
+        { f: 160, x: 70, y: 58 },
+        { f: 194, x: 50, y: 48 },
+      ]}
+    >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>
         <KineticText
           text={LINES.autofix}
