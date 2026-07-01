@@ -34,11 +34,12 @@ function DrawOnCircle({ cx, cy, r, delay }: { cx: number; cy: number; r: number;
 
 // Reference numerals that appear in FIG. 2 but not in the written description
 // (37 CFR 1.84(p)(5): reference characters must appear in both).
+// (nx, ny) is the numeral + circle center; (px, py) is the point on the part.
 const FLAGGED = [
-  { n: "108", cx: 300, cy: 405, delay: 54 },
-  { n: "203", cx: 118, cy: 420, delay: 68 },
-  { n: "216", cx: 150, cy: 214, delay: 82 },
-  { n: "224", cx: 452, cy: 392, delay: 96 },
+  { n: "108", nx: 300, ny: 428, px: 272, py: 352, delay: 54 },
+  { n: "203", nx: 120, ny: 430, px: 242, py: 410, delay: 68 },
+  { n: "216", nx: 126, ny: 205, px: 197, py: 194, delay: 82 },
+  { n: "224", nx: 470, ny: 398, px: 430, py: 366, delay: 96 },
 ];
 
 const G = COLORS.mutedForeground;
@@ -103,14 +104,15 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
               <Leader x1={372} y1={130} x2={452} y2={120} n="102" />
               <Leader x1={340} y1={193} x2={462} y2={200} n="104" />
               <Leader x1={330} y1={266} x2={462} y2={300} n="106" />
-              {/* flagged numerals */}
-              <Leader x1={278} y1={352} x2={300} y2={405} n="108" flag />
-              <Leader x1={240} y1={410} x2={118} y2={420} n="203" flag />
-              <Leader x1={196} y1={193} x2={150} y2={214} n="216" flag />
-              <Leader x1={430} y1={365} x2={452} y2={392} n="224" flag />
-
+              {/* flagged numerals, each circle centered on its numeral */}
               {FLAGGED.map((f) => (
-                <DrawOnCircle key={f.n} cx={f.cx} cy={f.cy} r={16} delay={f.delay} />
+                <g key={f.n}>
+                  <line x1={f.px} y1={f.py} x2={f.nx} y2={f.ny} stroke={G} strokeWidth={1.2} />
+                  <DrawOnCircle cx={f.nx} cy={f.ny} r={20} delay={f.delay} />
+                  <text x={f.nx} y={f.ny} textAnchor="middle" dominantBaseline="central" fill={COLORS.violation} fontSize={17} fontFamily="monospace" fontWeight={700}>
+                    {f.n}
+                  </text>
+                </g>
               ))}
             </svg>
           </div>

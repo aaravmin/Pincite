@@ -96,6 +96,7 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
             className="font-serif"
             style={{ fontSize: 64, fontWeight: 700, color: COLORS.foreground }}
           />
+          <p className="mt-3 text-[24px] text-muted-foreground">Every document formatted automatically.</p>
         </div>
         <div style={{ marginTop: 36, display: "flex", gap: 48, alignItems: "center" }}>
           <div style={{ flex: 0.82, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -154,6 +155,16 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
             One application, filed clean
           </div>
         </AbsoluteFill>
+      </AbsoluteFill>
+
+      {/* the line on the green fill */}
+      <AbsoluteFill
+        className="items-center justify-center"
+        style={{ opacity: interpolate(frame, [208, 220, 236, 246], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
+      >
+        <span className="font-serif" style={{ fontSize: 78, fontWeight: 700, color: "#ffffff" }}>
+          Be the one that gets accepted.
+        </span>
       </AbsoluteFill>
 
       {/* C: logo only */}

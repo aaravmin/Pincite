@@ -11,13 +11,31 @@ import { COLORS } from "../colors";
 import { LINES } from "../theme";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { SignalBadge } from "@visual/signal";
-import { ComplianceTracker, type TrackerBlock } from "@visual/compliance-tracker";
 import type { VisualSpan } from "@visual/types";
 
-// The checks Pincite ran: most pass (green), two are the violations (red).
-const CHECKS: TrackerBlock[] = [
-  "green", "green", "red", "green", "green", "green", "green", "red", "green", "green", "green", "green",
-].map((signal, i) => ({ id: `c${i}`, signal: signal as "green" | "red", label: `check ${i + 1}` }));
+// The named checks Pincite ran on the claims: most pass, two fail (the violations).
+const CHECKS = [
+  { name: "Claim numbering", ok: true },
+  { name: "Antecedent basis", ok: true },
+  { name: "Dependency form", ok: false },
+  { name: "Multiple dependent", ok: false },
+  { name: "Indefinite terms", ok: true },
+  { name: "Eligibility 101", ok: true },
+];
+
+function Mark({ ok }: { ok: boolean }) {
+  return ok ? (
+    <svg viewBox="0 0 20 20" className="size-6 shrink-0">
+      <circle cx="10" cy="10" r="9" fill={COLORS.pass} />
+      <path d="M6 10.5l2.6 2.6 5.6-6.2" stroke="#fff" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 20 20" className="size-6 shrink-0">
+      <circle cx="10" cy="10" r="9" fill={COLORS.violation} />
+      <path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="#fff" strokeWidth={2} strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const CLAIMS =
   "3. The container of claim 1, wherein the ridges are arranged concentrically.\n" +
@@ -42,7 +60,6 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
   const count = Math.round(
     interpolate(frame, [30, 76], [0, 2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
   );
-  const trackerP = interpolate(frame, [70, 118], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const trackerT = interpolate(frame, [68, 90], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
@@ -100,12 +117,23 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
           </div>
         </div>
 
-        <div style={{ marginTop: 44, width: "100%", maxWidth: 1120, opacity: trackerT }}>
-          <div className="mb-3 flex items-center justify-between text-[16px] text-muted-foreground">
-            <span>Checks run on this draft</span>
-            <span>2 of 12 flagged</span>
+        <div style={{ marginTop: 44, width: "100%", maxWidth: 1180, opacity: trackerT }}>
+          <div className="mb-3 text-[16px] font-medium text-muted-foreground">Checks Pincite ran on the claims</div>
+          <div className="grid grid-cols-3 gap-3">
+            {CHECKS.map((c, i) => {
+              const sp = spring({ frame: frame - (72 + i * 5), fps, config: { damping: 200 } });
+              return (
+                <div
+                  key={c.name}
+                  style={{ opacity: sp, transform: `translateY(${interpolate(sp, [0, 1], [12, 0])}px)` }}
+                  className={`flex items-center gap-3 rounded-xl border p-4 ${c.ok ? "bg-card" : "border-violation bg-violation-bg"}`}
+                >
+                  <Mark ok={c.ok} />
+                  <span className={`text-[19px] font-medium ${c.ok ? "text-foreground" : "text-violation"}`}>{c.name}</span>
+                </div>
+              );
+            })}
           </div>
-          <ComplianceTracker blocks={CHECKS} progress={trackerP} showLegend={false} />
         </div>
       </AbsoluteFill>
     </Scene>

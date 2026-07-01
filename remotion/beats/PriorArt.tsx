@@ -23,7 +23,7 @@ const YOUR_SPANS: VisualSpan[] = [{ start: YOURS.indexOf(YP), end: YOURS.indexOf
 const PRIOR_SPANS: VisualSpan[] = [{ start: PRIOR.indexOf(PP), end: PRIOR.indexOf(PP) + PP.length, signal: "red", flagId: "exact" }];
 
 const MATCHES = [
-  { label: "US 5,947,321  .  vented food container", value: 0.85, display: "limitation disclosed", signal: "red" as const },
+  { label: "US 5,947,321  .  vented food container", value: 0.85, display: "same feature", signal: "red" as const },
   { label: "US 2011/0011549  .  molded pulp containers", value: 0.57, display: "ridges overlap", signal: "yellow" as const },
   { label: "US 2006/0213916  .  molded fiber lid", value: 0.43, display: "lid overlap", signal: "yellow" as const },
 ];
@@ -65,7 +65,7 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
           <div style={{ flex: 1, opacity: slide, transform: `translateX(${interpolate(slide, [0, 1], [40, 0])}px)` }}>
             <AnnotatedEditor text={PRIOR} spans={PRIOR_SPANS} activeFlagId="exact" progress={1} caption="US 5,947,321 . vented food container" />
             <div style={{ marginTop: 12, opacity: badge }}>
-              <SignalBadge signal="red">Limitation disclosed in prior art</SignalBadge>
+              <SignalBadge signal="red">Same feature already in prior art</SignalBadge>
             </div>
           </div>
         </div>
