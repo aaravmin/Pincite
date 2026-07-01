@@ -30,10 +30,11 @@ const COLS = 15;
 const ROWS = 7;
 const SR = 3;
 const SC = 7;
-const CELL = 64;
-const DOT = 34;
+// The field spans the headline width ("Nine ... rejected"), with big dots.
+const CELL = 97;
+const DOT = 56;
 const FCX = 960;
-const FCY = 540;
+const FCY = 600;
 
 const isGreen = (r: number, c: number) => (r * COLS + c + r * 3) % 10 === 4;
 
@@ -108,7 +109,7 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
       </AbsoluteFill>
 
       {/* headline, in a clear band up top */}
-      <div style={{ position: "absolute", top: 120, left: 0, right: 0, textAlign: "center", opacity: headOut }} className="px-24">
+      <div style={{ position: "absolute", top: 84, left: 0, right: 0, textAlign: "center", opacity: headOut }} className="px-24">
         <KineticText text={LINES.theme} startFrame={8} className="font-serif" style={{ fontSize: 86, fontWeight: 700, lineHeight: 1.0, color: COLORS.foreground }} />
       </div>
 
