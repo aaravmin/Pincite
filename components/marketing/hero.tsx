@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { AnimatedBeam } from "@/components/ui/animated-beam";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { cn } from "@/lib/utils";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
@@ -92,51 +94,115 @@ function HeroDemo() {
   const { ref, progress } = useReveal({ amount: 0.15, duration: 1100 });
   // Default the flag open so the value reads instantly; hover keeps control.
   const [active, setActive] = useState<string | null>(FLAG_ID);
+  // Two-way link: hovering the flagged text OR the finding card lights both up,
+  // making the "this flag opens this rule" connection tangible.
+  const [linked, setLinked] = useState(false);
   const finding = MULTI_DEPENDENT_FINDING;
+
+  const container = useRef<HTMLDivElement>(null);
+  const fromRef = useRef<HTMLDivElement>(null);
+  const toRef = useRef<HTMLDivElement>(null);
+  const revealed = progress > 0.45;
 
   return (
     <div ref={ref as React.Ref<HTMLDivElement>} className="relative">
-      <AnnotatedEditor
-        text={APPLE_MULTI_CLAIMS}
-        spans={APPLE_MULTI_SPANS}
-        activeFlagId={active}
-        progress={progress}
-        caption={APPLE_META.claimsCaption}
-        onActivateFlag={(id) => setActive(id ?? FLAG_ID)}
-        className="shadow-md"
-      />
-
-      {/* the finding peek, connected to the flag above */}
-      <motion.div
-        initial={false}
-        animate={{ opacity: progress > 0.45 ? 1 : 0, y: progress > 0.45 ? 0 : 12 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className={cn(
-          "relative mx-3 -mt-2 rounded-xl border bg-card p-4 shadow-lg",
-          "sm:mx-6",
-        )}
-      >
-        <div className="mb-2 flex items-center gap-2">
-          <SignalBadge signal="red">Violation</SignalBadge>
-          <span className="text-xs text-muted-foreground">Claims</span>
-        </div>
-        <p className="text-sm font-medium text-foreground">{finding.title}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{finding.explanation}</p>
-
-        <div className="mt-3.5 border-t pt-3.5">
-          <CitationStack
-            dense
-            law={finding.citation.law}
-            cfr={finding.citation.cfr}
-            mpep={finding.citation.mpep}
-            guidance={finding.citation.guidance}
-            excerpt={finding.citation.excerpt}
+      <div ref={container} className="relative">
+        {/* the draft, with the live flag */}
+        <div className="group relative transition-transform duration-300 will-change-transform hover:-translate-y-0.5">
+          <AnnotatedEditor
+            text={APPLE_MULTI_CLAIMS}
+            spans={APPLE_MULTI_SPANS}
+            activeFlagId={active}
             progress={progress}
-            hideSource
-            helperLine="The same requirement at three levels."
+            caption={APPLE_META.claimsCaption}
+            onActivateFlag={(id) => {
+              setActive(id ?? FLAG_ID);
+              setLinked(id != null);
+            }}
+            className="shadow-md"
+          />
+          {/* connector origin, a neutral port sitting on the editor's lower edge */}
+          <span
+            ref={fromRef}
+            aria-hidden
+            className={cn(
+              "absolute -bottom-1.5 left-8 size-3 rounded-full border-2 bg-card transition-colors duration-300",
+              linked ? "border-foreground" : "border-border",
+            )}
           />
         </div>
-      </motion.div>
+
+        {/* the finding peek, wired to the flag above */}
+        <motion.div
+          initial={false}
+          animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : 12 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          onMouseEnter={() => setLinked(true)}
+          onMouseLeave={() => setLinked(false)}
+          className={cn(
+            "relative mx-3 mt-9 rounded-xl border bg-card p-4 shadow-lg transition-all duration-300 sm:mx-6",
+            linked
+              ? "-translate-y-0.5 shadow-xl ring-2 ring-violation/35"
+              : "ring-1 ring-transparent",
+          )}
+        >
+          {/* matching connector port, so the trace beam plugs into the finding */}
+          <span
+            ref={toRef}
+            aria-hidden
+            className={cn(
+              "absolute -top-1.5 left-8 size-3 rounded-full border-2 bg-card transition-colors duration-300",
+              linked ? "border-foreground" : "border-border",
+            )}
+          />
+          {revealed ? (
+            <BorderBeam
+              size={90}
+              duration={8}
+              className="opacity-60"
+              colorFrom="var(--muted-foreground)"
+              colorTo="var(--foreground)"
+            />
+          ) : null}
+
+          <div className="mb-2 flex items-center gap-2">
+            <SignalBadge signal="red">Violation</SignalBadge>
+            <span className="text-xs text-muted-foreground">Claims</span>
+          </div>
+          <p className="text-sm font-medium text-foreground">{finding.title}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{finding.explanation}</p>
+
+          <div className="mt-3.5 border-t pt-3.5">
+            <CitationStack
+              dense
+              law={finding.citation.law}
+              cfr={finding.citation.cfr}
+              mpep={finding.citation.mpep}
+              guidance={finding.citation.guidance}
+              excerpt={finding.citation.excerpt}
+              progress={progress}
+              hideSource
+              helperLine="The same requirement at three levels."
+            />
+          </div>
+        </motion.div>
+
+        {/* the trace line: a light travels from the flagged draft into its finding */}
+        <AnimatedBeam
+          containerRef={container}
+          fromRef={fromRef}
+          toRef={toRef}
+          curvature={0}
+          duration={4}
+          pathColor="var(--border)"
+          pathWidth={2}
+          pathOpacity={1}
+          gradientStartColor="var(--foreground)"
+          gradientStopColor="var(--muted-foreground)"
+          startYOffset={3}
+          endYOffset={-3}
+        />
+      </div>
     </div>
   );
 }

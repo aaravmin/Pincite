@@ -38,16 +38,21 @@ const MATCHES = [
 
 const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"];
 
-// The lead: a real violation opening into its Law, Rule, Guidance stack. Reveal is
-// driven by scroll so the citation tiers stagger in.
+// The lead feature: a real violation opening into its Law, Rule, Guidance stack.
+// One card (matching the other feature cards) with the label and heading inside;
+// the flag and the three-level rule sit as two nested panels. Reveal is driven by
+// scroll so the citation tiers stagger in.
 function TraceLead() {
-  const { ref, progress } = useReveal({ amount: 0.25, duration: 1100 });
+  const { ref, progress } = useReveal({ amount: 0.2, duration: 1100 });
   const f = MULTI_DEPENDENT_FINDING;
 
   return (
-    <div>
+    <div
+      ref={ref as React.Ref<HTMLDivElement>}
+      className="rounded-2xl border bg-card p-8 shadow-sm"
+    >
       <div className="flex items-center gap-2.5">
-        <span className="flex size-9 items-center justify-center rounded-lg border bg-card text-foreground">
+        <span className="flex size-9 items-center justify-center rounded-lg border bg-muted/50 text-foreground">
           <BookOpen className="size-5" aria-hidden />
         </span>
         <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -61,12 +66,9 @@ function TraceLead() {
         The same requirement, at three levels. Nothing is guessed.
       </p>
 
-      <div
-        ref={ref as React.Ref<HTMLDivElement>}
-        className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2"
-      >
+      <div className="mt-7 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
         {/* the flag */}
-        <div className="flex h-full flex-col justify-center gap-5 rounded-2xl border bg-card p-7 shadow-sm">
+        <div className="flex h-full flex-col justify-center gap-5 rounded-xl border bg-background p-6">
           <AnnotatedEditor
             text={APPLE_MULTI_CLAIMS}
             spans={APPLE_MULTI_SPANS}
@@ -74,7 +76,7 @@ function TraceLead() {
             progress={progress}
             caption={APPLE_META.claimsCaption}
           />
-          <div className="rounded-xl border bg-muted/20 p-5">
+          <div className="rounded-xl border bg-muted/30 p-5">
             <div className="mb-2.5 flex items-center gap-2">
               <SignalBadge signal="red">Violation</SignalBadge>
               <span className="text-sm text-muted-foreground">Claims</span>
@@ -84,7 +86,7 @@ function TraceLead() {
         </div>
 
         {/* the rule, at three levels */}
-        <div className="flex h-full flex-col rounded-2xl border bg-background p-7 shadow-sm">
+        <div className="flex h-full flex-col rounded-xl border bg-background p-6">
           <p className="mb-5 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             The rule, at three levels
           </p>
@@ -111,20 +113,22 @@ export function SectionOnePlace() {
     <section id="one-place" className="scroll-mt-20 overflow-x-clip border-t bg-muted/20">
       <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
         <BlurFade inView>
-          <h2 className="max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Features
+          </p>
+          <h2 className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Every step to filing, in one dashboard
           </h2>
         </BlurFade>
 
-        <BlurFade inView delay={0.05}>
-          <div className="mt-12">
-            <TraceLead />
-          </div>
-        </BlurFade>
-
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Drawing check - full width, real figure */}
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Rule trace - the lead feature, full width */}
           <BlurFade inView className="lg:col-span-2">
+            <TraceLead />
+          </BlurFade>
+
+          {/* Drawing check - full width, real figure */}
+          <BlurFade inView delay={0.05} className="lg:col-span-2">
             <div className="grid grid-cols-1 items-center gap-8 rounded-2xl border bg-card p-8 shadow-sm lg:grid-cols-2">
               <div className="rounded-xl border bg-background p-6">
                 <PatentFigure />
