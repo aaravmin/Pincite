@@ -249,17 +249,17 @@ export function SectionOnePlace() {
               </p>
 
               <div className="mt-auto border-t pt-5">
-                <div className="flex items-end justify-between gap-4">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-sm leading-snug text-muted-foreground">
                     Overlap with the closest granted patent, {OVERLAP_PATENT}
                   </p>
-                  <p className="shrink-0 font-rounded text-3xl font-semibold tracking-tight text-foreground">
+                  <p className="shrink-0 font-rounded text-3xl font-semibold leading-none tracking-tight text-violation">
                     {OVERLAP_PCT}%
                   </p>
                 </div>
                 <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className="h-full rounded-full bg-foreground/80"
+                    className="h-full rounded-full bg-violation"
                     style={{ width: `${OVERLAP_PCT}%` }}
                   />
                 </div>
