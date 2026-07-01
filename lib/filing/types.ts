@@ -48,17 +48,6 @@ export const ATTACHMENT_VIEW_LABELS: Record<AttachmentView, string> = {
   exploded: "Exploded",
 };
 
-/** A 3D model upload, rendered in-browser with an orientation toggle (never sent to a model). */
-export function is3dModel(mime: string, filename: string): boolean {
-  const n = filename.toLowerCase();
-  return (
-    mime === "model/gltf-binary" ||
-    mime === "model/gltf+json" ||
-    n.endsWith(".glb") ||
-    n.endsWith(".gltf")
-  );
-}
-
 /**
  * The editable drawing-annotation layer (the drawing editor). A movable reference-numeral
  * label sits at (x,y) normalized 0..1 from the top-left, with an optional lead line whose
@@ -77,6 +66,50 @@ export type DrawingAnnotations = {
   figureLabel: { text: string; x: number; y: number } | null;
 };
 
+/**
+ * One vectorized element of a drawing: a single traced ink island, or a line the user added
+ * in the editor. Geometry lives in the scene's intrinsic pixel space (the rasterized page or
+ * image, `VectorScene.width` x `.height`); `transform` then moves/scales/rotates it so the
+ * original trace stays intact while the user repositions it. `d` is SVG path data with one or
+ * more `M..Z` subpaths (extra subpaths punch holes). `hidden` keeps the object in the scene
+ * but skips it on render and export. Drawing line-art is always black.
+ */
+export type VectorObject = {
+  id: string;
+  d: string;
+  bbox: { x: number; y: number; w: number; h: number };
+  transform: { tx: number; ty: number; sx: number; sy: number; rot: number };
+  hidden: boolean;
+  z: number;
+  source: "trace" | "user";
+  fill: "#000000" | "none";
+  stroke: { color: "#000000"; width: number } | null;
+};
+
+export type VectorScene = {
+  version: 1;
+  width: number;
+  height: number;
+  objects: VectorObject[];
+  source: { kind: "pdf" | "image"; pageIndex: number; tracedAt: string };
+};
+
+/**
+ * The small pointer persisted in `project_attachments.vector_scene_meta`. The scene body
+ * itself (potentially MBs of path data) lives in Storage at the `storagePath`, so list queries
+ * that load every attachment stay light. `edited` flips true once the user saves a change and
+ * gates re-vectorization so a re-seed never clobbers their edits.
+ */
+export type VectorSceneMeta = {
+  version: 1;
+  storagePath: string;
+  width: number;
+  height: number;
+  objectCount: number;
+  edited: boolean;
+  tracedAt: string;
+};
+
 export type Attachment = {
   id: string;
   project_id: string;
@@ -91,39 +124,11 @@ export type Attachment = {
   analysis: DrawingReview | null;
   /** Editable label/lead-line layer for the drawing editor (Feature 2). */
   annotations: DrawingAnnotations | null;
+  /** Pointer to the editable vectorized scene in Storage, null until the figure is vectorized. */
+  vector_scene_meta: VectorSceneMeta | null;
+  /** Page within a multi-page PDF (one attachment row per page); null for images/single page. */
+  page_index: number | null;
 };
-
-/** The five 37 CFR 1.63 attestations captured when an inventor signs (PTO/AIA/01). */
-export type DeclarationStatements = {
-  made_or_authorized: boolean;
-  original_inventor: boolean;
-  reviewed_understood: boolean;
-  duty_to_disclose: boolean;
-  penalty_acknowledged: boolean;
-};
-
-export type Declaration = {
-  id: string;
-  project_id: string;
-  inventor_id: string | null;
-  legal_name: string;
-  /** The S-signature exactly as entered, e.g. "/John A. Smith/" (37 CFR 1.4(d)(2)). */
-  s_signature: string | null;
-  statements: DeclarationStatements;
-  signed_at: string;
-};
-
-/**
- * An S-signature per 37 CFR 1.4(d)(2): the signer personally inserts their name between two
- * forward slashes. Between the slashes are only letters and Arabic numerals with appropriate
- * spaces, commas, periods, apostrophes, or hyphens, and at least one letter.
- */
-export function isValidSSignature(sig: string): boolean {
-  const m = sig.trim().match(/^\/([^/]+)\/$/);
-  if (!m) return false;
-  const inner = m[1].trim();
-  return /[A-Za-z]/.test(inner) && /^[A-Za-z0-9 ,.'-]+$/.test(inner);
-}
 
 /**
  * A drawing-compliance issue found by the vision analysis. x,y are normalized 0..1 from the

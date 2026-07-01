@@ -13,6 +13,17 @@ const ALLOWED = [
 ];
 const MAX_BYTES = 26214400; // 25 MB, matches the bucket limit
 
+/** Page count of a PDF (pdf-lib is already a dependency); 1 on any failure. */
+async function pdfPageCount(bytes: Buffer): Promise<number> {
+  try {
+    const { PDFDocument } = await import("pdf-lib");
+    const doc = await PDFDocument.load(bytes, { updateMetadata: false });
+    return Math.max(1, doc.getPageCount());
+  } catch {
+    return 1;
+  }
+}
+
 // Upload a drawing or supporting document into the private US-region Storage bucket
 // under `{projectId}/...`. RLS enforces ownership; we also fail clearly on bad input.
 export async function POST(
@@ -40,26 +51,16 @@ export async function POST(
   if (!file || typeof file.arrayBuffer !== "function") {
     return NextResponse.json({ error: "No file provided." }, { status: 400 });
   }
-  const lname = file.name.toLowerCase();
-  const is3d = lname.endsWith(".glb") || lname.endsWith(".gltf");
-  if (!ALLOWED.includes(file.type) && !is3d) {
+  if (!ALLOWED.includes(file.type)) {
     return NextResponse.json(
-      {
-        error:
-          "Unsupported file type. Use PNG, JPEG, GIF, WEBP, PDF, or a 3D model (GLB/GLTF).",
-      },
+      { error: "Unsupported file type. Use PNG, JPEG, GIF, WEBP, or PDF." },
       { status: 400 },
     );
   }
   if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "File too large (max 25 MB)." }, { status: 400 });
   }
-  // 3D files often arrive with an empty or generic mime; normalize so the viewer can detect it.
-  const mime = is3d
-    ? lname.endsWith(".glb")
-      ? "model/gltf-binary"
-      : "model/gltf+json"
-    : file.type;
+  const mime = file.type;
 
   const { data: proj } = await supabase
     .from("projects")
@@ -80,26 +81,33 @@ export async function POST(
     .upload(path, bytes, { contentType: mime, upsert: false });
   if (upErr) return NextResponse.json({ error: upErr.message }, { status: 400 });
 
-  const { data: row, error: insErr } = await supabase
+  // A multi-page PDF drawing becomes one figure (row) per page, all sharing this PDF's bytes;
+  // each page vectorizes independently. Images and single-page PDFs are one row.
+  const pageCount =
+    mime === "application/pdf" && kind === "drawing" ? await pdfPageCount(bytes) : 1;
+  const rows = Array.from({ length: pageCount }, (_, p) => ({
+    project_id: projectId,
+    kind,
+    view,
+    storage_path: path,
+    filename: pageCount > 1 ? `${file.name} (p${p + 1})` : file.name,
+    mime,
+    size_bytes: file.size,
+    page_index: mime === "application/pdf" ? p : null,
+  }));
+
+  const { data: inserted, error: insErr } = await supabase
     .from("project_attachments")
-    .insert({
-      project_id: projectId,
-      kind,
-      view,
-      storage_path: path,
-      filename: file.name,
-      mime,
-      size_bytes: file.size,
-    })
-    .select("*")
-    .single();
-  if (insErr || !row) {
+    .insert(rows)
+    .select("*");
+  if (insErr || !inserted?.length) {
     await admin.storage.from("project-files").remove([path]);
     return NextResponse.json(
       { error: insErr?.message ?? "Could not record attachment." },
       { status: 400 },
     );
   }
+  const row = inserted.find((r) => (r.page_index ?? 0) === 0) ?? inserted[0];
 
   await logAudit(supabase, {
     userId: user.id,

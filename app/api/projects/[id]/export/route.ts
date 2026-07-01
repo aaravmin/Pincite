@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import JSZip from "jszip";
 import { createClient } from "@/lib/supabase/server";
 import { buildReportData, toText } from "@/lib/export/report";
-import { buildSpecDocx, specToText } from "@/lib/export/docx";
+import { buildSpecDocx } from "@/lib/export/docx";
+import { buildPatentPdf } from "@/lib/export/patent-pdf";
 import {
   buildAdsText,
   buildDeclarationText,
@@ -10,9 +11,10 @@ import {
   buildReadme,
 } from "@/lib/export/filing-package";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
+import { getInventors, getAttachments } from "@/lib/filing/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildFigureSvg, imageSize } from "@/lib/export/figure-svg";
+import { buildSceneSvg } from "@/lib/export/scene-svg";
 import {
   buildPatentLatex,
   buildLatexReadme,
@@ -21,6 +23,75 @@ import {
 import { buildFigurePdf } from "@/lib/export/figure-pdf";
 import { logAudit } from "@/lib/audit";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+/**
+ * Safe, collision-free names for the signed declaration documents placed under `declarations/`
+ * in the filing package. Sanitizes each filename and de-duplicates so two inventors who both
+ * upload "signed-declaration.pdf" don't overwrite each other in the zip.
+ */
+function declarationZipNames(filenames: string[]): string[] {
+  const used = new Set<string>();
+  return filenames.map((raw, i) => {
+    const fallback = `declaration-${i + 1}.pdf`;
+    const safe =
+      (raw || fallback).replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80) || fallback;
+    let candidate = safe;
+    let n = 1;
+    while (used.has(candidate.toLowerCase())) {
+      const dot = safe.lastIndexOf(".");
+      candidate =
+        dot > 0 ? `${safe.slice(0, dot)}-${n}${safe.slice(dot)}` : `${safe}-${n}`;
+      n++;
+    }
+    used.add(candidate.toLowerCase());
+    return candidate;
+  });
+}
+
+/**
+ * Render the application as a typeset patent PDF (lib/export/patent-pdf), with each uploaded
+ * drawing baked into a figure PDF (numerals + lead lines) and embedded on its own page. This is
+ * the visual output shown in the half-screen preview and downloaded as the PDF format; it is
+ * what the LaTeX bundle looks like compiled. Returns null if the matter does not exist.
+ */
+async function renderPatentPdf(id: string): Promise<Uint8Array | null> {
+  const project = await getProject(id);
+  if (!project) return null;
+  const [sections, inventors, attachments] = await Promise.all([
+    getSectionContent(id),
+    getInventors(id),
+    getAttachments(id),
+  ]);
+  const title = sections["title"] ?? "";
+  const admin = createAdminClient();
+  const figures: { pdf: Uint8Array; label: string; description: string }[] = [];
+  let n = 0;
+  for (const a of attachments) {
+    if (a.kind !== "drawing") continue;
+    if (a.mime !== "image/png" && a.mime !== "image/jpeg") continue;
+    const { data: blob } = await admin.storage
+      .from("project-files")
+      .download(a.storage_path);
+    if (!blob) continue;
+    n++;
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const pdf = await buildFigurePdf({
+      bytes,
+      mime: a.mime,
+      annotations: a.annotations,
+      includeFigureLabel: false,
+    });
+    if (pdf) {
+      figures.push({ pdf, label: `FIG. ${n}`, description: figureDescription(a.view) });
+    }
+  }
+  return buildPatentPdf({
+    sections,
+    title,
+    inventors: inventors.map((i) => i.legal_name).filter(Boolean),
+    figures,
+  });
+}
 
 async function record(
   supabase: SupabaseClient,
@@ -54,101 +125,19 @@ export async function GET(
   } = await supabase.auth.getUser();
   if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
-  // A half-screen preview of a file output: build the text representation of the chosen format
-  // and return it as JSON. A preview is not a download, so it is not recorded in `exports`.
+  // A half-screen preview shows what the application looks like typeset: the rendered patent PDF,
+  // streamed inline so the browser displays the actual pages. Every previewable format (PDF,
+  // LaTeX, filing package) previews this same document. A preview is not a download, so it is
+  // not recorded in `exports`.
   if (isPreview) {
-    if (format === "txt") {
-      const report = await buildReportData(id);
-      if (!report) return new NextResponse("Not found", { status: 404 });
-      return NextResponse.json({
-        title: "Review report",
-        filename: `pincite-${id}.txt`,
-        language: "text",
-        content: toText(report),
-      });
-    }
-
-    const project = await getProject(id);
-    if (!project) return new NextResponse("Not found", { status: 404 });
-    const [sections, inventors, declarations, attachments] = await Promise.all([
-      getSectionContent(id),
-      getInventors(id),
-      getDeclarations(id),
-      getAttachments(id),
-    ]);
-    const title = sections["title"] ?? "";
-
-    if (format === "docx") {
-      return NextResponse.json({
-        title: "Specification (DOCX)",
-        filename: `specification-${id}.docx`,
-        language: "text",
-        note: "A Microsoft Word file in 37 CFR 1.77 order. Download to open it in Word. Below is the text it contains.",
-        content: specToText(sections),
-      });
-    }
-
-    if (format === "latex") {
-      const figures: { file: string; label: string; description: string }[] = [];
-      let n = 0;
-      for (const a of attachments) {
-        if (a.kind !== "drawing") continue;
-        const ext =
-          a.mime === "image/png" ? "png" : a.mime === "image/jpeg" ? "jpg" : null;
-        if (!ext) continue;
-        n++;
-        figures.push({
-          file: `figures/figure-${String(n).padStart(2, "0")}.pdf`,
-          label: `FIG. ${n}`,
-          description: figureDescription(a.view),
-        });
-      }
-      const tex = buildPatentLatex({
-        sections,
-        title,
-        inventors: inventors.map((i) => i.legal_name).filter(Boolean),
-        figures,
-      });
-      return NextResponse.json({
-        title: "Patent format (LaTeX)",
-        filename: "patent.tex",
-        language: "latex",
-        note: "The LaTeX source. The download is a .zip with patent.tex plus the figure files; compile it on Overleaf or with pdflatex.",
-        content: tex,
-        files: ["patent.tex", ...figures.map((f) => f.file), "README.txt"],
-      });
-    }
-
-    if (format === "package") {
-      const drawingFiles = attachments
-        .filter((a) => a.kind === "drawing" && a.mime.startsWith("image/"))
-        .map((_, i) => `drawings/figure-${String(i + 1).padStart(2, "0")}.svg`);
-      const files = [
-        "specification.docx",
-        "application-data-sheet.txt",
-        "inventor-declaration.txt",
-        "transmittal-and-fees.txt",
-        ...drawingFiles,
-        "README.txt",
-      ];
-      const content = [
-        `SPECIFICATION (specification.docx)\n\n${specToText(sections)}`,
-        `APPLICATION DATA SHEET (application-data-sheet.txt)\n\n${buildAdsText(project, inventors, title)}`,
-        `INVENTOR DECLARATION (inventor-declaration.txt)\n\n${buildDeclarationText(project, inventors, declarations, title)}`,
-        `TRANSMITTAL AND FEES (transmittal-and-fees.txt)\n\n${buildTransmittalAndFeesText(project)}`,
-        `README (README.txt)\n\n${buildReadme()}`,
-      ].join("\n\n\n");
-      return NextResponse.json({
-        title: "Filing package",
-        filename: `pincite-filing-${id}.zip`,
-        language: "text",
-        note: "Everything in the .zip you would upload to Patent Center. The drawings export as SVG files; the rest is shown below.",
-        content,
-        files,
-      });
-    }
-
-    return new NextResponse("Unknown format", { status: 400 });
+    const pdfBytes = await renderPatentPdf(id);
+    if (!pdfBytes) return new NextResponse("Not found", { status: 404 });
+    return new NextResponse(new Uint8Array(pdfBytes), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="patent-${id}.pdf"`,
+      },
+    });
   }
 
   // The analysis report (the user's own review), kept separate from filing documents.
@@ -164,12 +153,24 @@ export async function GET(
     });
   }
 
+  // The typeset patent PDF: what the LaTeX bundle looks like compiled, ready to read or file.
+  if (format === "pdf") {
+    const pdfBytes = await renderPatentPdf(id);
+    if (!pdfBytes) return new NextResponse("Not found", { status: 404 });
+    await record(supabase, user.id, id, "pdf");
+    return new NextResponse(new Uint8Array(pdfBytes), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="patent-${id}.pdf"`,
+      },
+    });
+  }
+
   const project = await getProject(id);
   if (!project) return new NextResponse("Not found", { status: 404 });
-  const [sections, inventors, declarations] = await Promise.all([
+  const [sections, inventors] = await Promise.all([
     getSectionContent(id),
     getInventors(id),
-    getDeclarations(id),
   ]);
   const title = sections["title"] ?? "";
 
@@ -246,34 +247,55 @@ export async function GET(
   // The full filing package: spec DOCX + ADS data + declaration + transmittal/fees + README.
   if (format === "package") {
     const specBuf = await buildSpecDocx(sections);
+    const attachments = await getAttachments(id);
+    const admin = createAdminClient();
     const zip = new JSZip();
     zip.file("specification.docx", specBuf);
     zip.file("application-data-sheet.txt", buildAdsText(project, inventors, title));
+
+    // The signed inventor declarations: the operative wet-/hand-signed documents the inventors
+    // uploaded, bundled verbatim under declarations/ so the package is what actually gets filed.
+    const declarationDocs = attachments.filter((a) => a.kind === "declaration");
+    const declNames = declarationZipNames(declarationDocs.map((a) => a.filename));
+    for (const [i, doc] of declarationDocs.entries()) {
+      const { data: blob } = await admin.storage
+        .from("project-files")
+        .download(doc.storage_path);
+      if (!blob) continue;
+      zip.file(`declarations/${declNames[i]}`, new Uint8Array(await blob.arrayBuffer()));
+    }
     zip.file(
       "inventor-declaration.txt",
-      buildDeclarationText(project, inventors, declarations, title),
+      buildDeclarationText(inventors, declNames, title),
     );
     zip.file("transmittal-and-fees.txt", buildTransmittalAndFeesText(project));
 
-    // Drawings: each image figure with its edited annotation layer baked in (numerals, lead
-    // lines, figure label) as an SVG, so the package matches what the drawing editor shows.
-    // Falls back to the raw bytes when the dimensions can't be read (e.g. WEBP).
-    const attachments = await getAttachments(id);
+    // Drawings, in order. A figure the user has vectorized is filed as its EDITED vector scene
+    // (the drawing of record); this is what carries edits into the filed output and lets a
+    // vectorized PDF into the package. An un-vectorized image falls back to the raster with its
+    // annotation layer baked in; a raw PDF (which can't be embedded here) is skipped.
     const figures = attachments.filter(
-      (a) => a.kind === "drawing" && a.mime.startsWith("image/"),
+      (a) => a.kind === "drawing" && (a.vector_scene_meta || a.mime.startsWith("image/")),
     );
     if (figures.length > 0) {
-      const admin = createAdminClient();
       let n = 0;
       for (const f of figures) {
         n++;
+        const stem = `drawings/figure-${String(n).padStart(2, "0")}`;
+        if (f.vector_scene_meta) {
+          const { data: sceneBlob } = await admin.storage
+            .from("project-files")
+            .download(f.vector_scene_meta.storagePath);
+          if (!sceneBlob) continue;
+          zip.file(`${stem}.svg`, buildSceneSvg(JSON.parse(await sceneBlob.text())));
+          continue;
+        }
         const { data: blob } = await admin.storage
           .from("project-files")
           .download(f.storage_path);
         if (!blob) continue;
         const bytes = new Uint8Array(await blob.arrayBuffer());
         const dims = imageSize(bytes);
-        const stem = `drawings/figure-${String(n).padStart(2, "0")}`;
         if (dims) {
           const dataUrl = `data:${f.mime};base64,${Buffer.from(bytes).toString("base64")}`;
           zip.file(

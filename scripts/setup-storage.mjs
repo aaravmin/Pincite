@@ -13,7 +13,7 @@ await c.query(`
   insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
   values ('project-files', 'project-files', false, 26214400,
     array['image/png','image/jpeg','image/gif','image/webp','application/pdf',
-          'model/gltf-binary','model/gltf+json'])
+          'model/gltf-binary','model/gltf+json','application/json'])
   on conflict (id) do update set
     public = excluded.public,
     file_size_limit = excluded.file_size_limit,

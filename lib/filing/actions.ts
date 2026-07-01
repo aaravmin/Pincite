@@ -22,10 +22,12 @@ import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
 import {
   ATTACHMENT_VIEWS,
   type InventorInput,
-  type DeclarationStatements,
   type DrawingFinding,
   type DrawingReview,
   type DrawingAnnotations,
+  type VectorObject,
+  type VectorScene,
+  type VectorSceneMeta,
 } from "@/lib/filing/types";
 
 async function requireUser() {
@@ -128,10 +130,20 @@ export async function deleteAttachment(input: {
     .maybeSingle();
   if (!row) return { error: "Attachment not found." };
 
-  // Ownership confirmed via the user client above; remove bytes with the admin client.
-  await createAdminClient().storage
-    .from("project-files")
-    .remove([row.storage_path]);
+  // Ownership confirmed via the user client above; do Storage work with the admin client.
+  const admin = createAdminClient();
+  // The per-page rows of a multi-page PDF share one storage object; only remove the bytes when
+  // this is the last row referencing them, so deleting one page doesn't wipe the others.
+  const { count: siblings } = await supabase
+    .from("project_attachments")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", input.projectId)
+    .eq("storage_path", row.storage_path)
+    .neq("id", input.attachmentId);
+  const toRemove = [`${input.projectId}/scenes/${input.attachmentId}.json`];
+  if (!siblings) toRemove.push(row.storage_path);
+  await admin.storage.from("project-files").remove(toRemove);
+
   const { error } = await supabase
     .from("project_attachments")
     .delete()
@@ -144,42 +156,6 @@ export async function deleteAttachment(input: {
     projectId: input.projectId,
   });
   revalidatePath(`/projects/${input.projectId}/uploads`);
-  return { ok: true };
-}
-
-export async function signDeclaration(input: {
-  projectId: string;
-  inventorId: string;
-  legalName: string;
-  statements: DeclarationStatements;
-}): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
-  const legalName = input.legalName?.trim();
-  if (!legalName) {
-    return { error: "Enter the inventor's full legal name to certify." };
-  }
-  // The inventor certifies the five 37 CFR 1.63 statements; the operative signature is on the
-  // PDF they sign and upload, which Pincite does not need to verify.
-  if (!Object.values(input.statements).every(Boolean)) {
-    return { error: "Confirm every statement to certify the declaration." };
-  }
-
-  // Append-only: each certification inserts a new immutable declaration row.
-  const { error } = await supabase.from("project_declarations").insert({
-    project_id: input.projectId,
-    inventor_id: input.inventorId,
-    legal_name: legalName,
-    statements: input.statements,
-  });
-  if (error) return { error: error.message };
-
-  await logAudit(supabase, {
-    userId: user.id,
-    action: "declaration_signed",
-    projectId: input.projectId,
-    detail: { inventor_id: input.inventorId },
-  });
-  revalidatePath(`/projects/${input.projectId}/sign`);
   return { ok: true };
 }
 
@@ -513,4 +489,206 @@ export async function saveDrawingAnnotations(input: {
   });
 
   return { ok: true };
+}
+
+/**
+ * Vectorize a drawing into an editable scene: decode -> binarize -> trace each ink island into a
+ * movable/resizable/hideable path object. The scene body (potentially MBs of path data) is written
+ * to Storage at {projectId}/scenes/{attachmentId}.json and only a small pointer is stored on the
+ * row, so list queries stay light. Deterministic and AI-free, so it carries a soft per-user CPU
+ * cap only, no model budget. A figure the user has already hand-edited is left untouched so a
+ * re-run never clobbers their work.
+ */
+export async function seedVectorScene(input: {
+  projectId: string;
+  attachmentId: string;
+}): Promise<{ ok: true; meta: VectorSceneMeta } | { error: string }> {
+  const { supabase, user } = await requireUser();
+
+  const { data: att } = await supabase
+    .from("project_attachments")
+    .select("storage_path, mime, vector_scene_meta, page_index")
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  if (!att) return { error: "Attachment not found." };
+
+  const existing = att.vector_scene_meta as VectorSceneMeta | null;
+  if (existing?.edited) return { ok: true, meta: existing };
+  const isPdf = att.mime === "application/pdf";
+  if (!isPdf && !att.mime.startsWith("image/")) {
+    return { error: "This file type can't be vectorized." };
+  }
+
+  const rl = await checkRateLimit(supabase, "drawing_vectorize", 60, 3600);
+  if (!rl.allowed) return { error: rl.retryMessage };
+
+  const admin = createAdminClient();
+  const { data: blob, error: dlErr } = await admin.storage
+    .from("project-files")
+    .download(att.storage_path);
+  if (dlErr || !blob) return { error: dlErr?.message ?? "Could not read the file." };
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+
+  const tracedAt = new Date().toISOString();
+  let scene: VectorScene;
+  try {
+    // Dynamic import so the native canvas / pdf renderer loads only when a drawing is vectorized.
+    const { buildSceneFromImage, buildSceneFromPdf } = await import("@/lib/vector/scene");
+    ({ scene } = isPdf
+      ? await buildSceneFromPdf(bytes, tracedAt, att.page_index ?? 0)
+      : await buildSceneFromImage(bytes, tracedAt));
+  } catch (e) {
+    return { error: `Could not vectorize the drawing: ${(e as Error).message}` };
+  }
+  if (scene.objects.length === 0) {
+    return { error: "No drawn lines were found to vectorize in this figure." };
+  }
+
+  const storagePath = `${input.projectId}/scenes/${input.attachmentId}.json`;
+  const { error: upErr } = await admin.storage
+    .from("project-files")
+    .upload(storagePath, Buffer.from(JSON.stringify(scene)), {
+      contentType: "application/json",
+      upsert: true,
+    });
+  if (upErr) return { error: upErr.message };
+
+  const meta: VectorSceneMeta = {
+    version: 1,
+    storagePath,
+    width: scene.width,
+    height: scene.height,
+    objectCount: scene.objects.length,
+    edited: false,
+    tracedAt,
+  };
+  await admin
+    .from("project_attachments")
+    .update({ vector_scene_meta: meta })
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId);
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "drawing_vectorized",
+    projectId: input.projectId,
+    detail: { attachmentId: input.attachmentId, objects: scene.objects.length },
+  });
+
+  return { ok: true, meta };
+}
+
+/**
+ * Persist an edited vector scene back to Storage. Sanitizes the incoming objects (object cap,
+ * finite transforms, black-only fills/strokes, bounded path length) and flips `edited` so a later
+ * re-vectorize won't overwrite the user's work. Canvas dimensions are pinned to the original trace.
+ */
+export async function saveVectorScene(input: {
+  projectId: string;
+  attachmentId: string;
+  scene: VectorScene;
+}): Promise<{ ok: true; meta: VectorSceneMeta } | { error: string }> {
+  const { supabase, user } = await requireUser();
+
+  const { data: att } = await supabase
+    .from("project_attachments")
+    .select("vector_scene_meta")
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId)
+    .maybeSingle();
+  if (!att) return { error: "Attachment not found." };
+  const existing = att.vector_scene_meta as VectorSceneMeta | null;
+  if (!existing) return { error: "This figure has not been vectorized yet." };
+
+  const scene = sanitizeScene(input.scene, existing);
+
+  const { error: upErr } = await createAdminClient()
+    .storage.from("project-files")
+    .upload(existing.storagePath, Buffer.from(JSON.stringify(scene)), {
+      contentType: "application/json",
+      upsert: true,
+    });
+  if (upErr) return { error: upErr.message };
+
+  const meta: VectorSceneMeta = {
+    ...existing,
+    width: scene.width,
+    height: scene.height,
+    objectCount: scene.objects.length,
+    edited: true,
+  };
+  await createAdminClient()
+    .from("project_attachments")
+    .update({ vector_scene_meta: meta })
+    .eq("id", input.attachmentId)
+    .eq("project_id", input.projectId);
+
+  await logAudit(supabase, {
+    userId: user.id,
+    action: "drawing_scene_saved",
+    projectId: input.projectId,
+    detail: { attachmentId: input.attachmentId, objects: scene.objects.length },
+  });
+
+  return { ok: true, meta };
+}
+
+const MAX_SCENE_OBJECTS = 8000;
+// A single connected outline can legitimately be ~200k chars; only drop truly pathological
+// paths, and never slice (slicing mid-number produces an invalid `d`).
+const MAX_PATH_CHARS = 2_000_000;
+
+/** Coerce a client-sent scene into a safe, well-formed VectorScene before it is stored. */
+function sanitizeScene(scene: VectorScene, meta: VectorSceneMeta): VectorScene {
+  const fin = (n: unknown, fallback: number) =>
+    typeof n === "number" && Number.isFinite(n) ? n : fallback;
+  const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
+  // Canvas dimensions are fixed by the original trace; never trust the client to change them.
+  const width = meta.width;
+  const height = meta.height;
+
+  const objects: VectorObject[] = (Array.isArray(scene?.objects) ? scene.objects : [])
+    .slice(0, MAX_SCENE_OBJECTS)
+    .map((o, i): VectorObject | null => {
+      const d = typeof o?.d === "string" ? o.d : "";
+      if (!d || d.length > MAX_PATH_CHARS) return null;
+      const t = o?.transform ?? {};
+      const b = o?.bbox ?? {};
+      const stroke =
+        o?.stroke && typeof o.stroke === "object"
+          ? { color: "#000000" as const, width: clamp(fin(o.stroke.width, 1), 0.2, 50) }
+          : null;
+      return {
+        id: String(o?.id ?? `o${i}`).slice(0, 40),
+        d,
+        bbox: {
+          x: fin(b.x, 0),
+          y: fin(b.y, 0),
+          w: Math.max(1, fin(b.w, 1)),
+          h: Math.max(1, fin(b.h, 1)),
+        },
+        transform: {
+          tx: clamp(fin(t.tx, 0), -4 * width, 4 * width),
+          ty: clamp(fin(t.ty, 0), -4 * height, 4 * height),
+          sx: clamp(fin(t.sx, 1), 0.01, 100),
+          sy: clamp(fin(t.sy, 1), 0.01, 100),
+          rot: clamp(fin(t.rot, 0), -360, 360),
+        },
+        hidden: Boolean(o?.hidden),
+        z: fin(o?.z, i),
+        source: o?.source === "user" ? "user" : "trace",
+        fill: o?.fill === "none" ? "none" : "#000000",
+        stroke,
+      };
+    })
+    .filter((o): o is VectorObject => o !== null);
+
+  return {
+    version: 1,
+    width,
+    height,
+    objects,
+    source: scene?.source ?? { kind: "image", pageIndex: 0, tracedAt: meta.tracedAt },
+  };
 }

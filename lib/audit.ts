@@ -25,6 +25,8 @@ export type AuditAction =
   | "drawing_analyzed"
   | "drawing_oriented"
   | "drawing_edited"
+  | "drawing_vectorized"
+  | "drawing_scene_saved"
   | "project_deleted";
 
 export async function logAudit(

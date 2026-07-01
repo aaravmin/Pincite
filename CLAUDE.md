@@ -102,15 +102,25 @@ the end of each session — but be stringent; trim before it bloats.
   ownership with the user client, then upload/sign/remove via `lib/supabase/admin.ts`
   (service role). Bucket `project-files` is private; objects namespaced by `{projectId}/`.
   The bucket also enforces an `allowed_mime_types` allowlist (`scripts/setup-storage.mjs`): a
-  new upload type (e.g. 3D `model/gltf-binary`/`model/gltf+json`) must be added there or
-  Storage 400s the upload (the route then surfaces "Upload failed"). 3D models render via
-  `@google/model-viewer` (dynamic import, client only); bytes stream same-origin via the
-  attachment route's `?raw=1` to avoid a cross-origin CORS fetch.
+  new upload type must be added there or Storage 400s the upload (the route then surfaces
+  "Upload failed"). The drawing-editor `<img>` streams same-origin via the attachment route's
+  `?raw=1` so it can read onto a canvas without tainting it. (3D model upload was removed -
+  uploads are images/PDF only.)
 - **xAI ZDR header.** Don't send `x-zero-data-retention: true` on Grok requests unless the
   team has enterprise ZDR (xAI 400s: "team does not have zero data retention enabled"). Read
   the response header for ZDR status; it currently reads "false".
 - **exports.format CHECK.** `exports.format` is constrained; new formats need a migration
   (0008 added 'docx','package'). A silently-swallowed export insert = the CHECK rejected it.
+- **MPEP locate quality (migration 0020).** The keyword fallback (hit whenever Voyage
+  throttles - free tier is 3 RPM) used `.textSearch(...).limit()` with NO `order by ts_rank`,
+  so it returned matches in physical table order and broad catch-alls (101 "General", 103,
+  502.05) won almost every question. Now goes through the `match_mpep_keyword` RPC (ts_rank
+  desc, then title-match, then shorter-is-more-specific), and both locate RPCs drop `[Reserved]`
+  + "[top]" stubs. Separately, the MPEP has hundreds of pure cross-reference sections whose
+  whole body is "See MPEP Chapter 2300." - `isPointerStub` (`lib/mpep/highlight.ts`) detects
+  them so `askMpep` skips a stub section (unless the user typed that exact number) and
+  `selectResponsivePassage` never highlights a bare pointer line. The user lands on real text,
+  not "go look in chapter 2300 yourself." e2e in `ask.spec.ts`.
 - **Rate limiting (migration 0011).** Paid endpoints are throttled per user via the
   `consume_rate_limit(kind,limit,window)` SQL function (security definer, atomic check+record)
   called through `lib/ratelimit.ts:checkRateLimit` BEFORE the provider call: BigQuery live search
@@ -135,7 +145,9 @@ the end of each session — but be stringent; trim before it bloats.
 - [~] Phase 2 — corpus ingested (1908 sections, all 29 chapters, text; migration 0003,
       pgvector). Evidence pane + Ask (`/ask`), locate (keyword/number), `lib/mpep/*`
       (load/locate/citation/highlight), citation-validate drop — DONE + gated. Embeddings
-      DONE (2902 chunks). Enhancements not yet wired: semantic locate into `/ask`, Grok answer.
+      DONE (2902 chunks). Locate quality hardened (migration 0020): ranked keyword RPC +
+      pointer-stub skipping so questions land on real text, not "See MPEP Chapter 2300" (see
+      Gotchas). Enhancements not yet wired: semantic locate into `/ask`, Grok answer.
 - [~] Phase 7 — prior art (feature 3): schema 0004, `lib/patents/*` (extract + pinpoint
       match + transparent score), results UI + overlap evidence pane (yellow overlap / red
       full-limitation) — DONE + gated on the free deterministic "Compare a patent" path.
@@ -196,7 +208,7 @@ the end of each session — but be stringent; trim before it bloats.
       `updateRole`), audit-log CSV export (`/api/audit/export`). Drawing vision review is now
       persisted (migration 0014 `project_attachments.analysis` jsonb, written by `analyzeDrawing`
       via admin client; shown as `initialReview`) so flags survive page leaves; drawing remove
-      verified incl. 3D. Public `/privacy` + `/terms` (middleware allowlisted) + Google Search
+      verified. Public `/privacy` + `/terms` (middleware allowlisted) + Google Search
       Console verification meta tag in the root layout (for OAuth consent-screen domain).
       Demo aids: `docs/demo-script.md` + `docs/demo-pizza-box-fields.md`.
 - [x] Readiness overview (`/projects/[id]/overview`, `lib/readiness.ts`): the per-matter home
@@ -222,7 +234,7 @@ the end of each session — but be stringent; trim before it bloats.
     edit/live-clear/persist; F2.2 export edited figures to PNG/SVG per figure + into the filing
     package as `drawings/figure-NN.svg` (shared `lib/export/figure-svg.ts` buildFigureSvg/imageSize;
     overlay drawn BLACK not review-red; editor img uses `?raw=1` same-origin to avoid canvas taint).
-    e2e `drawing-editor`/`drawing-export`. TODO: multi-angle capture from a 3D model.
+    e2e `drawing-editor`/`drawing-export`.
   - [x] F3 real signing: USPTO S-signature (37 CFR 1.4(d)) on the inventor declaration - the
     signer's name between slashes /First M. Last/ + printed name + the 1.63 statements;
     `isValidSSignature` (lib/filing/types) shared by the sign action, filing validator (MPEP
@@ -242,6 +254,27 @@ the end of each session — but be stringent; trim before it bloats.
   **pdf-lib** (`lib/export/figure-pdf.ts`: raster + numerals + lead lines, halo'd; FIG. N caption
   from LaTeX) so the typeset patent shows the EDITED drawings. Button on Submission; migration 0017
   adds 'latex'. e2e `latex-export.spec.ts`. (No server-side TeX engine; user compiles.)
+
+- [x] VECTOR DRAWING EDITOR (drawings become editable objects): every uploaded drawing (image OR
+  PDF) has two views in `components/uploads/vector-drawing-editor.tsx` - "Original" (untouched
+  upload, the record) and "Edit" (a vectorized copy). Server-side pipeline `lib/vector/*`
+  (rasterize via `@napi-rs/canvas` + `pdfjs-dist` legacy; adaptive+hard-dark binarize handles
+  shaded CAD renders and noisy scans; 8-connectivity connected-components; marching-squares
+  boundary trace + RDP) turns the line-art into independent path objects the user can move,
+  resize (8 handles, opposite edge pinned), hide, delete, plus an "Add line" tool for
+  described-but-undrawn leads; undo + keyboard. Deterministic, AI-free, soft CPU cap
+  `drawing_vectorize`. Scene body is a Storage object `{projectId}/scenes/{attachmentId}.json`
+  (can be MBs); only a `vector_scene_meta` jsonb pointer + `page_index` on the row (migration
+  0019); served same-origin via the `.../scene` route. Actions `seedVectorScene`/`saveVectorScene`
+  (sanitized, `edited` gates re-seed). Multi-page PDFs split into one figure row per page at upload
+  (pdf-lib page count; shared storage_path; `deleteAttachment` only removes bytes when it's the
+  last referencing row). The EDITED scene is the drawing of record: the filing package files
+  `buildSceneSvg` (`lib/export/scene-svg.ts`) as `drawings/figure-NN.svg` when a scene exists.
+  Native modules are in next.config `serverExternalPackages` (turbopack must not bundle the .node
+  binding) + `serverActions.bodySizeLimit: 8mb` (scenes are large). e2e `vector-{editor,pdf,export}`.
+  DEFERRED (optional): LaTeX `buildScenePdf` + client PNG/SVG download from the scene; multi-angle
+  capture from a 3D model. Granularity note: objects are connected ink islands, so strokes that
+  physically touch move together (no ML segmentation of a single connected drawing).
 
 - [x] Dashboard rows open on click (`components/dashboard/openable-row.tsx`): both the attorney
   portfolio and the inventor list make the whole matter row clickable except `[data-no-open]`
@@ -276,6 +309,17 @@ the end of each session — but be stringent; trim before it bloats.
   the spec in 1.77 order. `report-workspace.tsx` keeps the per-format download (testids) + adds a
   Preview button; when the pane opens the report shifts to the left half so the toolbar stays
   clickable (a real half-screen split). e2e `export-preview.spec.ts`.
+
+- [x] Signature = the physically signed declaration only: the in-app "certify these five boxes"
+  flow is GONE (`SignClient`/`signDeclaration`/`project_declarations` reads removed - a click
+  does not hold up). The Sign step shows the 1.63 statements read-only (what the document says,
+  incl. sole/joint-inventor) then download the real declaration (PTO/AIA/01) -> sign by hand ->
+  upload; the uploaded signed PDF is the operative signature and is bundled verbatim into the
+  filing-package zip under `declarations/` (export route). "Signed" everywhere now means a
+  `kind=declaration` attachment exists (validators/filing `hasSignedDeclaration`, readiness,
+  step-rail, dashboard next-step/completeness); Pincite never verifies the signature. Removed the
+  now-dead `Declaration`/`DeclarationStatements`/`s_signature`/`isValidSSignature`. e2e
+  `sign.spec.ts` (rewritten: no certify, statements read-only, package bundles the signed doc).
 
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.

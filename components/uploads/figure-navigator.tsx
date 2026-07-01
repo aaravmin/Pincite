@@ -17,7 +17,7 @@ import {
   classifyOrientation,
   setAttachmentView,
 } from "@/lib/filing/actions";
-import { DrawingEditor } from "@/components/uploads/drawing-editor";
+import { VectorDrawingEditor } from "@/components/uploads/vector-drawing-editor";
 import {
   ATTACHMENT_VIEWS,
   ATTACHMENT_VIEW_LABELS,
@@ -288,23 +288,16 @@ export function FigureNavigator({
         </div>
 
         <div className="mt-3">
-          {isPdf ? (
-            <iframe
-              key={sel.id}
-              title={sel.filename}
-              src={url}
-              className="h-[480px] w-full rounded border border-border"
-            />
-          ) : (
-            <DrawingEditor
-              key={sel.id}
-              projectId={projectId}
-              attachmentId={sel.id}
-              filename={sel.filename}
-              initialReview={sel.analysis}
-              initialAnnotations={sel.annotations}
-            />
-          )}
+          <VectorDrawingEditor
+            key={sel.id}
+            projectId={projectId}
+            attachmentId={sel.id}
+            filename={sel.filename}
+            mime={sel.mime}
+            initialReview={sel.analysis}
+            initialAnnotations={sel.annotations}
+            initialSceneMeta={sel.vector_scene_meta}
+          />
         </div>
       </div>
     </div>
