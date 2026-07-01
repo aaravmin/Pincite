@@ -31,9 +31,9 @@ export function Hero() {
         {/* left: the stake */}
         <div className="max-w-xl">
           <BlurFade delay={0} inView>
-            <span className="inline-flex items-center rounded-full border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
-              Active patent review workbench
-            </span>
+            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Patent review dashboard
+            </p>
           </BlurFade>
 
           <TextAnimate
@@ -48,8 +48,9 @@ export function Hero() {
 
           <BlurFade delay={0.35} inView>
             <p className="mt-6 max-w-lg text-pretty text-xl leading-relaxed text-muted-foreground">
-              Most of them for preventable rule violations. Pincite catches them in your draft and
-              pins each one to the real MPEP and CFR text, so you fix them before you file.
+              Most of them for preventable rule violations. Pincite catches those in your draft and
+              pins each one to the real MPEP and CFR text. It also compares your claims against prior
+              patents, so you can judge your idea on novelty and obviousness before you file.
             </p>
           </BlurFade>
 
@@ -62,12 +63,6 @@ export function Hero() {
                 Start a review
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
-              <a
-                href="#trace"
-                className="inline-flex items-center gap-2 rounded-md border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-              >
-                See a violation open its rule
-              </a>
             </div>
           </BlurFade>
 

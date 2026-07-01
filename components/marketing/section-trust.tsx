@@ -10,32 +10,32 @@ const ITEMS = [
   {
     icon: Scale,
     title: "Not legal advice",
-    body: "Pincite is a research aid. You stay responsible for what you file and for anything time sensitive.",
+    body: "A research aid, not a lawyer. You stay responsible for what you file.",
   },
   {
     icon: Ban,
     title: "It never files for you",
-    body: "Pincite prepares the documents in the right format. You are the one who submits them to the USPTO.",
+    body: "It prepares the documents in the right format. You are the one who files.",
   },
   {
     icon: Gauge,
     title: "No single patentability score",
-    body: "By design. Prior art stays decomposed into pinpoint overlaps, so you judge the picture, not a number.",
+    body: "Prior art stays broken into pinpoint overlaps. You judge the picture, not a number.",
   },
   {
     icon: BookOpen,
     title: "Every citation resolves to real text",
-    body: "Nothing reaches the screen without a rule that pins to the real MPEP or CFR passage.",
+    body: "Nothing reaches the screen without a rule pinned to the real MPEP or CFR text.",
   },
   {
     icon: Lock,
     title: "Encrypted, US region storage",
-    body: "Your files are encrypted and stored in a US region, isolated to your account by row level security.",
+    body: "Files are encrypted, stored in a US region, and isolated to your account.",
   },
   {
     icon: ShieldCheck,
     title: "Your work is yours",
-    body: "Pincite does not sell your data and does not use your inventions to train its own models.",
+    body: "Pincite never sells your data or trains its models on your inventions.",
   },
 ];
 
@@ -48,11 +48,8 @@ export function SectionTrust() {
             Trust
           </p>
           <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Serious about the boundaries.
+            What Pincite does, and what it does not.
           </h2>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            A patent workbench earns trust by being honest about what it is and what it is not.
-          </p>
         </BlurFade>
 
         <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">

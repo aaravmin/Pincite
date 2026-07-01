@@ -56,10 +56,10 @@ export function SectionAudience() {
         <BlurFade inView delay={0.15}>
           <div className="mt-14 overflow-hidden rounded-2xl border bg-card px-6 py-12 text-center shadow-sm">
             <h2 className="mx-auto max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-              See what your draft is hiding.
+              Catch every problem before you file.
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
-              Start a review, watch the flags open into real rules, and export a filing ready set.
+              Start a review, open each flag to its exact rule, and export a filing ready set.
             </p>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <Link

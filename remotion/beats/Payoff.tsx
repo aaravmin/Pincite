@@ -31,10 +31,12 @@ function FieldCallback({ width = 1920, height = 1080, zoom = 1 }: { width?: numb
   const size = 62;
   const gridW = COLS * cell;
   const gridH = ROWS * cell;
-  const offX = (width - gridW) / 2;
-  const offY = (height - gridH) / 2;
-  const survCX = offX + SC * cell + cell / 2;
-  const survCY = offY + SR * cell + cell / 2;
+  // Center the SURVIVOR (not the grid) at the frame center, so the zoom fills
+  // symmetrically and the closing line sits in the middle of the green square.
+  const offX = width / 2 - (SC * cell + cell / 2);
+  const offY = height / 2 - (SR * cell + cell / 2);
+  const survCX = width / 2;
+  const survCY = height / 2;
   return (
     <div style={{ position: "absolute", inset: 0, transform: `scale(${zoom})`, transformOrigin: `${survCX}px ${survCY}px` }}>
       <div style={{ position: "absolute", left: offX, top: offY, width: gridW, height: gridH }}>
@@ -96,7 +98,7 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
             className="font-serif"
             style={{ fontSize: 64, fontWeight: 700, color: COLORS.foreground }}
           />
-          <p className="mt-3 text-[24px] text-muted-foreground">Every document formatted automatically.</p>
+          <p className="mt-3 text-[24px] text-muted-foreground">Every document formatted automatically</p>
         </div>
         <div style={{ marginTop: 36, display: "flex", gap: 48, alignItems: "center" }}>
           <div style={{ flex: 0.82, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -163,7 +165,7 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         style={{ opacity: interpolate(frame, [208, 220, 236, 246], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
       >
         <span className="font-serif" style={{ fontSize: 78, fontWeight: 700, color: "#ffffff" }}>
-          Be the one that gets accepted.
+          Be the one that gets accepted
         </span>
       </AbsoluteFill>
 

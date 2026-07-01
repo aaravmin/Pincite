@@ -12,11 +12,18 @@ import { KineticText } from "../components/KineticText";
 import { COLORS } from "../colors";
 import { LINES } from "../theme";
 import { AnnotatedEditor } from "@visual/annotated-editor";
-import {
-  APPLE_HERO_CLAIMS,
-  APPLE_HERO_SPANS,
-  APPLE_META,
-} from "@visual/fixtures/apple-example";
+import { APPLE_META } from "@visual/fixtures/apple-example";
+import type { VisualSpan } from "@visual/types";
+
+// A different violation than "claim does not exist" (which the later beats use):
+// a multiple dependent claim joined by "and" instead of "or".
+const HOOK_CLAIMS =
+  "1. A molded fiber container suitable for containing a food item …\n" +
+  "2. The container of claim 1, wherein the base and the lid are formed as one piece.\n" +
+  "3. The container of claim 1, wherein the ridges are arranged concentrically.\n" +
+  "4. The container of claims 1 and 2, wherein the base and the lid nest with a second container.";
+const HS = HOOK_CLAIMS.indexOf("claims 1 and 2");
+const HOOK_SPANS: VisualSpan[] = [{ start: HS, end: HS + "claims 1 and 2".length, signal: "red", flagId: "md" }];
 
 const COLS = 15;
 const ROWS = 7;
@@ -118,13 +125,27 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
         style={{ opacity: editorT, transform: `scale(${interpolate(editorT, [0, 1], [0.9, 1])})` }}
       >
         <div style={{ width: 1560, transform: "scale(1.12)" }}>
-          <AnnotatedEditor
-            text={APPLE_HERO_CLAIMS}
-            spans={APPLE_HERO_SPANS}
-            activeFlagId="claim-6"
-            progress={editorProgress}
-            caption={APPLE_META.claimsCaption}
-          />
+          <div style={{ position: "relative" }}>
+            {/* soft glow so the app window floats (sleek app presentation) */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: -34,
+                borderRadius: 44,
+                background: "radial-gradient(55% 55% at 50% 42%, rgba(0,0,0,0.08), transparent 72%)",
+                filter: "blur(26px)",
+              }}
+            />
+            <AnnotatedEditor
+              text={HOOK_CLAIMS}
+              spans={HOOK_SPANS}
+              activeFlagId="md"
+              progress={editorProgress}
+              caption={APPLE_META.claimsCaption}
+              className="shadow-[0_44px_110px_-24px_rgba(0,0,0,0.28)] ring-1 ring-black/5"
+            />
+          </div>
           <div className="mt-10 text-center" style={{ maxWidth: 1180, marginLeft: "auto", marginRight: "auto" }}>
           <KineticText
             text={LINES.themeSub}

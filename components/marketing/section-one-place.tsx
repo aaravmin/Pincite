@@ -33,11 +33,10 @@ const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Tr
 
 export function SectionOnePlace() {
   return (
-    <section id="one-place" className="scroll-mt-20 border-t bg-muted/20">
+    <section id="one-place" className="scroll-mt-20 overflow-x-clip border-t bg-muted/20">
       <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
         <BlurFade inView>
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">One place</p>
-          <h2 className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <h2 className="max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Every step to filing, in one workbench.
           </h2>
         </BlurFade>
@@ -94,9 +93,26 @@ export function SectionOnePlace() {
               <h3 className="mt-4 text-balance font-rounded text-2xl font-semibold tracking-tight text-foreground">
                 See the exact overlaps, not a score.
               </h3>
-              <div className="mt-5 space-y-2.5">
-                <AnnotatedEditor text={YOURS} spans={YOUR_SPANS} progress={1} caption="Your claim" />
-                <AnnotatedEditor text={PRIOR} spans={PRIOR_SPANS} activeFlagId="x" progress={1} caption="US 6,983,542 B2  .  prior art" />
+              <div className="mt-5 space-y-3">
+                <AnnotatedEditor
+                  text={YOURS}
+                  spans={YOUR_SPANS}
+                  progress={1}
+                  caption="Your claim"
+                  className="mr-10"
+                />
+                {/* the prior-art claim sits offset to the right, so the exact
+                    overlap visibly hangs past your claim above it */}
+                <div className="relative z-10 translate-x-6 sm:translate-x-12">
+                  <AnnotatedEditor
+                    text={PRIOR}
+                    spans={PRIOR_SPANS}
+                    activeFlagId="x"
+                    progress={1}
+                    caption="US 6,983,542 B2  .  prior art"
+                    className="shadow-md"
+                  />
+                </div>
               </div>
               <div className="mt-3">
                 <SignalBadge signal="red">Exact limitation match</SignalBadge>

@@ -45,6 +45,7 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
 
   const dot = interpolateColors(accept, [0, 1], [COLORS.violation, COLORS.pass]);
   const btnPress = interpolate(frame, [146, 152, 160], [1, 0.94, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const clickScale = interpolate(frame, [145, 150, 157], [1, 0.82, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <Scene>
@@ -84,7 +85,7 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
                 {accept > 0.5 ? "Resolved" : ""}
               </span>
             </div>
-            <div style={{ opacity: btnT, display: "flex", gap: 10 }}>
+            <div style={{ opacity: btnT, display: "flex", gap: 10, position: "relative" }}>
               <div className="rounded-lg border px-4 py-2 text-[16px] font-medium text-muted-foreground">Reject</div>
               <div
                 style={{ transform: `scale(${btnPress})`, background: accept > 0.5 ? COLORS.pass : COLORS.foreground }}
@@ -92,26 +93,27 @@ export function AutoFix({ width = 1920, height = 1080 }: { width?: number; heigh
               >
                 {accept > 0.5 ? "Applied" : "Accept fix"}
               </div>
+              {/* cursor lands on the Accept fix button */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  right: interpolate(cursorT, [0, 1], [-52, 26]),
+                  top: interpolate(cursorT, [0, 1], [64, 12]),
+                  transform: `scale(${clickScale})`,
+                  transformOrigin: "top left",
+                  opacity: interpolate(frame, [104, 118, 160, 172], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+                }}
+              >
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 2 L4 20 L9 15 L12 22 L15 21 L12 14 L19 14 Z" fill={COLORS.foreground} stroke="#fff" strokeWidth={1.2} />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
 
-        <p className="mt-6 text-[22px] text-muted-foreground">You review every change. Nothing is rewritten on its own.</p>
-
-        {/* animated cursor moving to Accept */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            left: interpolate(cursorT, [0, 1], [width * 0.62, width * 0.78]),
-            top: interpolate(cursorT, [0, 1], [height * 0.78, height * 0.6]),
-            opacity: interpolate(frame, [104, 116, 170, 182], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-          }}
-        >
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-            <path d="M4 2 L4 20 L9 15 L12 22 L15 21 L12 14 L19 14 Z" fill={COLORS.foreground} stroke="#fff" strokeWidth={1.2} />
-          </svg>
-        </div>
+        <p className="mt-6 text-[22px] text-muted-foreground">You review every change, nothing is rewritten on its own</p>
       </AbsoluteFill>
     </Scene>
   );

@@ -112,7 +112,7 @@ export function Trace({ width = 1920, height = 1080 }: { width?: number; height?
 
         <div style={{ marginTop: 34 }}>
           <KineticText
-            text="Nothing is guessed."
+            text="Nothing is guessed"
             startFrame={220}
             className="font-serif"
             style={{ fontSize: 40, fontWeight: 600, color: COLORS.mutedForeground }}

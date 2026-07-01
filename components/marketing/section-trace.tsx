@@ -24,10 +24,7 @@ export function SectionTrace() {
   return (
     <section id="trace" className="scroll-mt-20 border-t">
       <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
-        <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          The trace
-        </p>
-        <h2 className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+        <h2 className="max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
           Every violation opens its exact rule.
         </h2>
         <p className="mt-5 max-w-2xl text-pretty text-xl leading-relaxed text-muted-foreground">

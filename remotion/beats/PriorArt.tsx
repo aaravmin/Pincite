@@ -77,7 +77,7 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
           </div>
           <BarList items={MATCHES} progress={barProgress} />
           <p className="mt-4 text-[15px] text-muted-foreground">
-            No single score. You see exactly where you overlap and decide.
+            No single score, you see exactly where you overlap and decide
           </p>
         </div>
       </AbsoluteFill>

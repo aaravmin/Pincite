@@ -143,7 +143,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
                 </span>
               </div>
               <p className="mt-2 text-[15px] text-muted-foreground">
-                They appear in the drawing but are never described.
+                They appear in the drawing but are never described
               </p>
               <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
                 {FLAGGED.map((f, i) => {
@@ -164,7 +164,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
                   37 CFR 1.84(p)(5) . MPEP 608.02
                 </span>
                 <p className="mt-1 text-[15px] text-muted-foreground">
-                  A reference character has to appear in both the drawing and the description.
+                  A reference character has to appear in both the drawing and the description
                 </p>
               </div>
             </div>
