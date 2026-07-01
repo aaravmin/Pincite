@@ -5,6 +5,7 @@
 
 import { Scale, Ban, Gauge, BookOpen, Lock, ShieldCheck } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { AnimatedHeading } from "@/components/marketing/animated-heading";
 
 const ITEMS = [
   {
@@ -47,10 +48,10 @@ export function SectionTrust() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Trust
           </p>
-          <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            What Pincite does, and what it does not
-          </h2>
         </BlurFade>
+        <AnimatedHeading className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          What Pincite does, and what it does not
+        </AnimatedHeading>
 
         <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {ITEMS.map((item, i) => {

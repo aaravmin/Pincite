@@ -6,6 +6,7 @@
 
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { AnimatedHeading } from "@/components/marketing/animated-heading";
 import { RejectionExplorer } from "@/components/marketing/rejection-explorer";
 
 function Stat({
@@ -38,10 +39,12 @@ export function SectionStake() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             The stake
           </p>
-          <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Rejection is the default
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+        </BlurFade>
+        <AnimatedHeading className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          Rejection is the default
+        </AnimatedHeading>
+        <BlurFade inView delay={0.1} className="mt-4">
+          <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Most applications do not sail through. The average one waits two years and picks up at
             least one rejection along the way. Many of those rejections trace back to rules a careful
             review would have caught.

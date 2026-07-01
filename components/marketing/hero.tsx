@@ -134,15 +134,11 @@ function HeroReview() {
             law={f.citation.law}
             cfr={f.citation.cfr}
             mpep={f.citation.mpep}
-            guidance={f.citation.guidance}
+            guidance="The law and the rule set the requirement. The guidance is the part that tells you exactly how to fix it."
             progress={progress}
             hideSource
             helperLine=""
           />
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            The law and the rule set the requirement. The guidance is the part that tells you exactly
-            how to fix it.
-          </p>
         </div>
 
         {/* pull up the exact MPEP text the guidance rests on */}

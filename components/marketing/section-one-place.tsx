@@ -6,6 +6,7 @@
 
 import { PenLine, Layers, FileDown, BookOpen } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { AnimatedHeading } from "@/components/marketing/animated-heading";
 import { PatentFigure } from "@/components/marketing/patent-figure";
 import { MiniPatentPage } from "@/components/marketing/mini-patent-page";
 import { AnnotatedEditor } from "@visual/annotated-editor";
@@ -135,10 +136,10 @@ export function SectionOnePlace() {
           <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Features
           </p>
-          <h2 className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            Every step to filing, in one dashboard
-          </h2>
         </BlurFade>
+        <AnimatedHeading className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Every step to filing, in one dashboard
+        </AnimatedHeading>
 
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Rule trace - the lead feature, full width */}

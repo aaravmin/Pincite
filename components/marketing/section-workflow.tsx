@@ -6,6 +6,7 @@
 
 import { motion, type Variants } from "motion/react";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { AnimatedHeading } from "@/components/marketing/animated-heading";
 
 const STEPS = [
   { n: "01", title: "Draft", body: "Write your patent one section at a time." },
@@ -36,19 +37,23 @@ export function SectionWorkflow() {
   return (
     <section className="border-t">
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-14 px-6 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:py-32">
-        <BlurFade inView>
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            How it works
-          </p>
-          <h2 className="mt-3 max-w-md text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+        <div>
+          <BlurFade inView>
+            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              How it works
+            </p>
+          </BlurFade>
+          <AnimatedHeading className="mt-3 max-w-md text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Draft to filing in five steps
-          </h2>
-          <p className="mt-5 max-w-sm text-pretty text-lg leading-relaxed text-muted-foreground">
-            No new information to learn.
-            <br />
-            Write, and Pincite handles the rest.
-          </p>
-        </BlurFade>
+          </AnimatedHeading>
+          <BlurFade inView delay={0.1} className="mt-5">
+            <p className="max-w-sm text-pretty text-lg leading-relaxed text-muted-foreground">
+              No new information to learn.
+              <br />
+              Write, and Pincite handles the rest.
+            </p>
+          </BlurFade>
+        </div>
 
         <motion.ol
           className="relative"

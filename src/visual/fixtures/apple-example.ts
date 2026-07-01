@@ -80,7 +80,7 @@ export type StaticFinding = {
 // governing law for dependent-claim form; the app persists the CFR + MPEP pins.
 export const CLAIM6_FINDING: StaticFinding = {
   id: CLAIM6_FLAG_ID,
-  title: "Claim 4 depends on claim 6, which the application never sets out",
+  title: "Claim 4 depends on claim 6, which does not exist",
   explanation:
     "There is no claim 6 in the application, so claim 4 has nothing to build on and its scope is left undefined.",
   area: "Claims",
