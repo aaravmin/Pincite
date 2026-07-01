@@ -127,8 +127,10 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  /* Editorial serif display face (Fraunces). Marketing headlines + big numbers only; UI stays sans. */
+  /* Editorial serif (Fraunces), kept for the app's big numbers. */
   --font-serif: var(--font-fraunces);
+  /* Rounded display face (Baloo 2) for marketing headlines - matches the wordmark. */
+  --font-rounded: var(--font-baloo);
 }
 
 @layer base {

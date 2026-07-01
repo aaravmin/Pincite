@@ -1,208 +1,143 @@
 "use client";
 
-// One place. A bento of the capabilities that matter, each cell holding a small
-// live-ish preview rather than a static icon. Only the inline-review cell shows
-// the real public flag; the rest are schematic previews of the UI, never
-// fabricated analysis.
+// One place. The features from the demo, each with a real preview: the drawing
+// check (a real figure), prior-art overlap, and filing-ready export. Review and
+// the citation trace are shown in the hero and the trace section above.
 
-import {
-  ScanLine,
-  Layers,
-  PenLine,
-  FileDown,
-  History,
-  Route,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { PenLine, Layers, FileDown } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { PatentFigure } from "@/components/marketing/patent-figure";
+import { MiniPatentPage } from "@/components/marketing/mini-patent-page";
 import { AnnotatedEditor } from "@visual/annotated-editor";
-import { LifecycleTimeline } from "@visual/lifecycle-timeline";
-import { SignalBadge, SignalMark } from "@visual/signal";
+import { BarList } from "@visual/bar-list";
+import { SignalBadge } from "@visual/signal";
 import type { VisualSpan } from "@visual/types";
 
-const MINI_CLAIMS =
-  "2. The container of claim 1, wherein the base and the lid are formed as one piece.\n" +
-  "3. The container of claim 1, wherein the ridges are arranged concentrically.\n" +
-  "4. The container of claim 6, wherein the openings comprise a plurality of slots.";
-const s = MINI_CLAIMS.indexOf("claim 6");
-const MINI_SPANS: VisualSpan[] = [{ start: s, end: s + 7, signal: "red", flagId: "c6" }];
+const FLAGGED = ["108", "203", "216", "224"];
 
-function Cell({
-  icon: Icon,
-  title,
-  blurb,
-  children,
-  className,
-}: {
-  icon: typeof ScanLine;
-  title: string;
-  blurb: string;
-  children?: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col overflow-hidden rounded-xl border bg-card p-5 shadow-sm",
-        className,
-      )}
-    >
-      <div className="mb-1 flex items-center gap-2">
-        <span className="flex size-8 items-center justify-center rounded-md border bg-muted/50 text-muted-foreground">
-          <Icon className="size-4" aria-hidden />
-        </span>
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-      </div>
-      <p className="text-sm text-muted-foreground">{blurb}</p>
-      {children ? <div className="mt-4 flex-1">{children}</div> : null}
-    </div>
-  );
-}
+const YOURS = "a plurality of ridges integrated with an interior surface of the base";
+const PRIOR = "a plurality of ridges formed on an inner floor of the tray";
+const PHRASE = "a plurality of ridges";
+const ys = YOURS.indexOf(PHRASE);
+const ps = PRIOR.indexOf(PHRASE);
+const YOUR_SPANS: VisualSpan[] = [{ start: ys, end: ys + PHRASE.length, signal: "yellow" }];
+const PRIOR_SPANS: VisualSpan[] = [{ start: ps, end: ps + PHRASE.length, signal: "red", flagId: "x" }];
+
+const MATCHES = [
+  { label: "US 6,983,542 B2", value: 0.88, display: "exact match", signal: "red" as const },
+  { label: "US 5,743,110 A", value: 0.56, display: "partial", signal: "yellow" as const },
+  { label: "US 7,204,388 B2", value: 0.4, display: "partial", signal: "yellow" as const },
+];
+
+const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"];
 
 export function SectionOnePlace() {
   return (
     <section id="one-place" className="scroll-mt-20 border-t bg-muted/20">
-      <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-28">
+      <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
         <BlurFade inView>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            One place
-          </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            The whole path to filing, in one workbench.
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">One place</p>
+          <h2 className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+            Every step to filing, in one workbench.
           </h2>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Draft, check, trace, fix, and export without leaving the page or losing the thread.
-          </p>
         </BlurFade>
 
-        <div className="mt-12 grid auto-rows-[minmax(150px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* feature: inline review */}
-          <Cell
-            icon={ScanLine}
-            title="Inline review"
-            blurb="Deterministic checks flag rule violations right on the claim text."
-            className="sm:col-span-2 lg:col-span-2"
-          >
-            <div className="space-y-3">
-              <AnnotatedEditor text={MINI_CLAIMS} spans={MINI_SPANS} activeFlagId="c6" caption="Claims" />
-              <div className="flex items-center gap-2">
-                <SignalBadge signal="red">2 to fix</SignalBadge>
-                <SignalBadge signal="yellow">6 to review</SignalBadge>
+        <div className="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Drawing check - full width, real figure */}
+          <BlurFade inView className="lg:col-span-2">
+            <div className="grid grid-cols-1 items-center gap-8 rounded-2xl border bg-card p-8 shadow-sm lg:grid-cols-2">
+              <div className="rounded-xl border bg-background p-6">
+                <PatentFigure />
               </div>
-            </div>
-          </Cell>
-
-          {/* prior art */}
-          <Cell
-            icon={Layers}
-            title="Prior art overlap"
-            blurb="Overlaps pinned to your own claim element, with no single patentability score."
-          >
-            <div className="space-y-2 rounded-lg border bg-background p-3 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Your claim element</span>
-                <span className="font-mono text-foreground">a plurality of ridges</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <SignalMark signal="yellow" />
-                <span className="text-muted-foreground">overlapping passage in a prior patent</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <SignalMark signal="red" />
-                <span className="text-muted-foreground">full limitation match</span>
-              </div>
-            </div>
-          </Cell>
-
-          {/* drawing check */}
-          <Cell
-            icon={PenLine}
-            title="Drawing check"
-            blurb="Reads your figures for reference numerals the specification never introduces."
-          >
-            <DrawingPreview />
-          </Cell>
-
-          {/* export */}
-          <Cell
-            icon={FileDown}
-            title="Filing ready export"
-            blurb="The full set, in the order the USPTO expects."
-          >
-            <ul className="grid grid-cols-2 gap-2 text-xs">
-              {["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"].map(
-                (d) => (
-                  <li key={d} className="flex items-center gap-1.5 rounded-md border bg-background px-2 py-1.5">
-                    <SignalMark signal="green" />
-                    <span className="truncate text-muted-foreground">{d}</span>
-                  </li>
-                ),
-              )}
-            </ul>
-          </Cell>
-
-          {/* version history + audit */}
-          <Cell
-            icon={History}
-            title="Versions and audit"
-            blurb="Every save is an immutable snapshot with a full audit trail."
-          >
-            <ol className="space-y-2 text-xs">
-              {[
-                { v: "Save 3", note: "after fixing claim 4" },
-                { v: "Save 2", note: "added the abstract" },
-                { v: "Save 1", note: "first draft" },
-              ].map((row, i) => (
-                <li key={row.v} className="flex items-start gap-2">
-                  <span className="mt-0.5 flex flex-col items-center">
-                    <span className={cn("size-2 rounded-full", i === 0 ? "bg-foreground" : "bg-muted-foreground/40")} />
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-9 items-center justify-center rounded-lg border bg-muted/50 text-foreground">
+                    <PenLine className="size-5" aria-hidden />
                   </span>
-                  <span>
-                    <span className="font-medium text-foreground">{row.v}</span>{" "}
-                    <span className="text-muted-foreground">{row.note}</span>
+                  <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    Drawing check
                   </span>
-                </li>
-              ))}
-            </ol>
-          </Cell>
-
-          {/* stage tracking */}
-          <Cell
-            icon={Route}
-            title="Stage tracking"
-            blurb="Knows where the application stands and what is due next."
-            className="sm:col-span-2 lg:col-span-3"
-          >
-            <div className="rounded-lg border bg-background p-4">
-              <LifecycleTimeline currentIndex={1} currentDetail="Filed, awaiting examination" />
+                </div>
+                <h3 className="mt-4 text-balance font-rounded text-3xl font-semibold tracking-tight text-foreground">
+                  Right down to the reference numerals.
+                </h3>
+                <p className="mt-3 text-pretty text-lg leading-relaxed text-muted-foreground">
+                  It catches reference numerals that appear in a figure but never in the
+                  specification.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2.5">
+                  {FLAGGED.map((n) => (
+                    <span
+                      key={n}
+                      className="rounded-lg border border-violation bg-violation-bg px-3 py-1.5 font-mono text-lg font-medium text-violation"
+                    >
+                      {n}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-4 font-mono text-sm text-muted-foreground">37 CFR 1.84(p)(5)</p>
+              </div>
             </div>
-          </Cell>
+          </BlurFade>
+
+          {/* Prior art */}
+          <BlurFade inView delay={0.1}>
+            <div className="flex h-full flex-col rounded-2xl border bg-card p-8 shadow-sm">
+              <div className="flex items-center gap-2.5">
+                <span className="flex size-9 items-center justify-center rounded-lg border bg-muted/50 text-foreground">
+                  <Layers className="size-5" aria-hidden />
+                </span>
+                <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Prior art overlap
+                </span>
+              </div>
+              <h3 className="mt-4 text-balance font-rounded text-2xl font-semibold tracking-tight text-foreground">
+                See the exact overlaps, not a score.
+              </h3>
+              <div className="mt-5 space-y-2.5">
+                <AnnotatedEditor text={YOURS} spans={YOUR_SPANS} progress={1} caption="Your claim" />
+                <AnnotatedEditor text={PRIOR} spans={PRIOR_SPANS} activeFlagId="x" progress={1} caption="US 6,983,542 B2  .  prior art" />
+              </div>
+              <div className="mt-3">
+                <SignalBadge signal="red">Exact limitation match</SignalBadge>
+              </div>
+              <div className="mt-5 border-t pt-5">
+                <BarList items={MATCHES} progress={1} />
+              </div>
+            </div>
+          </BlurFade>
+
+          {/* Export */}
+          <BlurFade inView delay={0.15}>
+            <div className="flex h-full flex-col rounded-2xl border bg-card p-8 shadow-sm">
+              <div className="flex items-center gap-2.5">
+                <span className="flex size-9 items-center justify-center rounded-lg border bg-muted/50 text-foreground">
+                  <FileDown className="size-5" aria-hidden />
+                </span>
+                <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Filing ready export
+                </span>
+              </div>
+              <h3 className="mt-4 text-balance font-rounded text-2xl font-semibold tracking-tight text-foreground">
+                The full set, in the order the USPTO expects.
+              </h3>
+              <MiniPatentPage className="mt-5" />
+              <div className="mt-4 flex flex-1 flex-wrap content-center gap-2">
+                {DOCS.map((d) => (
+                  <div key={d} className="flex items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5">
+                    <span className="text-pass" aria-hidden>
+                      <svg viewBox="0 0 16 16" className="size-3.5" fill="none">
+                        <path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span className="text-[13px] text-foreground">{d}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </BlurFade>
         </div>
       </div>
     </section>
-  );
-}
-
-function DrawingPreview() {
-  return (
-    <div className="relative rounded-lg border bg-background p-3">
-      <svg viewBox="0 0 200 110" className="w-full" role="img" aria-label="Figure with two reference numerals flagged">
-        {/* a generic device outline */}
-        <rect x="30" y="25" width="140" height="60" rx="8" className="fill-none stroke-muted-foreground/40" strokeWidth={2} />
-        <line x1="60" y1="25" x2="60" y2="85" className="stroke-muted-foreground/30" strokeWidth={1.5} />
-        <line x1="30" y1="55" x2="170" y2="55" className="stroke-muted-foreground/30" strokeWidth={1.5} />
-        {/* leader lines + numerals */}
-        <text x="45" y="20" className="fill-muted-foreground text-[9px]">10</text>
-        <text x="95" y="20" className="fill-muted-foreground text-[9px]">12</text>
-        <text x="150" y="100" className="fill-muted-foreground text-[9px]">14</text>
-        <text x="45" y="100" className="fill-muted-foreground text-[9px]">16</text>
-        {/* flagged numerals (not introduced in the spec) */}
-        <circle cx="153" cy="96" r="11" className="fill-none stroke-violation" strokeWidth={2} />
-        <circle cx="48" cy="96" r="11" className="fill-none stroke-violation" strokeWidth={2} />
-      </svg>
-      <p className="mt-1 flex items-center gap-1.5 text-xs text-violation">
-        <SignalMark signal="red" />2 reference numerals not introduced
-      </p>
-    </div>
   );
 }

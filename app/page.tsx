@@ -7,7 +7,7 @@ import { Hero } from "@/components/marketing/hero";
 import { SectionStake } from "@/components/marketing/section-stake";
 import { SectionTrace } from "@/components/marketing/section-trace";
 import { SectionOnePlace } from "@/components/marketing/section-one-place";
-import { SectionPipeline } from "@/components/marketing/section-pipeline";
+import { SectionWorkflow } from "@/components/marketing/section-workflow";
 import { SectionTrust } from "@/components/marketing/section-trust";
 import { SectionAudience } from "@/components/marketing/section-audience";
 
@@ -30,7 +30,7 @@ export default async function Home() {
           <SectionStake />
           <SectionTrace />
           <SectionOnePlace />
-          <SectionPipeline />
+          <SectionWorkflow />
           <SectionTrust />
           <SectionAudience />
         </main>

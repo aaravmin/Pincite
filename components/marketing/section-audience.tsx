@@ -34,7 +34,7 @@ export function SectionAudience() {
                   <span className="flex size-10 items-center justify-center rounded-xl border bg-muted/50 text-foreground">
                     <Icon className="size-5" aria-hidden />
                   </span>
-                  <h3 className="mt-4 font-serif text-xl font-semibold tracking-tight text-foreground">
+                  <h3 className="mt-4 font-rounded text-xl font-semibold tracking-tight text-foreground">
                     {a.who}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{a.blurb}</p>
@@ -55,7 +55,7 @@ export function SectionAudience() {
         {/* final CTA */}
         <BlurFade inView delay={0.15}>
           <div className="mt-14 overflow-hidden rounded-2xl border bg-card px-6 py-12 text-center shadow-sm">
-            <h2 className="mx-auto max-w-2xl font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+            <h2 className="mx-auto max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
               See what your draft is hiding.
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">

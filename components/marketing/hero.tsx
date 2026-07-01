@@ -41,16 +41,15 @@ export function Hero() {
             by="word"
             animation="blurInUp"
             once
-            className="mt-5 font-serif text-4xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+            className="mt-5 text-balance font-rounded text-4xl font-semibold leading-[1.03] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
           >
             Nine in ten applications get rejected the first time.
           </TextAnimate>
 
           <BlurFade delay={0.35} inView>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Usually over preventable mistakes the rulebook already flags. Pincite finds them in
-              your draft and pins every flag to the real MPEP and CFR text, so you fix them before
-              you file.
+            <p className="mt-6 max-w-lg text-pretty text-xl leading-relaxed text-muted-foreground">
+              Most of them for preventable rule violations. Pincite catches them in your draft and
+              pins each one to the real MPEP and CFR text, so you fix them before you file.
             </p>
           </BlurFade>
 
@@ -67,7 +66,7 @@ export function Hero() {
                 href="#trace"
                 className="inline-flex items-center gap-2 rounded-md border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
               >
-                See a flag open its rule
+                See a violation open its rule
               </a>
             </div>
           </BlurFade>
@@ -78,7 +77,7 @@ export function Hero() {
               <SignalBadge signal="yellow">Attention</SignalBadge>
               <SignalBadge signal="green">Pass</SignalBadge>
               <span className="text-xs text-muted-foreground">
-                Every flag carries a citation that resolves to real text.
+                Every violation carries a citation that resolves to real text.
               </span>
             </div>
           </BlurFade>
@@ -135,6 +134,7 @@ function HeroDemo() {
             guidance={finding.citation.guidance}
             excerpt={finding.citation.excerpt}
             progress={progress}
+            hideSource
             helperLine="The same requirement at three levels."
           />
         </div>

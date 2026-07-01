@@ -27,6 +27,8 @@ export type CitationStackProps = Citation & {
   helperLine?: string;
   /** compact spacing for dense app contexts */
   dense?: boolean;
+  /** hide the external MPEP/USPTO source link (marketing pages do not link out) */
+  hideSource?: boolean;
   className?: string;
 };
 
@@ -40,6 +42,7 @@ export function CitationStack({
   onOpenMpep,
   helperLine = "The same requirement at three levels. The guidance explains the law and the rule.",
   dense,
+  hideSource,
   className,
 }: CitationStackProps) {
   const p = clamp01(progress);
@@ -90,7 +93,7 @@ export function CitationStack({
                     >
                       Open text <ArrowUpRight className="size-3" aria-hidden />
                     </button>
-                  ) : tier.isMpep ? (
+                  ) : tier.isMpep && !hideSource ? (
                     <a
                       href={USPTO_MPEP_BASE}
                       target="_blank"

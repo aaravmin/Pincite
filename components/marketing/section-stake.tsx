@@ -21,7 +21,7 @@ function Stat({
 }) {
   return (
     <div>
-      <div className="font-serif text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+      <div className="text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
         <span className="text-2xl font-normal text-muted-foreground">about </span>
         <NumberTicker value={value} decimalPlaces={decimals} className="text-foreground" />
         {suffix ? <span>{suffix}</span> : null}
@@ -49,7 +49,7 @@ export function SectionStake() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             The stake
           </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Rejection is the default, not the exception.
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">

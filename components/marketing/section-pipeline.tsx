@@ -32,7 +32,7 @@ export function SectionPipeline() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             The pipeline
           </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 max-w-2xl font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Draft, check, fix, export. One thread.
           </h2>
         </BlurFade>

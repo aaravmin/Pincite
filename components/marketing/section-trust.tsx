@@ -47,7 +47,7 @@ export function SectionTrust() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Trust
           </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 max-w-2xl text-balance font-rounded text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Serious about the boundaries.
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
