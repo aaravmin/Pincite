@@ -10,7 +10,7 @@ import {
 import { Scene } from "../components/Scene";
 import { KineticText } from "../components/KineticText";
 import { COLORS } from "../colors";
-import { THEME_LINE, THEME_SUB } from "../theme";
+import { LINES } from "../theme";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import {
   APPLE_HERO_CLAIMS,
@@ -18,50 +18,47 @@ import {
   APPLE_META,
 } from "@visual/fixtures/apple-example";
 
-const COLS = 9;
-const ROWS = 11;
-const SURV_C = 4;
-const SURV_R = 5;
+const COLS = 16;
+const ROWS = 9;
+const SURV_C = 8;
+const SURV_R = 4;
 
-// Beat 0 - theme and hook. A field of applications, almost all flipping red in a
-// staggered wave, then all but one recede as the camera pushes into the single
-// survivor, which resolves into the Apple draft (with its claim 6 flag).
-export function Hook({ width = 1080, height = 1350 }: { width?: number; height?: number }) {
+// Beat 0 - theme and hook. A wide field of applications, almost all flipping red
+// in a staggered wave, then the camera pushes into the single survivor, which
+// resolves into the Apple draft (with its claim 6 flag).
+export function Hook({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
   const cellW = width / COLS;
   const cellH = height / ROWS;
-  const markerSize = Math.min(cellW, cellH) * 0.62;
+  const markerSize = Math.min(cellW, cellH) * 0.6;
   const survX = SURV_C * cellW + cellW / 2;
   const survY = SURV_R * cellH + cellH / 2;
 
-  // Macro to micro push into the survivor.
-  const pushT = interpolate(frame, [105, 225], [0, 1], {
+  const pushT = interpolate(frame, [78, 168], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  const scale = interpolate(pushT, [0, 1], [1, 13]);
-  const fieldOpacity = interpolate(frame, [200, 248], [1, 0], {
+  const scale = interpolate(pushT, [0, 1], [1, 17]);
+  const fieldOpacity = interpolate(frame, [150, 186], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // The draft resolves in over the survivor.
-  const editorT = spring({ frame: frame - 205, fps, config: { damping: 200 } });
-  const editorProgress = interpolate(frame, [235, 300], [0, 1], {
+  const editorT = spring({ frame: frame - 150, fps, config: { damping: 200 } });
+  const editorProgress = interpolate(frame, [168, 210], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const themeOut = interpolate(frame, [188, 226], [1, 0], {
+  const themeOut = interpolate(frame, [132, 166], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   return (
     <Scene>
-      {/* the field */}
       <AbsoluteFill style={{ opacity: fieldOpacity }}>
         <div
           style={{
@@ -75,17 +72,17 @@ export function Hook({ width = 1080, height = 1350 }: { width?: number; height?:
             Array.from({ length: COLS }).map((_, c) => {
               const isSurv = r === SURV_R && c === SURV_C;
               const d = r + c;
-              const flipStart = interpolate(d, [0, ROWS + COLS - 2], [12, 92]);
+              const flipStart = interpolate(d, [0, ROWS + COLS - 2], [8, 66]);
               const flip = isSurv
                 ? 0
-                : interpolate(frame, [flipStart, flipStart + 16], [0, 1], {
+                : interpolate(frame, [flipStart, flipStart + 14], [0, 1], {
                     extrapolateLeft: "clamp",
                     extrapolateRight: "clamp",
                   });
               const color = isSurv
                 ? COLORS.neutralMarker
                 : interpolateColors(flip, [0, 1], [COLORS.neutralMarker, COLORS.violation]);
-              const survPulse = isSurv ? 1 + 0.04 * Math.sin(frame / 6) : 1;
+              const survPulse = isSurv ? 1 + 0.05 * Math.sin(frame / 6) : 1;
               return (
                 <div
                   key={`${r}-${c}`}
@@ -108,33 +105,25 @@ export function Hook({ width = 1080, height = 1350 }: { width?: number; height?:
         </div>
       </AbsoluteFill>
 
-      {/* the theme line */}
-      <AbsoluteFill className="items-center" style={{ opacity: themeOut }}>
-        <div className="px-20 text-center" style={{ marginTop: height * 0.12 }}>
+      <AbsoluteFill className="items-center justify-center" style={{ opacity: themeOut }}>
+        <div className="px-24 text-center">
           <KineticText
-            text={THEME_LINE}
-            startFrame={8}
+            text={LINES.theme}
+            startFrame={6}
             className="font-serif"
-            style={{
-              fontSize: 76,
-              fontWeight: 600,
-              lineHeight: 1.04,
-              letterSpacing: "-0.02em",
-              color: COLORS.foreground,
-            }}
+            style={{ fontSize: 92, fontWeight: 700, lineHeight: 1.02, color: COLORS.foreground }}
           />
         </div>
       </AbsoluteFill>
 
-      {/* the draft resolves in */}
       <AbsoluteFill
         className="items-center justify-center"
         style={{
           opacity: editorT,
-          transform: `scale(${interpolate(editorT, [0, 1], [0.86, 1])})`,
+          transform: `scale(${interpolate(editorT, [0, 1], [0.88, 1])})`,
         }}
       >
-        <div style={{ width: 900 }}>
+        <div style={{ width: 1180 }}>
           <AnnotatedEditor
             text={APPLE_HERO_CLAIMS}
             spans={APPLE_HERO_SPANS}
@@ -142,12 +131,12 @@ export function Hook({ width = 1080, height = 1350 }: { width?: number; height?:
             progress={editorProgress}
             caption={APPLE_META.claimsCaption}
           />
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <KineticText
-              text={THEME_SUB}
-              startFrame={252}
+              text={LINES.themeSub}
+              startFrame={182}
               className="font-serif"
-              style={{ fontSize: 40, color: COLORS.mutedForeground }}
+              style={{ fontSize: 38, fontWeight: 500, color: COLORS.mutedForeground }}
             />
           </div>
         </div>

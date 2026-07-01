@@ -11,29 +11,29 @@ import {
 import { Scene } from "../components/Scene";
 import { KineticText } from "../components/KineticText";
 import { COLORS } from "../colors";
-import { LINES, END_LINE } from "../theme";
+import { LINES } from "../theme";
 
 const RECOLOR = [
   "Claim 4 refers to claim 6",
   "Claim 5 dependency form",
-  "Reference numerals 14 and 16",
+  "Reference numerals 108, 203, 216, 224",
 ];
-const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary"];
+const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"];
 
-// A compact callback to the opening field: mostly red, one green survivor.
-function FieldCallback() {
-  const COLS = 9;
-  const ROWS = 7;
-  const SC = 4;
+// A wide callback to the opening field: mostly red, one green survivor.
+function FieldCallback({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+  const COLS = 16;
+  const ROWS = 8;
+  const SC = 8;
   const SR = 3;
-  const w = 1080;
   const cell = 96;
-  const size = 60;
+  const size = 62;
   const gridW = COLS * cell;
   const gridH = ROWS * cell;
-  const offX = (w - gridW) / 2;
+  const offX = (width - gridW) / 2;
+  const offY = (height - gridH) / 2;
   return (
-    <div style={{ position: "absolute", left: offX, top: 120, width: gridW, height: gridH }}>
+    <div style={{ position: "absolute", left: offX, top: offY, width: gridW, height: gridH }}>
       {Array.from({ length: ROWS }).map((_, r) =>
         Array.from({ length: COLS }).map((_, c) => {
           const isSurv = r === SR && c === SC;
@@ -59,85 +59,83 @@ function FieldCallback() {
   );
 }
 
-// Beat 4 - the payoff. Findings recolor red to green, the field callback shows the
-// one application green among the red, the filing set exports, and the logo lands.
-export function Payoff({ width = 1080, height = 1350 }: { width?: number; height?: number }) {
+// Beat 5 - the payoff. Findings recolor red to green, the filing set exports, the
+// field callback shows the one application green among the red, and the logo lands.
+export function Payoff({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const aOut = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const bIn = interpolate(frame, [104, 128], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const bOut = interpolate(frame, [186, 206], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cIn = interpolate(frame, [202, 226], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const aOut = interpolate(frame, [78, 98], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const bIn = interpolate(frame, [86, 110], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const bOut = interpolate(frame, [150, 170], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cIn = interpolate(frame, [166, 192], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoT = spring({ frame: frame - 168, fps, config: { damping: 200 } });
 
   return (
     <Scene>
       {/* A: recolor + export */}
-      <AbsoluteFill style={{ opacity: aOut, padding: "80px" }}>
+      <AbsoluteFill style={{ opacity: aOut, padding: "64px 100px" }}>
         <div className="text-center">
           <KineticText
             text={LINES.payoff}
             startFrame={4}
             className="font-serif"
-            style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", color: COLORS.foreground }}
+            style={{ fontSize: 66, fontWeight: 700, color: COLORS.foreground }}
           />
         </div>
-        <div style={{ marginTop: 56, display: "flex", flexDirection: "column", gap: 12 }}>
-          {RECOLOR.map((t, i) => {
-            const rt = interpolate(frame, [26 + i * 16, 26 + i * 16 + 22], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            });
-            const dot = interpolateColors(rt, [0, 1], [COLORS.violation, COLORS.pass]);
-            return (
-              <div key={i} className="flex items-center gap-3 rounded-xl border bg-card p-4">
-                <span style={{ width: 12, height: 12, borderRadius: 999, background: dot, display: "inline-block" }} />
-                <span className="flex-1 text-[17px] font-medium text-foreground">{t}</span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: interpolateColors(rt, [0, 1], [COLORS.mutedForeground, COLORS.pass]) }}>
-                  {rt > 0.5 ? "Resolved" : "Violation"}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 44 }} className="grid grid-cols-2 gap-3">
-          {DOCS.map((d, i) => {
-            const sp = spring({ frame: frame - (54 + i * 8), fps, config: { damping: 200 } });
-            return (
-              <div
-                key={d}
-                style={{ opacity: sp, transform: `translateX(${interpolate(sp, [0, 1], [40, 0])}px)` }}
-                className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2.5"
-              >
-                <span style={{ color: COLORS.pass, fontWeight: 700 }}>✓</span>
-                <span className="text-[15px] text-muted-foreground">{d}</span>
-              </div>
-            );
-          })}
+        <div style={{ marginTop: 48, display: "flex", gap: 44, alignItems: "flex-start" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+            {RECOLOR.map((t, i) => {
+              const rt = interpolate(frame, [22 + i * 14, 22 + i * 14 + 22], [0, 1], {
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+              });
+              const dot = interpolateColors(rt, [0, 1], [COLORS.violation, COLORS.pass]);
+              return (
+                <div key={i} className="flex items-center gap-3 rounded-xl border bg-card p-4">
+                  <span style={{ width: 13, height: 13, borderRadius: 999, background: dot, display: "inline-block" }} />
+                  <span className="flex-1 text-[18px] font-medium text-foreground">{t}</span>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: interpolateColors(rt, [0, 1], [COLORS.mutedForeground, COLORS.pass]) }}>
+                    {rt > 0.5 ? "Resolved" : "Violation"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ flex: 1 }} className="grid grid-cols-2 gap-3">
+            {DOCS.map((d, i) => {
+              const sp = spring({ frame: frame - (50 + i * 7), fps, config: { damping: 200 } });
+              return (
+                <div
+                  key={d}
+                  style={{ opacity: sp, transform: `translateX(${interpolate(sp, [0, 1], [40, 0])}px)` }}
+                  className="flex items-center gap-2 rounded-lg border bg-background px-3 py-3"
+                >
+                  <span style={{ color: COLORS.pass, fontWeight: 700 }}>✓</span>
+                  <span className="text-[16px] text-muted-foreground">{d}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </AbsoluteFill>
 
       {/* B: field callback */}
       <AbsoluteFill style={{ opacity: bIn * bOut }}>
-        <FieldCallback />
-        <AbsoluteFill className="items-center justify-end" style={{ paddingBottom: 200 }}>
-          <div className="rounded-full border border-pass bg-pass-bg px-5 py-2 text-[20px] font-medium text-pass">
+        <FieldCallback width={width} height={height} />
+        <AbsoluteFill className="items-center justify-end" style={{ paddingBottom: 90 }}>
+          <div className="rounded-full border border-pass bg-pass-bg px-6 py-2.5 text-[22px] font-medium text-pass">
             One application, filed clean
           </div>
         </AbsoluteFill>
       </AbsoluteFill>
 
-      {/* C: logo + end line */}
+      {/* C: logo only */}
       <AbsoluteFill className="items-center justify-center" style={{ opacity: cIn }}>
-        <Img src={staticFile("pincite-logo.png")} style={{ height: 96, width: "auto" }} />
-        <div className="mt-8">
-          <KineticText
-            text={END_LINE}
-            startFrame={210}
-            className="font-serif"
-            style={{ fontSize: 52, fontWeight: 600, letterSpacing: "-0.02em", color: COLORS.foreground }}
-          />
-        </div>
+        <Img
+          src={staticFile("pincite-logo.png")}
+          style={{ height: 150, width: "auto", transform: `scale(${interpolate(logoT, [0, 1], [0.9, 1])})` }}
+        />
       </AbsoluteFill>
     </Scene>
   );
