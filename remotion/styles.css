@@ -1,0 +1,3 @@
+/* Reuse the app's Tailwind v4 setup + the three-signal design tokens verbatim,
+   so the video and the product share one visual language. */
+@import "../app/globals.css";

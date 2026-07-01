@@ -323,6 +323,20 @@ the end of each session — but be stringent; trim before it bloats.
   (Tailwind-v4/React-19 friction + Remotion-incompatible), 21st.dev blocks (403/unverifiable),
   paid Aceternity - built those custom instead.
 
+- [x] REMOTION DEMO (`remotion/`, `remotion.config.ts`): a silent ~60s LinkedIn film, one theme
+  ("Nine out of ten patents are rejected. Yours does not have to be."), five beats - hook (field of
+  markers, macro-to-micro into the Apple draft), the catch (review + issue counter), the receipts
+  (citation trace, hero beat), the drawing check (draw-on red circles via strokeDashoffset), the
+  payoff (recolor red->green + field callback with one green survivor + export + logo "It shows its
+  work"). Brownfield Remotion 4.0.x + `@remotion/tailwind-v4` wired to the app's `globals.css`
+  tokens + `@/` and `@visual/` aliases, so it renders the **real** shared `@visual` components
+  (AnnotatedEditor, CitationStack) driven by a frame-derived `progress` (Part E proven). Fonts via
+  `@remotion/google-fonts` (Fraunces/Geist/GeistMono, matches the app). Public Apple example + real
+  MPEP 608.01(n) text only; red reserved for defects; on-screen text load-bearing (autoplay muted).
+  Compositions `PinciteDemo` (1080x1350, primary) + `PinciteDemoWide` (1920x1080, pillarboxed). Node
+  24 (Remotion needs >=16). `esbuild` added to `allowBuilds` (pnpm gotcha). Render: `pnpm
+  remotion:render` / `:render:wide` -> `out/` (gitignored); `pnpm remotion:studio` to preview.
+
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
 - `pnpm verify` — run all Playwright gates.   `pnpm lint` — eslint.
