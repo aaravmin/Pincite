@@ -323,6 +323,22 @@ the end of each session — but be stringent; trim before it bloats.
   (Tailwind-v4/React-19 friction + Remotion-incompatible), 21st.dev blocks (403/unverifiable),
   paid Aceternity - built those custom instead.
 
+- [x] HOMEPAGE REFINEMENT PASS (`app/page.tsx` + `components/marketing/*`): copy de-vagued (hero
+  pill -> plain "Patent review dashboard" eyebrow, dropped the "see a violation" / "see what your
+  draft is hiding" lines, hero blurb now names prior-art novelty/obviousness; "One place" + "The
+  trace" eyebrows removed; trust rewritten to 2-line bodies + concrete heading "What Pincite does,
+  and what it does not."). THREE interactive elements added, all on-palette (neutrals; red/green
+  only where a real finding/pass): (1) `rejection-explorer.tsx` - the "Where rejections come from"
+  card is now a selectable list of six grounds, each routed to the check that catches it (Rule
+  check = MPEP/CFR validators, Prior art check = pinpoint overlap), "about" shares w/ overlap
+  disclaimer; (2) `citation-marquee.tsx` on `ui/marquee.tsx` (Magic UI style, pause-on-hover,
+  reduced-motion renders a static row; keyframes live in globals.css `@theme`) - a scrolling strip
+  of the real authorities; (3) `section-fix.tsx` on `ui/compare-slider.tsx` - a draggable
+  before/after that wipes claim 6 (red, flagged) -> claim 3 (green, filing ready), the two layers
+  same-length so they line up. Workflow gained a **Compare** step (5 steps) + a rail that draws in
+  on scroll; prior-art claim in `section-one-place` offset right to hang past your claim (section
+  `overflow-x-clip`, no page scroll). Landing e2e green, 0 console errors, no overflow 390-1440.
+
 - [x] REMOTION DEMO (`remotion/`, `remotion.config.ts`): a silent ~45s **16:9** (1920x1080) film,
   one theme ("Nine out of ten patents are rejected."), SIX beats - hook (wide field of markers,
   macro-to-micro into the Apple draft), the catch (review + issue counter), the receipts (citation

@@ -28,7 +28,7 @@ export function Marquee({
 
   if (reduced) {
     return (
-      <div className={cn("flex flex-wrap justify-center gap-[--gap] [--gap:1rem]", className)} {...props}>
+      <div className={cn("flex flex-wrap justify-center gap-3", className)} {...props}>
         {children}
       </div>
     );

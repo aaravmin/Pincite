@@ -24,7 +24,7 @@ export const XFADE = 14;
 export const LINES = {
   theme: "Nine out of ten patents are rejected",
   themeSub: "Usually over a rule violation that could easily have been caught and fixed",
-  themeSub2: "Not because it is unpatentable",
+  themeSub2: "Not because they are unpatentable",
   catch: "Pincite finds them first",
   receipts: "Every violation opens its exact rule",
   autofix: "And proposes the exact fix",
