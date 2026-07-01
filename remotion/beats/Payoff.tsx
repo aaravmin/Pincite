@@ -43,6 +43,9 @@ function FieldCallback({ width = 1920, height = 1080, zoom = 1 }: { width?: numb
         {Array.from({ length: ROWS }).map((_, r) =>
           Array.from({ length: COLS }).map((_, c) => {
             const isSurv = r === SR && c === SC;
+            // same field as the opening: about one in ten accepted (green), the
+            // rest red - but now ours (bordered) is green too.
+            const isGreen = isSurv || (r * COLS + c + r * 3) % 10 === 6;
             return (
               <div
                 key={`${r}-${c}`}
@@ -53,7 +56,7 @@ function FieldCallback({ width = 1920, height = 1080, zoom = 1 }: { width?: numb
                   width: size,
                   height: size,
                   borderRadius: 8,
-                  background: isSurv ? COLORS.pass : COLORS.violation,
+                  background: isGreen ? COLORS.pass : COLORS.violation,
                   border: isSurv ? `2px solid ${COLORS.foreground}` : "none",
                   boxShadow: isSurv ? "0 6px 20px rgba(0,0,0,0.18)" : "none",
                 }}

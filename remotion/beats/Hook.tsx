@@ -50,7 +50,7 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
   // the survivor transforms into the patent: grows, rounds, whitens
   const EDW = 1480;
   const EDH = 210;
-  const EDCY = 500;
+  const EDCY = 400;
   const morph = interpolate(frame, [100, 180], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
   const cardW = interpolate(morph, [0, 1], [markerSize, EDW]);
   const cardH = interpolate(morph, [0, 1], [markerSize, EDH]);
@@ -77,7 +77,10 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
               const d = r + c;
               const flipStart = interpolate(d, [0, ROWS + COLS - 2], [24, 96]);
               const flip = interpolate(frame, [flipStart, flipStart + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-              const color = interpolateColors(flip, [0, 1], [COLORS.neutralMarker, COLORS.violation]);
+              // about one in ten patents is accepted (green); the rest are rejected
+              // (red). Stagger per row so the greens scatter instead of lining up.
+              const target = (r * COLS + c + r * 3) % 10 === 4 ? COLORS.pass : COLORS.violation;
+              const color = interpolateColors(flip, [0, 1], [COLORS.neutralMarker, target]);
               return (
                 <div key={`${r}-${c}`} style={{ position: "absolute", left: c * cellW + (cellW - markerSize) / 2, top: FIELD_TOP + r * cellH + (cellH - markerSize) / 2, width: markerSize, height: markerSize, borderRadius: 10, background: color }} />
               );
@@ -121,7 +124,7 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
       </div>
 
       {/* the sublines, below the patent */}
-      <div style={{ position: "absolute", left: 0, right: 0, top: EDCY + EDH / 2 + 64, textAlign: "center" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: EDCY + EDH / 2 + 56, textAlign: "center" }}>
         <div style={{ maxWidth: 1180, marginLeft: "auto", marginRight: "auto" }}>
           <KineticText text={LINES.themeSub} startFrame={202} className="font-serif" style={{ fontSize: 56, fontWeight: 700, color: COLORS.foreground }} />
           <div className="mt-3">
