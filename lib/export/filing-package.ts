@@ -7,6 +7,7 @@ import type { Project } from "@/lib/projects/types";
 import type { Inventor } from "@/lib/filing/types";
 import { ENTITY_STATUS_LABELS } from "@/lib/projects/sections";
 import { applicantName } from "@/lib/filing/ads";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 export function buildAdsText(
   project: Project,
@@ -36,7 +37,7 @@ export function buildAdsText(
   lines.push(
     "Correspondence address: confirm in Patent Center (defaults to the applicant address).",
   );
-  return lines.join("\n");
+  return sanitizeOutputText(lines.join("\n"));
 }
 
 export const DECLARATION_STATEMENTS = [
@@ -88,7 +89,7 @@ export function buildDeclarationText(
   lines.push(
     "above is only a reference copy of the declaration's contents. Pincite does not file for you.",
   );
-  return lines.join("\n");
+  return sanitizeOutputText(lines.join("\n"));
 }
 
 export function buildTransmittalAndFeesText(project: Project): string {
@@ -98,7 +99,7 @@ export function buildTransmittalAndFeesText(project: Project): string {
   lines.push("Documents in this package:");
   lines.push("  [x] Specification (specification.docx) - DOCX avoids the non-DOCX surcharge");
   lines.push("  [ ] Drawings (PDF) - upload your figures in Patent Center");
-  lines.push("  [x] Application Data Sheet data (application-data-sheet.txt) - enter via Web ADS");
+  lines.push("  [x] Application Data Sheet data (application_data_sheet.txt) enter via Web ADS");
   lines.push(
     "  [x] Inventor's declaration - signed copies in declarations/ (PTO/AIA/01, 37 CFR 1.63)",
   );
@@ -121,23 +122,23 @@ export function buildTransmittalAndFeesText(project: Project): string {
     lines.push(
       "Micro entity: file PTO/SB/15A or 15B before paying micro fees, and re-certify at each payment.",
     );
-  return lines.join("\n");
+  return sanitizeOutputText(lines.join("\n"));
 }
 
 export function buildReadme(): string {
-  return [
+  return sanitizeOutputText([
     "HOW TO FILE WITH THE USPTO (Patent Center)",
     "",
     "1. Go to patentcenter.uspto.gov and sign in (ID.me verification is required).",
     "2. Start a new nonprovisional utility application.",
     "3. Upload specification.docx as the specification (DOCX avoids the surcharge).",
     "   After upload, review the USPTO-converted PDF - that converted file is the official record.",
-    "4. Enter the Application Data Sheet using the Web ADS form, from application-data-sheet.txt.",
+    "4. Enter the Application Data Sheet using the Web ADS form, from application_data_sheet.txt.",
     "5. Upload your drawings as a PDF.",
     "6. Upload each inventor's signed declaration (PTO/AIA/01) from the declarations/ folder.",
     "7. Pay the fees.",
     "",
     "Pincite does not file for you; you submit these documents yourself. This package contains",
     "only filing documents - no internal analysis.",
-  ].join("\n");
+  ].join("\n"));
 }

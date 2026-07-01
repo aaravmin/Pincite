@@ -108,7 +108,7 @@ export function UploadsPanel({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="auto">Auto-detect</SelectItem>
+                <SelectItem value="auto">Auto detect</SelectItem>
                 {ATTACHMENT_VIEWS.filter((v) => v).map((v) => (
                   <SelectItem key={v} value={v}>
                     {ATTACHMENT_VIEW_LABELS[v]}

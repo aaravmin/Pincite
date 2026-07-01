@@ -21,8 +21,8 @@ test("figure view: explicit label on upload, then correctable per figure", async
   const id = await newProject(page);
   await page.goto(`/projects/${id}/uploads`);
 
-  // Default is Auto-detect; choose an explicit view so this test makes no vision call.
-  await expect(page.getByLabel("Drawing orientation")).toContainText("Auto-detect");
+  // Default is Auto detect; choose an explicit view so this test makes no vision call.
+  await expect(page.getByLabel("Drawing orientation")).toContainText("Auto detect");
   await page.getByLabel("Drawing orientation").click();
   await page.getByRole("option", { name: "Front", exact: true }).click();
   await page

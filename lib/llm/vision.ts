@@ -3,6 +3,8 @@
  * CONFIDENTIALITY: a figure sent here is seen by the vendor and ZDR is not confirmed on,
  * so use only public or synthetic figures until ZDR is on (docs/business-context.md).
  */
+import { sanitizeOutputText } from "@/lib/text/sanitize";
+
 const GROK_BASE = "https://api.x.ai/v1";
 
 async function grokVision(
@@ -141,7 +143,7 @@ export async function analyzeDrawingVision(
   const numerals: DrawingNumeral[] = Array.isArray(raw.numerals)
     ? (raw.numerals as Record<string, unknown>[])
         .map((r) => ({
-          numeral: String(r.numeral ?? "").trim(),
+          numeral: sanitizeOutputText(String(r.numeral ?? "")).trim(),
           x: clamp01(r.x) ?? 0,
           y: clamp01(r.y) ?? 0,
         }))
@@ -151,8 +153,8 @@ export async function analyzeDrawingVision(
   const issues: DrawingVisionIssue[] = Array.isArray(raw.issues)
     ? (raw.issues as Record<string, unknown>[])
         .map((r) => ({
-          title: String(r.title ?? "").trim(),
-          detail: String(r.detail ?? "").trim(),
+          title: sanitizeOutputText(String(r.title ?? "")).trim(),
+          detail: sanitizeOutputText(String(r.detail ?? "")).trim(),
           x: clamp01(r.x),
           y: clamp01(r.y),
         }))
@@ -160,11 +162,11 @@ export async function analyzeDrawingVision(
     : [];
 
   return {
-    summary: String(raw.summary ?? "").trim(),
+    summary: sanitizeOutputText(String(raw.summary ?? "")).trim(),
     figureLabel:
       raw.figureLabel == null || raw.figureLabel === ""
         ? null
-        : String(raw.figureLabel).trim(),
+        : sanitizeOutputText(String(raw.figureLabel)).trim(),
     numerals,
     issues,
   };

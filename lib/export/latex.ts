@@ -11,6 +11,7 @@
  * Pure string builder; the route bundles this .tex with the figure files into a ZIP.
  */
 import type { SectionKey } from "@/lib/projects/sections";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 const SEC_TITLE: Partial<Record<SectionKey, string>> = {
   cross_reference: "Cross-Reference to Related Applications",
@@ -45,7 +46,7 @@ export function figureDescription(view: string | null): string {
 }
 
 function esc(s: string): string {
-  return s
+  return sanitizeOutputText(s)
     .replace(/\\/g, "\\textbackslash{}")
     .replace(/([&%$#_{}])/g, "\\$1")
     .replace(/~/g, "\\textasciitilde{}")
@@ -100,7 +101,7 @@ export function buildPatentLatex(opts: {
   );
   if (inventors.length > 0) {
     L.push("\\\\[8pt]");
-    L.push(`{\\normalsize Inventor(s): ${esc(inventors.join("; "))}}`);
+    L.push(`{\\normalsize Inventor(s) ${esc(inventors.join(", "))}}`);
   }
   L.push("\\end{center}");
   L.push("\\vspace{12pt}");
@@ -122,10 +123,10 @@ export function buildPatentLatex(opts: {
     const body =
       items.length === 1
         ? `${items[0]}.`
-        : `${items.slice(0, -1).join("; ")}; and ${items[items.length - 1]}.`;
+        : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}.`;
     L.push("\\psection{Brief Description of the Drawings}");
     L.push(
-      `\\ppar{For a more complete understanding of the invention, reference is made to the following description and accompanying drawings, in which: ${body}}`,
+      `\\ppar{For a more complete understanding of the invention, reference is made to the following description and accompanying drawings, in which ${body}}`,
     );
   } else {
     section("brief_description_drawings", true);
@@ -137,7 +138,7 @@ export function buildPatentLatex(opts: {
   const claims = splitClaims(sections["claims"] ?? "");
   if (claims.length > 0) {
     L.push("\\clearpage");
-    L.push("\\noindent What is claimed is:\\par\\medskip");
+    L.push("\\noindent What is claimed is\\par\\medskip");
     for (const c of claims) L.push(`\\pclaim{${esc(c)}}`);
   }
 
@@ -174,7 +175,7 @@ export function buildPatentLatex(opts: {
 }
 
 export function buildLatexReadme(figureCount: number): string {
-  return [
+  return sanitizeOutputText([
     "Patent-format LaTeX export",
     "",
     "patent.tex typesets your application like a published patent: a centered title and",
@@ -193,5 +194,5 @@ export function buildLatexReadme(figureCount: number): string {
       : "Figures: none were uploaded, so the drawings pages are omitted.",
     "",
     "Pincite does not file for you; this is a typeset copy of what you drafted.",
-  ].join("\n");
+  ].join("\n"));
 }

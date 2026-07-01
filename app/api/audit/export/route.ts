@@ -3,11 +3,12 @@
  * one account can never export another's history.
  */
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 function csvCell(v: unknown): string {
   const s =
     v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v);
-  return `"${s.replace(/"/g, '""')}"`;
+  return `"${sanitizeOutputText(s).replace(/"/g, '""')}"`;
 }
 
 export async function GET() {
@@ -36,7 +37,7 @@ export async function GET() {
   return new Response(lines.join("\n"), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="pincite-audit-log.csv"',
+      "Content-Disposition": 'attachment; filename="pincite_audit_log.csv"',
       "Cache-Control": "no-store",
     },
   });

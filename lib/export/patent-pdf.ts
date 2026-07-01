@@ -9,6 +9,7 @@
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
 import type { SectionKey } from "@/lib/projects/sections";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);
 const PAGE_W = 612; // US Letter, points
@@ -51,13 +52,13 @@ function splitClaims(text: string): string[] {
 // (e.g. curly quotes, em dashes pasted from Word). Fold the common ones to ASCII so a real
 // paste never crashes the export.
 function sanitize(s: string): string {
-  return s
+  return sanitizeOutputText(s)
     .replace(/[‘’‚′]/g, "'")
     .replace(/[“”„″]/g, '"')
-    .replace(/[–—]/g, "-")
+    .replace(/[–—]/g, " ")
     .replace(/…/g, "...")
     .replace(/[   ]/g, " ")
-    .replace(/[•‧]/g, "-")
+    .replace(/[•‧]/g, " ")
     .replace(/[^\x00-\xFF]/g, "");
 }
 
@@ -187,7 +188,7 @@ export async function buildPatentPdf(opts: {
   y -= 12;
   centered((title.trim() || "Title of the Invention").toUpperCase(), bold, 15, 4);
   if (inventors.length > 0) {
-    centered(`Inventor(s): ${inventors.join("; ")}`, font, 11);
+    centered(`Inventor(s) ${inventors.join(", ")}`, font, 11);
   }
   y -= 12;
 
@@ -210,10 +211,10 @@ export async function buildPatentPdf(opts: {
     const run =
       items.length === 1
         ? `${items[0]}.`
-        : `${items.slice(0, -1).join("; ")}; and ${items[items.length - 1]}.`;
+        : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}.`;
     heading("Brief Description of the Drawings");
     body(
-      `For a more complete understanding of the invention, reference is made to the following description and accompanying drawings, in which: ${run}`,
+      `For a more complete understanding of the invention, reference is made to the following description and accompanying drawings, in which ${run}`,
       { number: ++paraNum },
     );
   } else if ((sections["brief_description_drawings"] ?? "").trim()) {
@@ -224,11 +225,11 @@ export async function buildPatentPdf(opts: {
 
   section("detailed_description", true);
 
-  // Claims: own page, "What is claimed is:", numbered.
+  // Claims: own page, numbered.
   const claims = splitClaims(sections["claims"] ?? "");
   if (claims.length > 0) {
     newPage();
-    page.drawText("What is claimed is:", {
+    page.drawText("What is claimed is", {
       x: MARGIN,
       y: y - 11,
       size: 11,

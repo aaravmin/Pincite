@@ -41,7 +41,7 @@ test("drawing export: original figure is preserved", async ({ page }) => {
   expect(res.ok()).toBeTruthy();
   const zip = await JSZip.loadAsync(await res.body());
   const fig = Object.keys(zip.files).find(
-    (n) => n.startsWith("drawings/figure-") && n.endsWith(".png"),
+    (n) => n.startsWith("drawings/figure_") && n.endsWith(".png"),
   );
   expect(fig, "package has the original PNG drawing").toBeTruthy();
   const packaged = await zip.file(fig!)!.async("nodebuffer");

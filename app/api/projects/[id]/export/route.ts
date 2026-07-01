@@ -20,6 +20,11 @@ import {
 } from "@/lib/export/latex";
 import { buildFigurePdf } from "@/lib/export/figure-pdf";
 import { logAudit } from "@/lib/audit";
+import {
+  sanitizeOutputFilename,
+  sanitizeOutputRecord,
+  sanitizeOutputText,
+} from "@/lib/text/sanitize";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -30,15 +35,16 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 function declarationZipNames(filenames: string[]): string[] {
   const used = new Set<string>();
   return filenames.map((raw, i) => {
-    const fallback = `declaration-${i + 1}.pdf`;
+    const fallback = `declaration_${i + 1}.pdf`;
     const safe =
-      (raw || fallback).replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80) || fallback;
+      sanitizeOutputFilename((raw || fallback).replace(/[^a-zA-Z0-9._-]/g, "_"))
+        .slice(0, 80) || fallback;
     let candidate = safe;
     let n = 1;
     while (used.has(candidate.toLowerCase())) {
       const dot = safe.lastIndexOf(".");
       candidate =
-        dot > 0 ? `${safe.slice(0, dot)}-${n}${safe.slice(dot)}` : `${safe}-${n}`;
+        dot > 0 ? `${safe.slice(0, dot)}_${n}${safe.slice(dot)}` : `${safe}_${n}`;
       n++;
     }
     used.add(candidate.toLowerCase());
@@ -60,7 +66,8 @@ async function renderPatentPdf(id: string): Promise<Uint8Array | null> {
     getInventors(id),
     getAttachments(id),
   ]);
-  const title = sections["title"] ?? "";
+  const cleanSections = sanitizeOutputRecord(sections);
+  const title = cleanSections["title"] ?? "";
   const admin = createAdminClient();
   const figures: { pdf: Uint8Array; label: string; description: string }[] = [];
   let n = 0;
@@ -84,9 +91,9 @@ async function renderPatentPdf(id: string): Promise<Uint8Array | null> {
     }
   }
   return buildPatentPdf({
-    sections,
+    sections: cleanSections,
     title,
-    inventors: inventors.map((i) => i.legal_name).filter(Boolean),
+    inventors: inventors.map((i) => sanitizeOutputText(i.legal_name)).filter(Boolean),
     figures,
   });
 }
@@ -116,6 +123,7 @@ export async function GET(
   const url = new URL(request.url);
   const format = url.searchParams.get("format") ?? "txt";
   const isPreview = url.searchParams.get("preview") === "1";
+  const safeId = sanitizeOutputFilename(id);
 
   const supabase = await createClient();
   const {
@@ -133,7 +141,7 @@ export async function GET(
     return new NextResponse(new Uint8Array(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="patent-${id}.pdf"`,
+        "Content-Disposition": `inline; filename="patent_${safeId}.pdf"`,
       },
     });
   }
@@ -146,7 +154,7 @@ export async function GET(
     return new NextResponse(toText(report), {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-        "Content-Disposition": `attachment; filename="pincite-${id}.txt"`,
+        "Content-Disposition": `attachment; filename="pincite_${safeId}.txt"`,
       },
     });
   }
@@ -159,7 +167,7 @@ export async function GET(
     return new NextResponse(new Uint8Array(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="patent-${id}.pdf"`,
+        "Content-Disposition": `attachment; filename="patent_${safeId}.pdf"`,
       },
     });
   }
@@ -170,17 +178,25 @@ export async function GET(
     getSectionContent(id),
     getInventors(id),
   ]);
-  const title = sections["title"] ?? "";
+  const cleanSections = sanitizeOutputRecord(sections);
+  const cleanInventors = inventors.map((i) => ({
+    ...i,
+    legal_name: sanitizeOutputText(i.legal_name),
+    residence: sanitizeOutputText(i.residence),
+    mailing_address: sanitizeOutputText(i.mailing_address),
+    citizenship: sanitizeOutputText(i.citizenship),
+  }));
+  const title = cleanSections["title"] ?? "";
 
   // The specification only, as a 37 CFR 1.77 DOCX (the user's main Patent Center upload).
   if (format === "docx") {
-    const buf = await buildSpecDocx(sections);
+    const buf = await buildSpecDocx(cleanSections);
     await record(supabase, user.id, id, "docx");
     return new NextResponse(new Uint8Array(buf), {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "Content-Disposition": `attachment; filename="specification-${id}.docx"`,
+        "Content-Disposition": `attachment; filename="specification_${safeId}.docx"`,
       },
     });
   }
@@ -206,7 +222,7 @@ export async function GET(
       n++;
       // Figures are numbered by sequence in the formal document; the page caption supplies the
       // FIG. label, so the baked image carries only the numerals and lead lines.
-      const stem = `figures/figure-${String(n).padStart(2, "0")}`;
+      const stem = `figures/figure_${String(n).padStart(2, "0")}`;
       const label = `FIG. ${n}`;
       const description = figureDescription(a.view);
       const bytes = new Uint8Array(await blob.arrayBuffer());
@@ -225,9 +241,9 @@ export async function GET(
       }
     }
     const tex = buildPatentLatex({
-      sections,
+      sections: cleanSections,
       title,
-      inventors: inventors.map((i) => i.legal_name).filter(Boolean),
+      inventors: cleanInventors.map((i) => i.legal_name).filter(Boolean),
       figures,
     });
     zip.file("patent.tex", tex);
@@ -237,19 +253,19 @@ export async function GET(
     return new NextResponse(new Uint8Array(zipBuf), {
       headers: {
         "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="pincite-patent-latex-${id}.zip"`,
+        "Content-Disposition": `attachment; filename="pincite_patent_latex_${safeId}.zip"`,
       },
     });
   }
 
   // The full filing package: spec DOCX + ADS data + declaration + transmittal/fees + README.
   if (format === "package") {
-    const specBuf = await buildSpecDocx(sections);
+    const specBuf = await buildSpecDocx(cleanSections);
     const attachments = await getAttachments(id);
     const admin = createAdminClient();
     const zip = new JSZip();
     zip.file("specification.docx", specBuf);
-    zip.file("application-data-sheet.txt", buildAdsText(project, inventors, title));
+    zip.file("application_data_sheet.txt", buildAdsText(project, cleanInventors, title));
 
     // The signed inventor declarations: the operative wet-/hand-signed documents the inventors
     // uploaded, bundled verbatim under declarations/ so the package is what actually gets filed.
@@ -263,10 +279,10 @@ export async function GET(
       zip.file(`declarations/${declNames[i]}`, new Uint8Array(await blob.arrayBuffer()));
     }
     zip.file(
-      "inventor-declaration.txt",
-      buildDeclarationText(inventors, declNames, title),
+      "inventor_declaration.txt",
+      buildDeclarationText(cleanInventors, declNames, title),
     );
-    zip.file("transmittal-and-fees.txt", buildTransmittalAndFeesText(project));
+    zip.file("transmittal_and_fees.txt", buildTransmittalAndFeesText(project));
 
     // Drawings, in order. The edit/vectorize surface was removed, so the filing package keeps
     // the user's uploaded drawing files as-is instead of filing derived editable scenes.
@@ -288,7 +304,7 @@ export async function GET(
               : f.mime === "image/jpeg"
                 ? "jpg"
                 : (f.filename.split(".").pop() || "img").toLowerCase();
-        zip.file(`drawings/figure-${String(n).padStart(2, "0")}.${ext}`, bytes);
+        zip.file(`drawings/figure_${String(n).padStart(2, "0")}.${ext}`, bytes);
       }
     }
 
@@ -298,7 +314,7 @@ export async function GET(
     return new NextResponse(new Uint8Array(zipBuf), {
       headers: {
         "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="pincite-filing-${id}.zip"`,
+        "Content-Disposition": `attachment; filename="pincite_filing_${safeId}.zip"`,
       },
     });
   }

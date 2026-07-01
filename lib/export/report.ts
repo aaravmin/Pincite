@@ -15,6 +15,7 @@ import {
 } from "@/lib/rules/surface";
 import { SECTION_KEYS, SECTION_LABELS } from "@/lib/projects/sections";
 import type { Project } from "@/lib/projects/types";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 export type Report = {
   project: Project;
@@ -138,7 +139,7 @@ export function toText(r: Report): string {
   }
   L.push("");
   L.push(
-    "Research signal only - not a validity or freedom-to-operate opinion.",
+    "Research signal only. This is not a validity or freedom to operate opinion.",
   );
-  return L.join("\n");
+  return sanitizeOutputText(L.join("\n"));
 }

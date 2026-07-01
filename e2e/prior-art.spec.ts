@@ -33,11 +33,11 @@ test("phase-7: prior-art pinpoint overlaps render with score and disclaimer (det
   await page.getByRole("button", { name: "Compare", exact: true }).click();
 
   // Results: a scored match, pinpoint overlaps, and the standing disclaimer.
-  await expect(page.getByText("US-0000000-A1").first()).toBeVisible();
+  await expect(page.getByText("US 0000000 A1").first()).toBeVisible();
   await expect(page.getByTestId("overlap-detail")).toBeVisible();
   await expect(page.locator("[data-overlap]").first()).toBeVisible();
   await expect(
-    page.getByText(/not a validity or freedom-to-operate opinion/i),
+    page.getByText(/not a validity or freedom to operate opinion/i),
   ).toBeVisible();
   await screenshot(page, "phase-7-prior-art-overlaps");
 

@@ -40,7 +40,7 @@ test("patent-format LaTeX export bundles patent.tex + figures", async ({ page })
   const names = Object.keys(zip.files);
   expect(names).toContain("patent.tex");
   // The figure is baked into a PDF (numerals + lead lines) for the typeset drawing page.
-  expect(names).toContain("figures/figure-01.pdf");
+  expect(names).toContain("figures/figure_01.pdf");
   expect(names).toContain("README.txt");
 
   const tex = await zip.file("patent.tex")!.async("string");
@@ -50,12 +50,12 @@ test("patent-format LaTeX export bundles patent.tex + figures", async ({ page })
   expect(tex).toContain("\\psection{Background of the Invention}");
   expect(tex).toContain("\\ppar{"); // a numbered paragraph
   expect(tex).toContain("Brief Description of the Drawings");
-  expect(tex).toContain("What is claimed is:");
+  expect(tex).toContain("What is claimed is");
   expect(tex).toContain("\\pclaim{");
   expect(tex).toContain("A container comprising a base.");
   expect(tex).toContain("FIG. 1");
   expect(tex).toContain("\\includegraphics");
-  expect(tex).toContain("figures/figure-01.pdf");
+  expect(tex).toContain("figures/figure_01.pdf");
 
   assertClean(errs);
 });

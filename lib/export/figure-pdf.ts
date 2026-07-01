@@ -7,6 +7,7 @@
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { DrawingAnnotations } from "@/lib/filing/types";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);
 const WHITE = rgb(1, 1, 1);
@@ -57,8 +58,9 @@ export async function buildFigurePdf(opts: {
   }
 
   const label = (text: string, nx: number, ny: number, s: number) => {
-    if (!text) return;
-    const w = font.widthOfTextAtSize(text, s);
+    const clean = sanitizeOutputText(text);
+    if (!clean) return;
+    const w = font.widthOfTextAtSize(clean, s);
     const cx = px(nx);
     const baseline = py(ny) - s * 0.35;
     page.drawRectangle({
@@ -68,7 +70,7 @@ export async function buildFigurePdf(opts: {
       height: s,
       color: WHITE,
     });
-    page.drawText(text, { x: cx - w / 2, y: baseline, size: s, font, color: BLACK });
+    page.drawText(clean, { x: cx - w / 2, y: baseline, size: s, font, color: BLACK });
   };
   for (const l of a.labels) label(l.text || "?", l.x, l.y, size);
   if ((opts.includeFigureLabel ?? true) && a.figureLabel?.text)

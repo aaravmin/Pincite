@@ -91,7 +91,7 @@ export function lifecycleActions(
           title: "Pay the issue fee",
           detail:
             "Pay the issue fee (and publication fee if due) to let the patent grant. Not extendable.",
-          deadline: "3 months from the Notice of Allowance (non-extendable)",
+          deadline: "3 months from the Notice of Allowance. This is not extendable",
           cfr_ref: "37 CFR 1.311; 35 U.S.C. 151",
           mpep_section: "1306",
         },

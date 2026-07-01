@@ -6,6 +6,7 @@
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DECLARATION_STATEMENTS } from "@/lib/export/filing-package";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);
 
@@ -28,7 +29,7 @@ export async function buildDeclarationPdf(opts: {
   const wrap = (text: string, f: typeof font, size: number): string[] => {
     const out: string[] = [];
     let line = "";
-    for (const word of text.split(/\s+/)) {
+    for (const word of sanitizeOutputText(text).split(/\s+/)) {
       const next = line ? `${line} ${word}` : word;
       if (f.widthOfTextAtSize(next, size) > maxW && line) {
         out.push(line);
@@ -57,8 +58,8 @@ export async function buildDeclarationPdf(opts: {
     };
 
     draw("DECLARATION (37 CFR 1.63)", bold, 14, 12);
-    draw(`Title of the invention: ${title.trim() || "[not provided]"}`, font, 11, 14);
-    draw("As a named inventor in the above-identified application, I declare that:", font, 11, 10);
+    draw(`Title of the invention ${title.trim() || "[not provided]"}`, font, 11, 14);
+    draw("As a named inventor in the above identified application, I declare that", font, 11, 10);
 
     DECLARATION_STATEMENTS.forEach((s, i) => {
       y -= 2;
@@ -97,9 +98,9 @@ export async function buildDeclarationPdf(opts: {
         });
       y -= 34;
     };
-    lineY("Inventor:", inv.legal_name || "");
-    lineY("Signature:", "");
-    lineY("Date:", "");
+    lineY("Inventor", inv.legal_name || "");
+    lineY("Signature", "");
+    lineY("Date", "");
 
     y -= 8;
     draw(
@@ -137,7 +138,7 @@ export async function buildPoaPdf(opts: {
   const wrap = (text: string, f: typeof font, size: number): string[] => {
     const out: string[] = [];
     let line = "";
-    for (const word of text.split(/\s+/)) {
+    for (const word of sanitizeOutputText(text).split(/\s+/)) {
       const next = line ? `${line} ${word}` : word;
       if (f.widthOfTextAtSize(next, size) > maxW && line) {
         out.push(line);
@@ -155,7 +156,7 @@ export async function buildPoaPdf(opts: {
   };
 
   draw("POWER OF ATTORNEY (37 CFR 1.32)", bold, 14, 12);
-  draw(`Title of the invention: ${title.trim() || "[not provided]"}`, font, 11, 14);
+  draw(`Title of the invention ${title.trim() || "[not provided]"}`, font, 11, 14);
   draw(
     `The undersigned applicant, ${applicant.trim() || "[applicant]"}, hereby appoints ${practitioner.trim() || "the registered practitioner of record"} to prosecute the above-identified application and to transact all business in the United States Patent and Trademark Office connected with it.`,
     font,
@@ -181,10 +182,10 @@ export async function buildPoaPdf(opts: {
       page.drawText(value, { x: margin + 136, y: y + 2, size: 11, font, color: BLACK });
     y -= 34;
   };
-  lineY("Applicant:", applicant.trim() || "");
-  lineY("Signature:", "");
-  lineY("Title (if juristic):", "");
-  lineY("Date:", "");
+  lineY("Applicant", applicant.trim() || "");
+  lineY("Signature", "");
+  lineY("Title if juristic", "");
+  lineY("Date", "");
 
   y -= 8;
   draw(

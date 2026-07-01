@@ -9,6 +9,7 @@
  * header (xAI 400s unless the team has ZDR enabled). It currently reads "false", so use
  * synthetic / non-confidential text until ZDR is on. See docs/business-context.md.
  */
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 export type GenerateParams = {
   system?: string;
@@ -111,7 +112,7 @@ export async function generateText(
 
   if (provider === "gemini") {
     return {
-      text: await generateWithGemini(params, geminiModel),
+      text: sanitizeOutputText(await generateWithGemini(params, geminiModel)),
       provider: "gemini",
       model: geminiModel,
     };
@@ -119,7 +120,7 @@ export async function generateText(
 
   try {
     return {
-      text: await generateWithGrok(params, grokModel),
+      text: sanitizeOutputText(await generateWithGrok(params, grokModel)),
       provider: "grok",
       model: grokModel,
     };
@@ -130,7 +131,7 @@ export async function generateText(
         (err as Error).message,
       );
       return {
-        text: await generateWithGemini(params, geminiModel),
+        text: sanitizeOutputText(await generateWithGemini(params, geminiModel)),
         provider: "gemini",
         model: geminiModel,
       };

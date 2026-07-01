@@ -35,7 +35,7 @@ test("declaration: download to sign and upload the signed copy", async ({ page }
     mimeType: "application/pdf",
     buffer: Buffer.from(pdf),
   });
-  await expect(page.getByText("signed-declaration.pdf")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText("signed declaration.pdf")).toBeVisible({ timeout: 15000 });
   await screenshot(page, "declaration-signed");
 
   assertClean(errs);

@@ -39,7 +39,7 @@ test("phase-v3: lifecycle next-actions by status", async ({ page }) => {
     .eq("id", id);
   await page.goto(`/projects/${id}/stage`);
   await expect(page.getByText(/Pay the issue fee/i).first()).toBeVisible();
-  await expect(page.getByText(/non-extendable/i).first()).toBeVisible();
+  await expect(page.getByText(/not extendable/i).first()).toBeVisible();
 
   assertClean(errs);
 });

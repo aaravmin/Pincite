@@ -32,7 +32,7 @@ test("phase-4: validator flags seeded issues with severity colors, the actionabl
   await expect(page.locator('[data-severity="violation"]').first()).toBeVisible();
   await expect(page.getByText("Informational").first()).toBeVisible();
   // Tier 2 consistency checks (attention/verify).
-  await expect(page.getByText(/invokes means-plus-function/i).first()).toBeVisible();
+  await expect(page.getByText(/invokes means plus function/i).first()).toBeVisible();
   await expect(page.getByText(/may lack antecedent basis/i).first()).toBeVisible();
   await expect(page.getByText(/relative term "substantially"/i).first()).toBeVisible();
   await screenshot(page, "phase-4-findings");

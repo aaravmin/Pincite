@@ -2,6 +2,7 @@ import { type Page, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs";
 import path from "node:path";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 /**
  * Reusable verification harness for the §7 gate.
@@ -88,7 +89,9 @@ export async function createMatter(
   if (o.matterNo !== undefined) await page.getByLabel("Matter no.").fill(o.matterNo);
   await page.getByRole("button", { name: "Create", exact: true }).click();
   // Not auto-opened: the new matter appears on the dashboard.
-  await expect(page.getByText(o.name).first()).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText(sanitizeOutputText(o.name)).first()).toBeVisible({
+    timeout: 15000,
+  });
   const db = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,

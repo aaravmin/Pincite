@@ -80,7 +80,7 @@ export function PriorArtClient({
           Find public patents that overlap your claims. <strong>Run search</strong> pulls
           candidates from Google&apos;s public patent data; <strong>Compare a patent</strong> checks
           your claims against one patent you paste. A similarity hit is a research signal to verify,
-          not a validity or freedom-to-operate opinion.
+          not a validity or freedom to operate opinion.
         </p>
         {!hasClaims && (
           <p className="mt-2 rounded-md border border-attention bg-attention-bg px-3 py-2 text-xs text-attention-foreground">
@@ -122,7 +122,7 @@ export function PriorArtClient({
                 data-testid="cmp-number"
                 value={cmpNum}
                 onChange={(e) => setCmpNum(e.target.value)}
-                placeholder="e.g. US-1234567-A1"
+                placeholder="e.g. US 1234567 A1"
               />
             </div>
             <div className="space-y-1">
@@ -147,7 +147,7 @@ export function PriorArtClient({
 
       {matches.length === 0 ? (
         <p className="px-6 py-6 text-sm text-muted-foreground">
-          No prior-art matches yet. Run a search, or compare a specific patent.
+          No prior art matches yet. Run a search, or compare a specific patent.
         </p>
       ) : (
         <div className="grid md:grid-cols-[2fr_3fr]">

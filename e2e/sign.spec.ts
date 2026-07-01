@@ -50,7 +50,7 @@ test("sign: declaration is download-sign-upload, no in-app signature", async ({ 
     mimeType: "application/pdf",
     buffer: Buffer.from(pdf),
   });
-  await expect(page.getByText("signed-declaration.pdf")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText("signed declaration.pdf")).toBeVisible({ timeout: 15000 });
   await screenshot(page, "v3-sign");
 
   // The uploaded signed declaration is recorded as a declaration-kind attachment...

@@ -64,7 +64,7 @@ export function runTier2(
         severity: "attention",
         kind: "consistency",
         actionable: true,
-        title: `Claim ${c.number} invokes means-plus-function ("${mpf[0].trim()}")`,
+        title: `Claim ${c.number} invokes means plus function "${mpf[0].trim()}"`,
         explanation:
           "Disclose the structure that performs it, or it may be indefinite.",
         mpep_section: "2181",

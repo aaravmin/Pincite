@@ -12,6 +12,7 @@ import {
   AlignmentType,
 } from "docx";
 import type { SectionKey } from "@/lib/projects/sections";
+import { sanitizeOutputText } from "@/lib/text/sanitize";
 
 type SpecEntry = {
   key: SectionKey;
@@ -47,7 +48,7 @@ const SPEC_ORDER: SpecEntry[] = [
 
 function heading(text: string, pageBreakBefore?: boolean): Paragraph {
   return new Paragraph({
-    children: [new TextRun({ text, allCaps: true })],
+    children: [new TextRun({ text: sanitizeOutputText(text), allCaps: true })],
     pageBreakBefore,
     spacing: { before: 240, after: 120, line: 360, lineRule: "auto" },
   });
@@ -60,7 +61,7 @@ function para(
   const children: TextRun[] = [];
   if (opts?.numberLabel)
     children.push(new TextRun({ text: `${opts.numberLabel} `, bold: true }));
-  children.push(new TextRun(text));
+  children.push(new TextRun(sanitizeOutputText(text)));
   return new Paragraph({
     children,
     alignment: opts?.center ? AlignmentType.CENTER : AlignmentType.LEFT,
