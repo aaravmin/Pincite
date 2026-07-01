@@ -3,7 +3,7 @@ import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getDeclarations } from "@/lib/filing/queries";
+import { getInventors, getAttachments } from "@/lib/filing/queries";
 import { getDisclosure } from "@/lib/disclosure/queries";
 import { runFilingChecks, resolveFilingPins } from "@/lib/validators/filing";
 import { runCrossRefChecks } from "@/lib/validators/crossref";
@@ -33,16 +33,16 @@ export default async function ReviewPage({
   if (!project) notFound();
   const { sections, findings } = await getReview(id);
 
-  const [inventors, declarations, sectionContent] = await Promise.all([
+  const [inventors, attachments, sectionContent] = await Promise.all([
     getInventors(id),
-    getDeclarations(id),
+    getAttachments(id),
     getSectionContent(id),
   ]);
   const filing = await resolveFilingPins(
     runFilingChecks({
       project,
       inventors,
-      declarations,
+      hasSignedDeclaration: attachments.some((a) => a.kind === "declaration"),
       role: profile.role ?? null,
       title: sectionContent["title"] ?? "",
     }),
@@ -57,12 +57,6 @@ export default async function ReviewPage({
     <div className="flex h-screen flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <div className="flex items-center gap-3">
-          <Link
-            href={`/projects/${id}`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← {project.name}
-          </Link>
           <span className="text-lg font-semibold tracking-tight text-foreground">
             Review
           </span>
@@ -95,7 +89,7 @@ export default async function ReviewPage({
           <span className="text-attention-foreground">
             {consistency.length} to reconcile
           </span>{" "}
-          between your disclosure and draft →{" "}
+          →{" "}
           <span className="underline">Invention intake</span>
         </Link>
       )}

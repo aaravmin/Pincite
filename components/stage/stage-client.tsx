@@ -101,7 +101,7 @@ export function StageClient({
       <div className="mt-8 rounded-lg border border-border p-4">
         <p className="text-sm font-medium text-foreground">Declared status</p>
         <p className="text-xs text-muted-foreground">
-          Set where you are in the lifecycle. Filing details are informational.
+          Where you are in the lifecycle.
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="space-y-1">
@@ -131,8 +131,7 @@ export function StageClient({
               placeholder="e.g. 17/123,456"
             />
             <p className="text-xs text-muted-foreground">
-              The USPTO assigns this when you file. Leave blank until then; it lets Pincite track
-              your deadlines.
+              Assigned by the USPTO at filing; blank until then.
             </p>
           </div>
           <div className="space-y-1">
@@ -144,7 +143,7 @@ export function StageClient({
               onChange={(e) => setFiling(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              The date the USPTO received your application. Drives the lifecycle deadlines.
+              Date the USPTO received the application.
             </p>
           </div>
         </div>

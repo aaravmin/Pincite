@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-v3: claim-structure checks (dependency + multiple-dependent)", async ({
@@ -13,14 +13,13 @@ test("phase-v3: claim-structure checks (dependency + multiple-dependent)", async
 
   const id = await createMatter(page, "Claims synthetic");
 
-  // Seed claims with deliberate structural defects.
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page.locator("[data-testid^='editor-']").fill(
-    "1. A widget of claim 5, wherein it is small.\n" +
+  // Seed claims with deliberate structural defects, then save.
+  await saveDraft(page, {
+    claims:
+      "1. A widget of claim 5, wherein it is small.\n" +
       "2. The widget of claim 1, comprising a base.\n" +
       "3. The widget of claims 1 and 2, wherein the base is round.",
-  );
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  });
 
   await page.goto(`/projects/${id}/review`);
   await page.getByTestId("run-check").click();

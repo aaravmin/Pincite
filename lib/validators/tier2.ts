@@ -66,7 +66,7 @@ export function runTier2(
         actionable: true,
         title: `Claim ${c.number} invokes means-plus-function ("${mpf[0].trim()}")`,
         explanation:
-          "Under 35 U.S.C. 112(f), make sure your draft discloses the corresponding structure, or the limitation may be indefinite.",
+          "Disclose the structure that performs it, or it may be indefinite.",
         mpep_section: "2181",
         cfr_ref: "35 U.S.C. 112(f)",
       });
@@ -125,7 +125,7 @@ export function runTier2(
         actionable: true,
         title: `Claim ${c.number}: "${m[0].trim()}" may lack antecedent basis`,
         explanation:
-          'Introduce this element earlier with "a" or "an" before referring to it with "the" or "said", or it may be indefinite.',
+          'Introduce it with "a"/"an" before "the"/"said".',
         mpep_section: "2173.05(e)",
         cfr_ref: "35 U.S.C. 112(b)",
       });

@@ -112,11 +112,17 @@ export function toText(r: Report): string {
     L.push(`- ${ru.note} (${pin(ru.cfr_ref, ru.mpep_section)})`);
   L.push("");
 
-  L.push("== RULES THAT MAY APPLY NEXT ==");
-  for (const ru of r.conditional)
-    L.push(
-      `- ${ru.trigger}: ${ru.note}${ru.triggered ? " [NOW APPLIES]" : ""} (${pin(ru.cfr_ref, ru.mpep_section)})`,
-    );
+  const nowApplies = r.conditional.filter((ru) => ru.triggered);
+  const mayApply = r.conditional.filter((ru) => !ru.triggered);
+  if (nowApplies.length) {
+    L.push("== CONDITIONS NOW MET (THESE RULES NOW APPLY) ==");
+    for (const ru of nowApplies)
+      L.push(`- ${ru.met}: ${ru.note} (${pin(ru.cfr_ref, ru.mpep_section)})`);
+    L.push("");
+  }
+  L.push("== RULES THAT MAY APPLY NEXT (NOT YET) ==");
+  for (const ru of mayApply)
+    L.push(`- ${ru.trigger}: ${ru.note} (${pin(ru.cfr_ref, ru.mpep_section)})`);
   L.push("");
 
   L.push("== SIMILAR PATENTS ==");
@@ -127,7 +133,7 @@ export function toText(r: Report): string {
     );
     for (const sp of m.spans)
       L.push(
-        `    ${sp.overlap_type === "claim_limitation" ? "[matches a full claim limitation]" : "[overlap]"} ${sp.patent_span_text.slice(0, 140)}`,
+        `    ${sp.overlap_type === "claim_limitation" ? "[covers a whole requirement of your claim]" : "[shares wording]"} ${sp.patent_span_text.slice(0, 140)}`,
       );
   }
   L.push("");

@@ -25,7 +25,7 @@ export function lifecycleActions(
         {
           title: "Watch for a restriction requirement",
           detail:
-            "If the examiner restricts the application, elect an invention or species within the set period; non-elected claims can be pursued in a divisional.",
+            "If the examiner restricts, elect one invention; pursue the rest in a divisional.",
           deadline: "Set period (often 1 month / 30 days)",
           cfr_ref: "37 CFR 1.142; 35 U.S.C. 121",
           mpep_section: "818",
@@ -37,8 +37,8 @@ export function lifecycleActions(
               : "Publication at 18 months",
           detail:
             patentType === "design"
-              ? "A design application is not published before grant; only the issued design patent publishes."
-              : "Utility applications publish about 18 months from the earliest filing date unless a nonpublication request was filed at filing.",
+              ? "Not published before grant; only the issued patent publishes."
+              : "Publishes ~18 months from the earliest filing, absent a nonpublication request.",
           deadline:
             patentType === "design"
               ? null
@@ -52,7 +52,7 @@ export function lifecycleActions(
         {
           title: "Await examination; respond promptly to any office action",
           detail:
-            "Examination timing is controlled by the USPTO. When an office action issues, the reply clock starts immediately.",
+            "The USPTO controls timing; the reply clock starts when an office action issues.",
           deadline: null,
           cfr_ref: "37 CFR 1.211",
           mpep_section: "1120",
@@ -63,16 +63,15 @@ export function lifecycleActions(
         {
           title: "Reply to every rejection and objection",
           detail:
-            "A complete reply must address each ground of rejection and objection, and specifically amend or argue (not general allegations of error).",
-          deadline:
-            "3 months (shortened statutory period), extendable to 6 months total with fees",
+            "Address each rejection and objection, amending or arguing specifically.",
+          deadline: "3 months, extendable to 6 with fees",
           cfr_ref: "37 CFR 1.111; 1.136(a); 35 U.S.C. 133",
           mpep_section: "714",
         },
         {
           title: "Missing the reply deadline abandons the application",
           detail:
-            "No reply by the deadline means abandonment by operation of law; revival then requires a petition showing the delay was unintentional.",
+            "No reply abandons the application; revival needs an unintentional-delay petition.",
           deadline: "6 months absolute maximum from the action",
           cfr_ref: "37 CFR 1.135; 1.137",
           mpep_section: "711",
@@ -80,7 +79,7 @@ export function lifecycleActions(
         {
           title: "After a FINAL rejection, choose a path",
           detail:
-            "Options are an after-final amendment (entry is discretionary), a Request for Continued Examination (RCE), or an appeal to the PTAB.",
+            "Options: after-final amendment, an RCE, or a PTAB appeal.",
           deadline: "Within the reply period for the final action",
           cfr_ref: "37 CFR 1.116; 1.114; 41.31",
           mpep_section: "706.07(h)",
@@ -91,7 +90,7 @@ export function lifecycleActions(
         {
           title: "Pay the issue fee",
           detail:
-            "Pay the issue fee (and the publication fee if due) so the patent can grant. This deadline is NOT extendable - there is no authority to extend it.",
+            "Pay the issue fee (and publication fee if due) to let the patent grant. Not extendable.",
           deadline: "3 months from the Notice of Allowance (non-extendable)",
           cfr_ref: "37 CFR 1.311; 35 U.S.C. 151",
           mpep_section: "1306",
@@ -103,7 +102,7 @@ export function lifecycleActions(
             {
               title: "No maintenance fees for a design patent",
               detail:
-                "Design patents require no maintenance fees. The term is 15 years from grant (for applications filed on or after May 13, 2015).",
+                "No maintenance fees. Term is 15 years from grant.",
               deadline: null,
               cfr_ref: "35 U.S.C. 173",
               mpep_section: "1505",
@@ -113,7 +112,7 @@ export function lifecycleActions(
             {
               title: "Pay maintenance fees on schedule",
               detail:
-                "Utility maintenance fees keep the patent in force; each window has a 6-month grace period with a surcharge. Missing them lets the patent lapse.",
+                "Keep the patent in force; each window has a 6-month grace period with surcharge.",
               deadline:
                 "Due at 3-3.5, 7-7.5, and 11-11.5 years from the grant date",
               cfr_ref: "37 CFR 1.20(e)-(h); 35 U.S.C. 41(b)",

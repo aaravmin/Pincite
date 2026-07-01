@@ -37,27 +37,22 @@ export const SECTION_LABELS: Record<SectionKey, string> = {
 /** Short, neutral guidance shown under each section heading. No legal advice. */
 export const SECTION_HINTS: Partial<Record<SectionKey, string>> = {
   title:
-    "A short, specific technical name for the invention - what it is, not a brand name. Example: 'Adjustable mount for a display arm'.",
+    "A specific technical name, not a brand. E.g. 'Adjustable mount for a display arm'.",
   cross_reference:
-    "If this builds on an earlier filing you are claiming priority to (a provisional or a parent application), name it and its number. Otherwise write 'Not applicable'.",
+    "Any earlier filing you claim priority to, and its number, or 'Not applicable'.",
   gov_interest:
-    "If the invention was made with US government funding, name the agency and contract number. Most people write 'Not applicable'.",
-  background:
-    "Describe the field and the problem, what existing solutions do, and why they fall short. Set up the need your invention fills, without arguing that it is patentable.",
-  summary:
-    "A plain, high-level description of what the invention is and does, in a few sentences. It previews the detailed description.",
+    "If US-government-funded, name the agency and contract number; else 'Not applicable'.",
+  background: "The field, the problem, and why existing solutions fall short.",
+  summary: "A high-level description of what the invention is and does.",
   brief_description_drawings:
-    "One short line per figure, e.g. 'FIG. 1 is a perspective view of the container.' Upload your figures on the Drawings step first, then describe each one here.",
+    "One short line per figure, e.g. 'FIG. 1 is a perspective view of the container.'",
   detailed_description:
-    "The full, enabling description: how to make and use the invention, step by step, introducing each part with a reference numeral (e.g. base 10, arm 12) that matches the drawings.",
+    "How to make and use it, introducing each part with a reference numeral (base 10, arm 12) matching the drawings.",
   claims:
-    "The legal definition of what you are protecting. One numbered claim per block, each a single sentence. Claim 1 stands alone; a dependent claim refers back to an earlier claim and adds to it. Draft these after your disclosure and detailed description so they are supported.",
-  abstract:
-    "A single paragraph, 150 words or fewer, summarizing the invention so a reader grasps it quickly. Easiest to write last, once the rest is drafted.",
-  drawings_meta:
-    "List each figure and the reference numerals it shows, so the drawings, description, and claims stay consistent. Needs your drawings and detailed description in place.",
-  office_action:
-    "Only once the USPTO has examined the application and sent an Office action: paste the examiner's text here so Pincite can help you respond.",
+    "What you're protecting. One numbered claim per block, each one sentence. Claim 1 stands alone; a dependent claim builds on an earlier one.",
+  abstract: "One paragraph, 150 words or fewer, summarizing the invention.",
+  drawings_meta: "Each figure and the reference numerals it shows.",
+  office_action: "Paste the examiner's Office action text here.",
 };
 
 /** Sections only relevant once later stages are reached; hidden by default in intake. */
@@ -149,12 +144,12 @@ export function filingCompleteness(input: {
   sectionWords: Partial<Record<SectionKey, number>>;
   hasDisclosure: boolean;
   inventorCount: number;
-  signedCount: number;
+  hasSignedDeclaration: boolean;
 }): number {
   const spec = specProgress(input.sectionWords);
   const disclosure = input.hasDisclosure ? 1 : 0;
   const inventors = input.inventorCount > 0 ? 1 : 0;
-  const signed = input.signedCount > 0 ? 1 : 0;
+  const signed = input.hasSignedDeclaration ? 1 : 0;
   const score = 0.7 * spec + 0.1 * disclosure + 0.1 * inventors + 0.1 * signed;
   return Math.round(score * 100);
 }

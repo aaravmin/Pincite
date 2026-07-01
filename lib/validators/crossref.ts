@@ -49,7 +49,7 @@ export function runCrossRefChecks(
       actionable: true,
       title: `Component "${comp}" from your disclosure is not claimed or described`,
       explanation:
-        "Every component you disclose should appear in the detailed description and, where it is part of the invention, in the claims - otherwise the application and claims do not line up.",
+        "Add it to the detailed description, and to the claims if it's part of the invention.",
       mpep_section: "2163",
       cfr_ref: "35 U.S.C. 112(a)",
     });
@@ -61,8 +61,7 @@ export function runCrossRefChecks(
       severity: "attention",
       actionable: true,
       title: "Your problem statement is not reflected in the Background",
-      explanation:
-        "You described the problem in the disclosure, but the Background of the Invention is empty. Carry the problem into the draft.",
+      explanation: "Carry it into the Background, which is empty.",
       mpep_section: "608.01(c)",
       cfr_ref: "37 CFR 1.77(b)",
     });

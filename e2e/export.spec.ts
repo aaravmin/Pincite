@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-8: export — report renders and a TXT export is generated and logged", async ({
@@ -15,9 +15,7 @@ test("phase-8: export — report renders and a TXT export is generated and logge
 
   const projectId = await createMatter(page, "Export synthetic");
 
-  await page.getByRole("button", { name: "Title of the invention", exact: true }).click();
-  await page.locator("[data-testid^='editor-']").fill("Adjustable widget mount");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, { title: "Adjustable widget mount" });
 
   // Report view renders the review.
   await page.goto(`/projects/${projectId}/report`);

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-9: audit-log viewer lists actions and filters", async ({ page }) => {
@@ -12,17 +12,9 @@ test("phase-9: audit-log viewer lists actions and filters", async ({ page }) => 
 
   const projectId = await createMatter(page, "Audit synthetic");
 
-  // Generate a few audited actions: edit a section, save a version.
-  await page.getByRole("button", { name: "Title of the invention", exact: true }).click();
-  await page.locator("[data-testid^='editor-']").fill("Adjustable widget mount");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
-  await page.getByRole("button", { name: "Save version" }).click();
-  await page.getByLabel(/label/i).fill("First draft");
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Save", exact: true })
-    .click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  // Generate a few audited actions: edit sections and save a version, all from the one save
+  // in the All-sections view (it writes the sections, then appends the immutable snapshot).
+  await saveDraft(page, { title: "Adjustable widget mount" });
 
   // Audit log shows the actions.
   await page.goto(`/projects/${projectId}/audit`);

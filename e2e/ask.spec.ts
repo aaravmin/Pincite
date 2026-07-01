@@ -32,6 +32,24 @@ test("phase-2: Ask opens the evidence pane with the right section highlighted; f
   await page.getByRole("button", { name: "Ask" }).click();
   await expect(page.getByTestId("evidence")).toContainText("2111.03");
 
+  // A question whose closest stub section is a bare cross-reference ("See MPEP Chapter
+  // 2300.") must NOT route the user to that pointer - it resolves to a substantive section
+  // with real text instead. (Regression: pointer stubs used to win the locate step.)
+  await page
+    .getByTestId("ask-input")
+    .fill("cancel a claim that was lost in an interference proceeding");
+  await page.getByRole("button", { name: "Ask" }).click();
+  await expect(page.getByTestId("evidence")).toBeVisible();
+  await expect(page.getByTestId("evidence")).not.toContainText(
+    /^\s*See MPEP Chapter \d+\.\s*$/,
+  );
+  const highlighted = (
+    await page.locator("#evidence-highlight").textContent()
+  )?.trim();
+  expect(highlighted, "highlight should be real text, not a bare pointer").not.toMatch(
+    /^See MPEP (Chapter \d+|§)/i,
+  );
+
   // A section number not in the corpus is dropped, not fabricated.
   await page.getByTestId("ask-input").fill("MPEP 2111.99 imaginary subsection");
   await page.getByRole("button", { name: "Ask" }).click();

@@ -157,11 +157,11 @@ export async function proposeFix(input: {
   if (!rl.allowed) return { error: rl.retryMessage };
   const budget = await checkGlobalLimit(supabase, "grok_global_day", 300, 86400);
   if (!budget.allowed)
-    return { error: "The daily AI budget is used up. Please try again tomorrow." };
+    return { error: "Daily AI budget used up. Try again tomorrow." };
 
   const sections = await getSectionContent(input.projectId);
   const content = sections[input.sectionKey as SectionKey] ?? "";
-  if (!content.trim()) return { error: "There is no text in this section to fix." };
+  if (!content.trim()) return { error: "No text in this section to fix." };
 
   const s = Math.max(0, Math.min(content.length, input.spanStart));
   const e = Math.max(s, Math.min(content.length, input.spanEnd));
@@ -205,7 +205,7 @@ Rules:
   const note = String(raw.note ?? "").slice(0, 200);
   if (!before || !content.includes(before)) {
     return {
-      error: "Could not propose a precise fix. Use Take me to issue to edit it by hand.",
+      error: "Couldn't draft a precise fix - edit it by hand.",
     };
   }
   if (before === after) return { error: "No change was proposed." };
@@ -227,7 +227,7 @@ export async function applyFix(input: {
   const sections = await getSectionContent(input.projectId);
   const content = sections[input.sectionKey as SectionKey] ?? "";
   const idx = nearestIndex(content, input.before, input.spanStart);
-  if (idx < 0) return { error: "The text has changed since the fix was proposed. Re-run it." };
+  if (idx < 0) return { error: "Text changed since the fix - re-run it." };
 
   const next =
     content.slice(0, idx) + input.after + content.slice(idx + input.before.length);
@@ -275,7 +275,7 @@ export async function analyzeEligibility(projectId: string): Promise<
 > {
   const { supabase, user } = await requireUser();
   const claims = (await getSectionContent(projectId))["claims"] ?? "";
-  if (!claims.trim()) return { error: "Add claims to the project first." };
+  if (!claims.trim()) return { error: "Add claims first." };
 
   const parsed = parseClaims(claims);
   const indep = parsed.find((c) => !/\bclaim\s+\d+\b/i.test(c.raw)) ?? parsed[0];
@@ -285,7 +285,7 @@ export async function analyzeEligibility(projectId: string): Promise<
   if (!rl.allowed) return { error: rl.retryMessage };
   const budget = await checkGlobalLimit(supabase, "grok_global_day", 300, 86400);
   if (!budget.allowed)
-    return { error: "The daily AI budget for the §101 walkthrough is used up. Please try again tomorrow." };
+    return { error: "Daily §101 budget used up. Try again tomorrow." };
 
   const system =
     "You are a patent examiner aid applying the USPTO Alice/Mayo subject-matter eligibility framework (MPEP 2106). Do NOT decide whether the claim is eligible or ineligible. Walk the framework concisely and neutrally. Return ONLY a JSON object.";

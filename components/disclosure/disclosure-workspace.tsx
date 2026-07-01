@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,14 +14,15 @@ import {
 import type { FilingFinding } from "@/lib/validators/filing";
 
 type SaveState = "saved" | "unsaved" | "saving" | "error";
-const AUTOSAVE_MS = 1200;
 const ALL = "__all__" as const;
 type Active = DisclosureKey | typeof ALL;
 
 /**
  * The invention-intake dashboard. Mirrors the draft workspace: a left field nav, a single
- * focused field editor, debounced autosave per field, and an "All fields" view that shows
- * every field together with the cross-reference consistency check and an explicit save.
+ * focused field editor, and an "All fields" view that shows every field together with the
+ * cross-reference consistency check. Nothing autosaves - the disclosure is written (and its
+ * step lit green) only when the user opens All fields and clicks Save. Field edits stay in
+ * memory across the nav so switching fields loses nothing before that save.
  */
 export function DisclosureWorkspace({
   projectId,
@@ -36,48 +37,42 @@ export function DisclosureWorkspace({
   const [values, setValues] = useState<Disclosure>(initial);
   const valuesRef = useRef(values);
   valuesRef.current = values;
+  // Baseline of what's persisted, so we know when there are unsaved edits.
+  const [savedValues, setSavedValues] = useState<Disclosure>(initial);
 
   const [active, setActive] = useState<Active>(DISCLOSURE_FIELDS[0].key);
-  const [status, setStatus] = useState<SaveState>("saved");
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [phase, setPhase] = useState<"idle" | "error">("idle");
   const [saving, startSave] = useTransition();
   const [savedMsg, setSavedMsg] = useState(false);
 
-  const commit = useCallback(async () => {
-    if (timer.current) {
-      clearTimeout(timer.current);
-      timer.current = null;
-    }
-    setStatus("saving");
-    const r = await saveDisclosure({ projectId, values: valuesRef.current });
-    setStatus("error" in r ? "error" : "saved");
-  }, [projectId]);
+  const dirty = DISCLOSURE_FIELDS.some(
+    (f) => (values[f.key] ?? "") !== (savedValues[f.key] ?? ""),
+  );
+  const status: SaveState = saving
+    ? "saving"
+    : phase === "error"
+      ? "error"
+      : dirty
+        ? "unsaved"
+        : "saved";
 
   function set(key: DisclosureKey, v: string) {
     setValues((p) => ({ ...p, [key]: v }));
     setSavedMsg(false);
-    setStatus("unsaved");
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => void commit(), AUTOSAVE_MS);
-  }
-
-  function flush() {
-    if (status === "unsaved" || timer.current) void commit();
+    if (phase === "error") setPhase("idle");
   }
 
   function saveAll() {
     setSavedMsg(false);
+    setPhase("idle");
     startSave(async () => {
-      if (timer.current) {
-        clearTimeout(timer.current);
-        timer.current = null;
-      }
-      const r = await saveDisclosure({ projectId, values: valuesRef.current });
+      const current = valuesRef.current;
+      const r = await saveDisclosure({ projectId, values: current });
       if ("error" in r) {
-        setStatus("error");
+        setPhase("error");
         return;
       }
-      setStatus("saved");
+      setSavedValues(current);
       setSavedMsg(true);
       router.refresh();
     });
@@ -97,10 +92,7 @@ export function DisclosureWorkspace({
               <li key={f.key}>
                 <button
                   type="button"
-                  onClick={() => {
-                    flush();
-                    setActive(f.key);
-                  }}
+                  onClick={() => setActive(f.key)}
                   aria-current={isActive ? "true" : undefined}
                   className={
                     "flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm " +
@@ -123,10 +115,7 @@ export function DisclosureWorkspace({
           <li className="mt-2 border-t border-border pt-2">
             <button
               type="button"
-              onClick={() => {
-                flush();
-                setActive(ALL);
-              }}
+              onClick={() => setActive(ALL)}
               aria-current={active === ALL ? "true" : undefined}
               className={
                 "flex w-full items-center rounded-md px-3 py-2 text-left text-sm font-medium " +
@@ -154,16 +143,28 @@ export function DisclosureWorkspace({
               <Textarea
                 value={values[activeField.key]}
                 onChange={(e) => set(activeField.key, e.target.value)}
-                onBlur={flush}
                 spellCheck
                 aria-label={activeField.label}
                 className="mt-4 min-h-[420px] resize-y text-sm leading-relaxed"
-                placeholder="Type here, in as much technical detail as you can…"
+                placeholder="Type here, in technical detail…"
                 data-testid={`disclosure-${activeField.key}`}
               />
               <div className="mt-2 text-xs text-muted-foreground">
                 {statusLabel(status)}
               </div>
+              {dirty && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Unsaved changes.{" "}
+                  <button
+                    type="button"
+                    onClick={() => setActive(ALL)}
+                    className="font-medium text-foreground underline underline-offset-2"
+                  >
+                    Go to All fields to save
+                  </button>
+                  .
+                </p>
+              )}
             </>
           ) : (
             <>
@@ -171,7 +172,7 @@ export function DisclosureWorkspace({
                 All fields
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Your whole disclosure in one place. Review it against your draft, then save.
+                Review it against your draft, then save. Nothing is saved until you do.
               </p>
               <div className="mt-6 space-y-6">
                 {DISCLOSURE_FIELDS.map((f) => (
@@ -187,7 +188,6 @@ export function DisclosureWorkspace({
                       id={`all-${f.key}`}
                       value={values[f.key]}
                       onChange={(e) => set(f.key, e.target.value)}
-                      onBlur={flush}
                       className="min-h-[120px] resize-y text-sm leading-relaxed"
                       data-testid={`disclosure-${f.key}`}
                     />
@@ -202,7 +202,7 @@ export function DisclosureWorkspace({
                 <div className="mt-3">
                   <FilingReadiness
                     findings={consistency}
-                    emptyMessage="Your disclosure lines up with the draft so far."
+                    emptyMessage="Lines up with the draft so far."
                   />
                 </div>
               </section>

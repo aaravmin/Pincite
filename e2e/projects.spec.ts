@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
-test("phase-1: create project, intake autosave, versioning, restore — all audited", async ({
+test("phase-1: create project, intake save, versioning, restore — all audited", async ({
   page,
 }) => {
   const errs = captureErrors(page);
@@ -17,35 +17,18 @@ test("phase-1: create project, intake autosave, versioning, restore — all audi
   // Create a project via the dialog (patent type defaults to Utility).
   const projectId = await createMatter(page, "Synthetic widget mount");
 
-  // Intake: Title is active by default. Fill it and wait for debounced autosave.
-  await page
-    .getByTestId("editor-title")
-    .fill("Adjustable mount for a widget");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  // Intake: nothing is saved until the user opens All sections and clicks Save. This writes
+  // the title and appends the first immutable version.
+  await saveDraft(page, { title: "Adjustable mount for a widget" });
   await screenshot(page, "phase-1-intake");
 
-  // Save a first version.
-  await page.getByRole("button", { name: "Save version" }).click();
-  await page.getByLabel(/label/i).fill("First draft");
-  await page.getByRole("dialog").getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  // Edit, then save again - a second version (proves saves append, not overwrite).
+  await saveDraft(page, { title: "Adjustable mount for a widget, revised" });
   await screenshot(page, "phase-1-save");
 
-  // Edit, then save a second version (proves saves append, not overwrite).
-  await page
-    .getByTestId("editor-title")
-    .fill("Adjustable mount for a widget, revised");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
-  await page.getByRole("button", { name: "Save version" }).click();
-  await page.getByLabel(/label/i).fill("Second draft");
-  await page.getByRole("dialog").getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-
-  // Version history shows both saves.
-  await page.getByRole("link", { name: /version history/i }).click();
-  await page.waitForURL("**/versions");
-  await expect(page.getByText("First draft")).toBeVisible();
-  await expect(page.getByText("Second draft")).toBeVisible();
+  // Version history shows both saves (unlabeled snapshots read as "Untitled save").
+  await page.goto(`/projects/${projectId}/versions`);
+  await expect(page.getByText("Untitled save")).toHaveCount(2);
   await screenshot(page, "phase-1-versions");
 
   // Continue from the oldest save (last row) -> opens a NEW save in the workspace.

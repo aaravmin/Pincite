@@ -95,7 +95,7 @@ export function UploadsPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="drawing">Drawing / figure / 3D</SelectItem>
+              <SelectItem value="drawing">Drawing / figure</SelectItem>
               <SelectItem value="supporting">Supporting document</SelectItem>
             </SelectContent>
           </Select>
@@ -129,20 +129,14 @@ export function UploadsPanel({
         <input
           ref={fileRef}
           type="file"
-          accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,model/gltf-binary,model/gltf+json,.glb,.gltf"
+          accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"
           className="sr-only"
           aria-label="Choose a file to upload"
           data-testid="upload-input"
           onChange={onPick}
         />
         <p className="max-w-prose text-xs text-muted-foreground">
-          Figures upload as PNG, JPEG, GIF, WEBP, or PDF. The USPTO files 2D drawings, so
-          these are what go in the package. You can also upload a 3D model (GLB or GLTF) to
-          turn and inspect while you draft; it is a visualization aid and is not part of the
-          filing. Auto-detect reads the view of each figure on upload (top, front, perspective,
-          and so on); you can pick one yourself or correct it on the figure. It only reads the
-          orientation, not errors. Up to 25 MB, stored encrypted in the US. Reading a figure
-          sends it to a vision model, so use public or synthetic figures for now.
+          Images or PDF, up to 25 MB. Synthetic or public figures only for now.
         </p>
       </div>
 

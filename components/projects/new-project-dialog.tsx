@@ -84,7 +84,7 @@ export function NewProjectDialog({ isAttorney = false }: { isAttorney?: boolean 
               autoFocus
             />
             <p className="text-xs text-muted-foreground">
-              A label so you can find this project later. It is not the patent title.
+              A label for you to find it later, not the patent title.
             </p>
           </div>
           <div className="space-y-2">
@@ -105,9 +105,8 @@ export function NewProjectDialog({ isAttorney = false }: { isAttorney?: boolean 
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Utility covers how something works or is used (most inventions). Design covers only the
-              ornamental look of an object. Plant covers a new asexually reproduced plant variety.
-              This changes which checks Pincite runs, so it is hard to change later.
+              Utility = how it works (most inventions). Design = how it looks. Plant = a new
+              plant variety. Hard to change later.
             </p>
           </div>
           {isAttorney && (

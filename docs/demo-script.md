@@ -52,9 +52,9 @@ Do. Open Review, click Check for issues. Expand the claim-7 missing-period findi
 
 ### 3.35 Eligibility (optional)
 
-Say. "Quick one. Analyze section 101 walks the eligibility test, the Alice and Mayo framework, and it opens by explaining what section 101 even is, framed as the model's read for me to verify, not a verdict."
+Say. "Quick one. Check patent eligibility walks the eligibility test in plain language, framed as the model's read for me to verify, not a verdict."
 
-Do. Click Analyze §101 and show the plain explanation and the step by step panel.
+Do. Click Check patent eligibility and show the plain explanation and the step by step panel.
 
 ### 3.50 Rules and stage
 

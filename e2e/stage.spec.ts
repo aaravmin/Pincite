@@ -1,13 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
-
-const SPEC: [string, string][] = [
-  ["Title of the invention", "Widget"],
-  ["Background", "Field of the invention and description of related art."],
-  ["Brief summary", "A widget apparatus."],
-  ["Detailed description", "The widget 10 has a base 12 and an arm 14."],
-];
 
 test("phase-3: stage detection transitions across fill levels and declared status", async ({
   page,
@@ -22,20 +15,19 @@ test("phase-3: stage detection transitions across fill levels and declared statu
   const projectId = await createMatter(page, "Stage synthetic");
 
   // Description sections only, no claims -> Description drafting.
-  for (const [label, text] of SPEC) {
-    await page.getByRole("button", { name: label, exact: true }).click();
-    await page.locator("[data-testid^='editor-']").fill(text);
-    await expect(page.getByTestId("save-status")).toHaveText("Saved");
-  }
+  await saveDraft(page, {
+    title: "Widget",
+    background: "Field of the invention and description of related art.",
+    summary: "A widget apparatus.",
+    detailed_description: "The widget 10 has a base 12 and an arm 14.",
+  });
   await page.goto(`/projects/${projectId}/stage`);
   await expect(page.getByTestId("stage-label")).toHaveText(/Description drafting/i);
   await screenshot(page, "phase-3-stage-spec");
 
   // Add claims -> Claims drafting.
   await page.goto(`/projects/${projectId}`);
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page.locator("[data-testid^='editor-']").fill("1. A widget comprising a base.");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, { claims: "1. A widget comprising a base." });
   await page.goto(`/projects/${projectId}/stage`);
   await expect(page.getByTestId("stage-label")).toHaveText(/Claims drafting/i);
 

@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { locate, extractSectionNumbers } from "@/lib/mpep/locate";
 import { loadSection } from "@/lib/mpep/load";
 import { partitionCitations } from "@/lib/mpep/citation";
-import { selectResponsivePassage } from "@/lib/mpep/highlight";
+import { selectResponsivePassage, isPointerStub } from "@/lib/mpep/highlight";
 import { checkRateLimit } from "@/lib/ratelimit";
 import type { AskResult } from "@/lib/mpep/types";
 
@@ -31,15 +31,39 @@ export async function askMpep(
 
   const requested = await partitionCitations(extractSectionNumbers(q));
   const candidates = await locate(q, 6);
-  const top = candidates[0] ?? null;
-  const section = top ? await loadSection(top.section_number) : null;
+
+  // For a free-text question, walk the ranked candidates and answer with the first one
+  // that is actually substantive - skip the MPEP's pure cross-reference stubs ("See MPEP
+  // Chapter 2300.") so the user lands on real text, not a pointer. When the user typed an
+  // explicit section number, honor it verbatim (that's a deliberate lookup, not a search).
+  const explicitLookup = requested.resolved.length > 0;
+  let section: Awaited<ReturnType<typeof loadSection>> = null;
+  let chosenIdx = -1;
+  for (let i = 0; i < candidates.length; i++) {
+    const loaded = await loadSection(candidates[i].section_number);
+    if (!loaded) continue;
+    if (explicitLookup || !isPointerStub(loaded.full_text)) {
+      section = loaded;
+      chosenIdx = i;
+      break;
+    }
+  }
+  // Everything matched was a stub (rare): fall back to the top-ranked candidate so the
+  // pane still resolves to real corpus text rather than going blank.
+  if (!section && candidates[0]) {
+    section = await loadSection(candidates[0].section_number);
+    chosenIdx = 0;
+  }
   const span = section ? selectResponsivePassage(section.full_text, q) : null;
+  const alternatives = candidates
+    .filter((_, i) => i !== chosenIdx)
+    .slice(0, 4);
 
   return {
     query: q,
     section,
     span,
-    alternatives: candidates.slice(1, 5),
+    alternatives,
     requested,
   };
 }

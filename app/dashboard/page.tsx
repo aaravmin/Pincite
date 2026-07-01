@@ -45,8 +45,8 @@ export default async function DashboardPage() {
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 {isAttorney
-                  ? "Every matter across your clients, with status and the next step."
-                  : "Each project is one patent. Pincite guides you step by step and checks your filing before you submit."}
+                  ? "Matters across your clients."
+                  : "Each project is one patent."}
               </p>
             </div>
             <NewProjectDialog isAttorney={isAttorney} />

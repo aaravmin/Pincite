@@ -41,7 +41,7 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
     { data: versions },
     { data: disclosure },
     { data: inventors },
-    { data: declarations },
+    { data: declarationDocs },
   ] = await Promise.all([
     supabase
       .from("project_sections")
@@ -53,7 +53,13 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
       .select("project_id, problem_solved, how_it_works")
       .in("project_id", ids),
     supabase.from("project_inventors").select("project_id").in("project_id", ids),
-    supabase.from("project_declarations").select("project_id").in("project_id", ids),
+    // "Signed" = the inventor's hand-signed declaration document was uploaded (the operative
+    // signature lives on that document, not on any in-app click).
+    supabase
+      .from("project_attachments")
+      .select("project_id")
+      .eq("kind", "declaration")
+      .in("project_id", ids),
   ]);
 
   // filled = required sections with any content (drives stage detection).
@@ -94,10 +100,8 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
   for (const r of inventors ?? []) {
     inventorCount.set(r.project_id, (inventorCount.get(r.project_id) ?? 0) + 1);
   }
-  const signedCount = new Map<string, number>();
-  for (const r of declarations ?? []) {
-    signedCount.set(r.project_id, (signedCount.get(r.project_id) ?? 0) + 1);
-  }
+  const hasSignedDecl = new Set<string>();
+  for (const r of declarationDocs ?? []) hasSignedDecl.add(r.project_id);
 
   return projects.map((p) => {
     const proj = p as Project;
@@ -111,14 +115,14 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
     const openIssues = findings.filter((f) => f.severity === "violation").length;
     const projFilled = filled.get(p.id) ?? new Set<string>();
     const invCount = inventorCount.get(p.id) ?? 0;
-    const signCount = signedCount.get(p.id) ?? 0;
+    const hasSigned = hasSignedDecl.has(p.id);
     return {
       ...proj,
       completeness: filingCompleteness({
         sectionWords: words.get(p.id) ?? {},
         hasDisclosure: hasDisclosure.has(p.id),
         inventorCount: invCount,
-        signedCount: signCount,
+        hasSignedDeclaration: hasSigned,
       }),
       versionCount: versionCount.get(p.id) ?? 0,
       openIssues,
@@ -127,7 +131,7 @@ export async function getDashboardProjects(): Promise<DashboardProject[]> {
         draftComplete: requiredKeys.every((k) => projFilled.has(k)),
         inventorCount: invCount,
         openIssues,
-        signedCount: signCount,
+        hasSignedDeclaration: hasSigned,
       }),
       stage: detectStage({
         filled: [...projFilled],

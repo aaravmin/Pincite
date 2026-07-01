@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-4: validator flags seeded issues with severity colors, the actionable/informational split, and opens the pinned rule", async ({
@@ -14,20 +14,13 @@ test("phase-4: validator flags seeded issues with severity colors, the actionabl
 
   const projectId = await createMatter(page, "Validator synthetic");
 
-  // Seed an over-length abstract (red violation).
-  await page.getByRole("button", { name: "Abstract", exact: true }).click();
-  await page.getByTestId("editor-abstract").fill(Array(160).fill("widget").join(" "));
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
-
-  // Seed claims: claim 1 missing a terminal period (violation); claim 2 multiple
-  // dependent (informational fee).
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page
-    .getByTestId("editor-claims")
-    .fill(
+  // Seed an over-length abstract (red violation) and claims with seeded defects: claim 1
+  // missing a terminal period (violation); claim 2 multiple dependent (informational fee).
+  await saveDraft(page, {
+    abstract: Array(160).fill("widget").join(" "),
+    claims:
       "1. A device comprising a widget\n2. The device of claim 1 or 2, wherein it includes a base.\n3. The widget of claim 1, further comprising means for adjusting the lever.\n4. The device of claim 1, wherein the widget is substantially rigid.",
-    );
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  });
 
   // Run the check.
   await page.goto(`/projects/${projectId}/review`);

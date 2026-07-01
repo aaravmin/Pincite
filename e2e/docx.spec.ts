@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-v3: USPTO-aligned DOCX + filing package export", async ({ page }) => {
@@ -12,13 +12,12 @@ test("phase-v3: USPTO-aligned DOCX + filing package export", async ({ page }) =>
 
   const projectId = await createMatter(page, "Synthetic clasp");
 
-  await page.getByTestId("editor-title").fill("A synthetic clasp mechanism");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, { title: "A synthetic clasp mechanism" });
 
-  // Report screen exposes the new export buttons.
+  // Submission screen exposes the filing-package export; the spec DOCX is bundled inside it
+  // (and still downloadable directly via the export route, exercised below).
   await page.goto(`/projects/${projectId}/report`);
   await expect(page.getByTestId("download-package")).toBeVisible();
-  await expect(page.getByTestId("download-docx")).toBeVisible();
   await screenshot(page, "v3-export");
 
   // DOCX: a valid Office Open XML file (zip, starts with "PK").

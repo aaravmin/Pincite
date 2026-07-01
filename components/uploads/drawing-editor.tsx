@@ -370,8 +370,8 @@ export function DrawingEditor({
               {checking
                 ? "Reading the figure…"
                 : review
-                  ? "Re-check drawing (vision)"
-                  : "Check drawing (vision)"}
+                  ? "Re-check this figure"
+                  : "Check this figure"}
             </Button>
             <Button
               variant="outline"
@@ -448,6 +448,14 @@ export function DrawingEditor({
       {err && (
         <p className="mt-2 text-sm text-violation" role="alert">
           {err}
+        </p>
+      )}
+
+      {/* Make it obvious the figure is read, and tied to the draft, before any check has run. */}
+      {!review && !editing && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Not checked yet. Checking reads this figure and flags any reference numerals that
+          aren&apos;t described in your draft.
         </p>
       )}
 

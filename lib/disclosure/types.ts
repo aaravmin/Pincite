@@ -7,37 +7,37 @@ export const DISCLOSURE_FIELDS = [
   {
     key: "field_industry",
     label: "Technical field / industry",
-    hint: "What field or industry does your invention operate in?",
+    hint: "The field or industry it operates in.",
   },
   {
     key: "problem_solved",
     label: "Problem solved",
-    hint: "What problem does your invention solve, and why do existing solutions fall short?",
+    hint: "The problem it solves, and why existing solutions fall short.",
   },
   {
     key: "how_it_works",
     label: "How it works",
-    hint: "Describe the mechanism, process, or method your invention uses.",
+    hint: "The mechanism, process, or method it uses.",
   },
   {
     key: "components",
     label: "Key components",
-    hint: "List the key components, parts, or elements - one per line.",
+    hint: "Key parts or elements, one per line.",
   },
   {
     key: "advantages",
     label: "Advantages",
-    hint: "What measurable advantages does it have over existing solutions?",
+    hint: "Measurable advantages over existing solutions.",
   },
   {
     key: "alternatives",
     label: "Alternatives & variations",
-    hint: "Alternative embodiments, materials, or configurations that still work.",
+    hint: "Alternative embodiments, materials, or configurations.",
   },
   {
     key: "known_prior_art",
     label: "Known prior solutions",
-    hint: "Products, patents, or papers you already know of (this feeds your duty to disclose).",
+    hint: "Products, patents, or papers you already know of.",
   },
 ] as const;
 

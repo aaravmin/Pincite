@@ -31,12 +31,6 @@ export default async function OverviewPage({
     <div className="flex min-h-screen flex-1 flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← Dashboard
-          </Link>
           <span className="text-lg font-semibold tracking-tight text-foreground">
             {r.project.name}
           </span>

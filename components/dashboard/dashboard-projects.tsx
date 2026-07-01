@@ -36,8 +36,7 @@ export function DashboardProjects({
       <div className="mt-10 flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20 text-center">
         <p className="text-sm font-medium text-foreground">No projects yet</p>
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Create your first project to start the structured intake. Your workspace is
-          ready and your session is secure.
+          Create your first project to start.
         </p>
       </div>
     );

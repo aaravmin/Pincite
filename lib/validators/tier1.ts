@@ -57,7 +57,7 @@ export function runTier1(
       kind: "structural",
       actionable: true,
       title: `Title is ${title.length} characters (limit 500)`,
-      explanation: "Shorten the title of the invention to 500 characters or fewer.",
+      explanation: "Shorten to 500 characters or fewer.",
       mpep_section: "606",
       cfr_ref: "37 CFR 1.72(a)",
     });
@@ -76,7 +76,7 @@ export function runTier1(
         kind: "structural",
         actionable: true,
         title: `Abstract is ${w} words (limit 150)`,
-        explanation: "Reduce the abstract to 150 words or fewer.",
+        explanation: "Cut to 150 words or fewer.",
         mpep_section: "608.01(b)",
         cfr_ref: "37 CFR 1.72(b)",
       });
@@ -91,8 +91,7 @@ export function runTier1(
         kind: "structural",
         actionable: true,
         title: 'Abstract uses "means"',
-        explanation:
-          'Avoid claim-style or legal phrasing such as "means" in the abstract.',
+        explanation: 'Avoid claim-style language in the abstract.',
         mpep_section: "608.01(b)",
         cfr_ref: "37 CFR 1.72(b)",
       });
@@ -106,7 +105,7 @@ export function runTier1(
         kind: "structural",
         actionable: true,
         title: "Abstract is more than one paragraph",
-        explanation: "The abstract should be a single paragraph.",
+        explanation: "Use a single paragraph.",
         mpep_section: "608.01(b)",
         cfr_ref: "37 CFR 1.72(b)",
       });
@@ -133,8 +132,7 @@ export function runTier1(
           kind: "structural",
           actionable: true,
           title: `A design application must have exactly one claim (found ${claims.length})`,
-          explanation:
-            'More than one claim is neither required nor permitted in a design application.',
+          explanation: "A design application allows only one claim.",
           mpep_section: "1503.03",
           cfr_ref: "37 CFR 1.153",
         });
@@ -157,7 +155,7 @@ export function runTier1(
             actionable: true,
             title: "Design claim is not in the required form",
             explanation:
-              'A design claim must read: "The ornamental design for [article] as shown" (or "as shown and described").',
+              'Must read "The ornamental design for [article] as shown".',
             mpep_section: "1503.03",
             cfr_ref: "37 CFR 1.153",
           });
@@ -179,8 +177,7 @@ export function runTier1(
             kind: "consistency",
             actionable: true,
             title: "Design claim article does not match the title",
-            explanation:
-              "The article named in the design claim should use the same terminology as the title of the invention.",
+            explanation: "Name the same article as the title.",
             mpep_section: "1503.03",
             cfr_ref: "37 CFR 1.153",
           });
@@ -207,7 +204,7 @@ export function runTier1(
         kind: "structural",
         actionable: true,
         title: "Claims are not numbered consecutively",
-        explanation: "Number claims consecutively in Arabic numerals starting at 1.",
+        explanation: "Number consecutively from 1.",
         mpep_section: "608.01(m)",
         cfr_ref: "37 CFR 1.126",
       });
@@ -233,7 +230,7 @@ export function runTier1(
           kind: "structural",
           actionable: true,
           title: `Claim ${c.number} is not a single sentence`,
-          explanation: "Each claim must be a single sentence ending in one period.",
+          explanation: "One sentence ending in one period.",
           mpep_section: "608.01(m)",
           cfr_ref: "37 CFR 1.75",
         });
@@ -249,8 +246,7 @@ export function runTier1(
           kind: "structural",
           actionable: true,
           title: `Claim ${c.number} has no recognized transitional phrase`,
-          explanation:
-            'Use a transitional phrase such as "comprising", "consisting of", or "consisting essentially of".',
+          explanation: 'Add a transitional phrase such as "comprising".',
           mpep_section: "2111.03",
           cfr_ref: null,
         });
@@ -266,8 +262,7 @@ export function runTier1(
           kind: "structural",
           actionable: true,
           title: "Claim 1 is a dependent claim",
-          explanation:
-            "Claim 1 should be an independent claim; the least restrictive claim is presented first.",
+          explanation: "Claim 1 should be independent.",
           mpep_section: "608.01(m)",
           cfr_ref: "37 CFR 1.75(g)",
         });
@@ -284,7 +279,7 @@ export function runTier1(
             kind: "structural",
             actionable: true,
             title: `Claim ${c.number} refers to claim ${n}, which does not exist`,
-            explanation: "A dependent claim must refer to an existing, preceding claim.",
+            explanation: "Refer to an existing, earlier claim.",
             mpep_section: "608.01(n)",
             cfr_ref: "37 CFR 1.75(c)",
           });
@@ -297,7 +292,7 @@ export function runTier1(
             kind: "structural",
             actionable: true,
             title: `Claim ${c.number} refers to claim ${n}, which does not precede it`,
-            explanation: "A dependent claim must refer to a preceding (lower-numbered) claim.",
+            explanation: "Refer to a lower-numbered claim.",
             mpep_section: "608.01(n)",
             cfr_ref: "37 CFR 1.75(c)",
           });
@@ -314,8 +309,7 @@ export function runTier1(
           kind: "structural",
           actionable: false,
           title: `Claim ${c.number} is a multiple dependent claim (fee applies)`,
-          explanation:
-            "A multiple dependent claim incurs the fee under 37 CFR 1.16(j), paid to the USPTO, not entered here.",
+          explanation: "Incurs a fee under 37 CFR 1.16(j).",
           mpep_section: "608.01(n)",
           cfr_ref: "37 CFR 1.16(j)",
         });
@@ -329,7 +323,7 @@ export function runTier1(
             actionable: true,
             title: `Claim ${c.number} multiple dependent claim must be in the alternative`,
             explanation:
-              'A multiple dependent claim must refer to the other claims in the alternative ("claim 1 or 2" / "any one of claims 1-3"), not cumulatively ("and").',
+              'Refer to the claims in the alternative ("1 or 2"), not with "and".',
             mpep_section: "608.01(n)",
             cfr_ref: "37 CFR 1.75(c)",
           });
@@ -343,8 +337,7 @@ export function runTier1(
             kind: "structural",
             actionable: true,
             title: `Claim ${c.number} depends on another multiple dependent claim`,
-            explanation:
-              "A multiple dependent claim must not serve as a basis for any other multiple dependent claim.",
+            explanation: "A multiple dependent claim can't depend on another.",
             mpep_section: "608.01(n)",
             cfr_ref: "37 CFR 1.75(c)",
           });
@@ -362,8 +355,7 @@ export function runTier1(
         kind: "structural",
         actionable: false,
         title: `${claims.length} total claims (over 20; fee applies)`,
-        explanation:
-          "Excess-claim fees under 37 CFR 1.16(i) apply above 20 total claims, paid to the USPTO.",
+        explanation: "Excess-claim fees apply above 20 total claims.",
         mpep_section: "608.01(m)",
         cfr_ref: "37 CFR 1.16(i)",
       });
@@ -377,8 +369,7 @@ export function runTier1(
         kind: "structural",
         actionable: false,
         title: `${independent} independent claims (over 3; fee applies)`,
-        explanation:
-          "Excess independent-claim fees under 37 CFR 1.16(h) apply above 3, paid to the USPTO.",
+        explanation: "Excess fees apply above 3 independent claims.",
         mpep_section: "608.01(m)",
         cfr_ref: "37 CFR 1.16(h)",
       });

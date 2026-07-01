@@ -1,0 +1,12 @@
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+BH_DOMAIN_SKILLS = "1"
+
+[mcp_servers.hermes]
+command = "hermes"
+args = [
+    "mcp",
+    "serve",
+]

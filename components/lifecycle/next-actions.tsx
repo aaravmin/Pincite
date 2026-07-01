@@ -8,8 +8,7 @@ export function NextActions({ actions }: { actions: LifecycleAction[] }) {
     <section className="mx-auto w-full max-w-3xl px-6 pb-12">
       <h2 className="text-sm font-semibold text-foreground">What to do now</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Required steps for this stage, pinned to the governing rule. Pincite does not
-        file or pay for you.
+        Pincite doesn&apos;t file or pay for you.
       </p>
       <ul className="mt-3 space-y-2">
         {actions.map((a, i) => (

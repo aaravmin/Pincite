@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-6: rule surfacing shows applies-now + conditional rules, and a met trigger lights up", async ({
@@ -15,11 +15,9 @@ test("phase-6: rule surfacing shows applies-now + conditional rules, and a met t
   const projectId = await createMatter(page, "Rules synthetic");
 
   // A claim with a means-for limitation arms the §112(f) conditional.
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page
-    .locator("[data-testid^='editor-']")
-    .fill("1. A device comprising means for adjusting a widget.");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, {
+    claims: "1. A device comprising means for adjusting a widget.",
+  });
 
   await page.goto(`/projects/${projectId}/rules`);
 
@@ -27,11 +25,14 @@ test("phase-6: rule surfacing shows applies-now + conditional rules, and a met t
   await expect(page.getByText("Applies now")).toBeVisible();
   await expect(page.getByText(/Claims must be definite/i).first()).toBeVisible();
 
-  // May-apply-next: the means-for conditional, marked "now applies".
-  await expect(page.getByText("May apply next")).toBeVisible();
+  // A met condition (the means-for §112(f) trigger) is grouped under Applies-now as
+  // "Now applies" - never left under "may apply next" while claiming to apply.
   await expect(page.getByText(/'means for' wording/i).first()).toBeVisible();
   await expect(page.getByText(/now applies/i).first()).toBeVisible();
   await expect(page.locator('[data-triggered="true"]').first()).toBeVisible();
+
+  // May-apply-next: only genuinely-future conditions remain here.
+  await expect(page.getByText("May apply next")).toBeVisible();
   await screenshot(page, "phase-6-rules");
 
   // Opening a rule loads it in the evidence pane.

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,10 +18,16 @@ import {
 import type { Project } from "@/lib/projects/types";
 
 type SaveState = "saved" | "unsaved" | "saving" | "error";
-const AUTOSAVE_MS = 1200;
 const ALL = "__all__" as const;
 type Active = SectionKey | typeof ALL;
 
+/**
+ * The draft workspace. Edits live in memory and are NEVER autosaved: the only way to persist
+ * the draft - and the only thing that lights the step's green check - is to open All sections
+ * and click Save. That keeps a section from looking "saved" before the user has deliberately
+ * committed it. Switching sections keeps every edit in state, so nothing is lost until the
+ * page itself is left without saving.
+ */
 export function Workspace({
   project,
   initialSections,
@@ -41,6 +46,11 @@ export function Workspace({
   const sectionsRef = useRef(sections);
   sectionsRef.current = sections;
 
+  // The last text persisted to the database. Edits are compared against this baseline so the
+  // workspace knows whether there are unsaved changes; nothing here is written on its own.
+  const [savedSections, setSavedSections] =
+    useState<Record<SectionKey, string>>(seed);
+
   const searchParams = useSearchParams();
   const initialActive = ((): SectionKey => {
     const s = searchParams.get("section");
@@ -50,12 +60,9 @@ export function Workspace({
   })();
 
   const [active, setActive] = useState<Active>(initialActive);
-  const [state, setState] = useState<Record<SectionKey, SaveState>>(
-    {} as Record<SectionKey, SaveState>,
-  );
-  const timers = useRef<Map<SectionKey, ReturnType<typeof setTimeout>>>(
-    new Map(),
-  );
+  const [phase, setPhase] = useState<"idle" | "error">("idle");
+  const [savingVersion, startVersion] = useTransition();
+  const [versionSaved, setVersionSaved] = useState(false);
 
   // Arriving from a review finding (?section&from&to): open that section and select the
   // offending span so the user lands on exactly the text to change.
@@ -77,78 +84,57 @@ export function Workspace({
     }
   }, [searchParams]);
 
-  const commit = useCallback(
-    async (key: SectionKey) => {
-      const t = timers.current.get(key);
-      if (t) {
-        clearTimeout(t);
-        timers.current.delete(key);
-      }
-      setState((s) => ({ ...s, [key]: "saving" }));
-      const res = await saveSection({
-        projectId: project.id,
-        sectionKey: key,
-        content: sectionsRef.current[key],
-      });
-      setState((s) => ({
-        ...s,
-        [key]: "error" in res ? "error" : "saved",
-      }));
-    },
-    [project.id],
-  );
+  const dirty = SECTION_KEYS.some((k) => sections[k] !== savedSections[k]);
+  const status: SaveState = savingVersion
+    ? "saving"
+    : phase === "error"
+      ? "error"
+      : dirty
+        ? "unsaved"
+        : "saved";
 
   function onChange(key: SectionKey, value: string) {
     setSections((s) => ({ ...s, [key]: value }));
-    setState((s) => ({ ...s, [key]: "unsaved" }));
-    const existing = timers.current.get(key);
-    if (existing) clearTimeout(existing);
-    timers.current.set(
-      key,
-      setTimeout(() => void commit(key), AUTOSAVE_MS),
-    );
-  }
-
-  function maybeCommit(key: SectionKey) {
-    if (state[key] === "unsaved" || timers.current.has(key)) void commit(key);
-  }
-
-  async function switchTo(next: Active) {
-    if (next === active) return;
-    if (
-      active !== ALL &&
-      (state[active] === "unsaved" || timers.current.has(active))
-    ) {
-      await commit(active);
-    }
-    setActive(next);
-  }
-
-  // Save a version (immutable snapshot) from the All-sections view; flush pending edits first.
-  const [savingVersion, startVersion] = useTransition();
-  const [versionSaved, setVersionSaved] = useState(false);
-  function saveAllVersion() {
     setVersionSaved(false);
+    if (phase === "error") setPhase("idle");
+  }
+
+  function switchTo(next: Active) {
+    if (next !== active) setActive(next);
+  }
+
+  // The one and only save: persist every changed section, then append an immutable version
+  // snapshot. Driven from the All-sections view; the snapshot reads the rows we just wrote.
+  function saveAll() {
+    setVersionSaved(false);
+    setPhase("idle");
     startVersion(async () => {
-      const keys = Array.from(timers.current.keys());
-      await Promise.all(keys.map((k) => commit(k)));
-      const res = await saveVersion({ projectId: project.id, label: "" });
-      if (!("error" in res)) {
-        setVersionSaved(true);
-        router.refresh();
+      const current = sectionsRef.current;
+      const changed = SECTION_KEYS.filter((k) => current[k] !== savedSections[k]);
+      const results = await Promise.all(
+        changed.map((k) =>
+          saveSection({
+            projectId: project.id,
+            sectionKey: k,
+            content: current[k],
+          }),
+        ),
+      );
+      if (results.some((r) => "error" in r)) {
+        setPhase("error");
+        return;
       }
+      const res = await saveVersion({ projectId: project.id, label: "" });
+      if ("error" in res) {
+        setPhase("error");
+        return;
+      }
+      setSavedSections(current);
+      setVersionSaved(true);
+      router.refresh();
     });
   }
 
-  const aggregate: SaveState = Object.values(state).includes("saving")
-    ? "saving"
-    : Object.values(state).includes("unsaved")
-      ? "unsaved"
-      : Object.values(state).includes("error")
-        ? "error"
-        : "saved";
-  const activeStatus: SaveState =
-    active === ALL ? aggregate : (state[active] ?? "saved");
   const activeWords = active === ALL ? 0 : wordCount(sections[active]);
   const abstractOver =
     active === "abstract" && activeWords > ABSTRACT_WORD_LIMIT;
@@ -157,12 +143,6 @@ export function Workspace({
     <div className="flex min-h-screen flex-1 flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← Projects
-          </Link>
           <span className="text-lg font-semibold tracking-tight text-foreground">
             {project.name}
           </span>
@@ -172,9 +152,9 @@ export function Workspace({
             className="text-sm text-muted-foreground"
             data-testid="save-status"
           >
-            {statusLabel(activeStatus)}
+            {statusLabel(status)}
           </span>
-          <HeaderActions projectId={project.id} />
+          <HeaderActions projectId={project.id} showSaveVersion={false} />
         </div>
       </header>
 
@@ -188,7 +168,7 @@ export function Workspace({
                 <li key={k}>
                   <button
                     type="button"
-                    onClick={() => void switchTo(k)}
+                    onClick={() => switchTo(k)}
                     aria-current={isActive ? "true" : undefined}
                     className={
                       "flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm " +
@@ -210,7 +190,7 @@ export function Workspace({
             <li className="mt-2 border-t border-border pt-2">
               <button
                 type="button"
-                onClick={() => void switchTo(ALL)}
+                onClick={() => switchTo(ALL)}
                 aria-current={active === ALL ? "true" : undefined}
                 className={
                   "flex w-full items-center rounded-md px-3 py-2 text-left text-sm font-medium " +
@@ -233,7 +213,7 @@ export function Workspace({
                   All sections
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your whole draft in one place. Edit any section, then save a version.
+                  Edit any section, then save. Nothing is saved until you do.
                 </p>
                 <div className="mt-6 space-y-6">
                   {SECTION_KEYS.map((k) => (
@@ -253,7 +233,6 @@ export function Workspace({
                         id={`all-${k}`}
                         value={sections[k]}
                         onChange={(e) => onChange(k, e.target.value)}
-                        onBlur={() => maybeCommit(k)}
                         spellCheck
                         aria-label={SECTION_LABELS[k]}
                         className="min-h-[140px] resize-y font-mono text-sm leading-relaxed"
@@ -264,14 +243,19 @@ export function Workspace({
                   ))}
                 </div>
                 <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-4">
-                  <Button onClick={saveAllVersion} disabled={savingVersion}>
+                  <Button
+                    onClick={saveAll}
+                    disabled={savingVersion}
+                    data-testid="save-draft"
+                  >
                     {savingVersion ? "Saving…" : "Save version"}
                   </Button>
                   {versionSaved && (
                     <span className="text-sm text-pass">Version saved</span>
                   )}
                   <span className="ml-auto text-xs text-muted-foreground">
-                    Every edit autosaves; Save version stores an immutable snapshot.
+                    Nothing is saved until you click Save - it stores an immutable
+                    snapshot.
                   </span>
                 </div>
               </>
@@ -289,7 +273,6 @@ export function Workspace({
                   ref={taRef}
                   value={sections[active]}
                   onChange={(e) => onChange(active, e.target.value)}
-                  onBlur={() => maybeCommit(active)}
                   spellCheck
                   aria-label={SECTION_LABELS[active]}
                   className="mt-4 min-h-[420px] resize-y font-mono text-sm leading-relaxed"
@@ -298,7 +281,7 @@ export function Workspace({
                 />
                 <div className="mt-2 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">
-                    {statusLabel(activeStatus)}
+                    {statusLabel(status)}
                   </span>
                   <span
                     className={
@@ -312,14 +295,26 @@ export function Workspace({
                       : `${activeWords} words`}
                   </span>
                 </div>
+                {dirty && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Unsaved changes.{" "}
+                    <button
+                      type="button"
+                      onClick={() => switchTo(ALL)}
+                      className="font-medium text-foreground underline underline-offset-2"
+                    >
+                      Go to All sections to save
+                    </button>
+                    .
+                  </p>
+                )}
                 {active === "claims" && sections["claims"].trim() && (
                   <div className="mt-4 rounded-md border border-border p-3">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Claim structure
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      Independent claims with the dependent claims nested under each. Edit the
-                      text above; this tree updates.
+                      Dependent claims nested under each independent claim.
                     </p>
                     <ClaimTree text={sections["claims"]} />
                   </div>

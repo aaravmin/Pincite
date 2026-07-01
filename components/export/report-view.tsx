@@ -86,17 +86,34 @@ export function ReportView({ report: r }: { report: Report }) {
         ))}
       </Section>
 
-      <Section title="Rules that may apply next">
-        {r.conditional.map((ru, i) => (
-          <p key={i} className="mt-1">
-            <span className="text-attention-foreground">○</span>{" "}
-            <em>{ru.trigger}.</em> {ru.note}
-            {ru.triggered && <span className="text-xs"> [now applies]</span>}{" "}
-            <span className="text-xs text-muted-foreground">
-              ({pin(ru.cfr_ref, ru.mpep_section)})
-            </span>
-          </p>
-        ))}
+      {r.conditional.some((ru) => ru.triggered) && (
+        <Section title="Conditions now met (these rules now apply)">
+          {r.conditional
+            .filter((ru) => ru.triggered)
+            .map((ru, i) => (
+              <p key={i} className="mt-1">
+                <span className="text-attention-foreground">●</span>{" "}
+                <em>{ru.met}.</em> {ru.note}{" "}
+                <span className="text-xs text-muted-foreground">
+                  ({pin(ru.cfr_ref, ru.mpep_section)})
+                </span>
+              </p>
+            ))}
+        </Section>
+      )}
+
+      <Section title="Rules that may apply next (not yet)">
+        {r.conditional
+          .filter((ru) => !ru.triggered)
+          .map((ru, i) => (
+            <p key={i} className="mt-1">
+              <span className="text-attention-foreground">○</span>{" "}
+              <em>{ru.trigger}.</em> {ru.note}{" "}
+              <span className="text-xs text-muted-foreground">
+                ({pin(ru.cfr_ref, ru.mpep_section)})
+              </span>
+            </p>
+          ))}
       </Section>
 
       <Section title="Similar patents">
@@ -115,8 +132,8 @@ export function ReportView({ report: r }: { report: Report }) {
               {m.spans.map((sp, i) => (
                 <p key={i} className="text-xs text-muted-foreground">
                   {sp.overlap_type === "claim_limitation"
-                    ? "● matches a full claim limitation"
-                    : "○ overlap"}
+                    ? "● covers a whole requirement of your claim"
+                    : "○ shares wording"}
                   : {sp.patent_span_text.slice(0, 160)}
                 </p>
               ))}

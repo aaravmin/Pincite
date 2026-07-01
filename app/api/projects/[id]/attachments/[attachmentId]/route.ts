@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 // Serve a private attachment. By default redirect to a short-lived signed URL (good for
 // <img> previews and downloads). With ?raw=1 stream the bytes from this same-origin route
-// instead, so the 3D model viewer can fetch a model without a cross-origin CORS problem.
+// instead, so the drawing editor can read the image onto a canvas without tainting it.
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string; attachmentId: string }> },

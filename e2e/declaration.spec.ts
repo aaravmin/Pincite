@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter, saveFiling } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveFiling, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // Real signing: the inventor downloads the declaration (37 CFR 1.63) as a PDF, signs it, and
@@ -12,8 +12,7 @@ test("declaration: download to sign and upload the signed copy", async ({ page }
   await page.goto("/dashboard");
   const id = await createMatter(page, "Sign demo");
 
-  await page.getByRole("button", { name: "Title of the invention", exact: true }).click();
-  await page.getByTestId("editor-title").fill("A molded fiber container");
+  await saveDraft(page, { title: "A molded fiber container" });
   await page.goto(`/projects/${id}/inventors`);
   await page.getByTestId("inventor-name-0").fill("Test Inventor");
   await page.getByLabel("Residence (city, state/country)").fill("Austin, TX");

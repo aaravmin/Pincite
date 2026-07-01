@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import Link from "next/link";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -39,12 +38,6 @@ export default async function InventorsPage({
     <div className="flex min-h-screen flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <div className="flex items-center gap-3">
-          <Link
-            href={`/projects/${id}`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← {project.name}
-          </Link>
           <span className="text-lg font-semibold tracking-tight text-foreground">
             Inventors &amp; applicant
           </span>
@@ -54,8 +47,7 @@ export default async function InventorsPage({
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
         <p className="text-sm text-muted-foreground">
-          This is the Application Data Sheet (PTO/AIA/14) data the USPTO needs. You type it
-          into Patent Center&apos;s Web ADS, and Pincite checks it for defects before you
+          Application Data Sheet (PTO/AIA/14) data. Pincite checks it for defects before you
           file.
         </p>
 

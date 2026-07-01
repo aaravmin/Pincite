@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "h=$(hostname -s 2>/dev/null); osascript -e \"display notification \\\"Session started on ${h:-this device}\\\" with title \\\"Claude Code\\\" subtitle \\\"Pincite\\\" sound name \\\"Glass\\\"\" >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "h=$(hostname -s 2>/dev/null); osascript -e \"display notification \\\"A device is talking to this session (${h:-unknown})\\\" with title \\\"Claude Code\\\" subtitle \\\"Pincite\\\" sound name \\\"Glass\\\"\" >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  }
+}

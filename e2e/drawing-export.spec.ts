@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 import { readFileSync } from "fs";
 import JSZip from "jszip";
@@ -15,11 +15,9 @@ test("export edited figure to SVG/PNG and into the filing package", async ({ pag
   await page.goto("/dashboard");
   const id = await createMatter(page, "Drawing export");
 
-  await page.getByRole("button", { name: "Detailed description", exact: true }).click();
-  await page
-    .getByTestId("editor-detailed_description")
-    .fill("The base 12 sits on a surface.");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, {
+    detailed_description: "The base 12 sits on a surface.",
+  });
 
   await page.goto(`/projects/${id}/uploads`);
   await page.getByLabel("Drawing orientation").click();

@@ -35,7 +35,7 @@ export function dashboardNextStep(input: {
   draftComplete: boolean;
   inventorCount: number;
   openIssues: number;
-  signedCount: number;
+  hasSignedDeclaration: boolean;
 }): NextStep {
   if (input.status !== "drafting") return nextStep(input.status);
   if (!input.draftComplete) return { label: "Finish the draft", urgent: false };
@@ -45,6 +45,7 @@ export function dashboardNextStep(input: {
       label: `Fix ${input.openIssues} issue${input.openIssues === 1 ? "" : "s"}`,
       urgent: false,
     };
-  if (input.signedCount === 0) return { label: "Sign the declaration", urgent: false };
+  if (!input.hasSignedDeclaration)
+    return { label: "Sign the declaration", urgent: false };
   return { label: "Export and file", urgent: false };
 }

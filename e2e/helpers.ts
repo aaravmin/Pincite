@@ -117,6 +117,29 @@ export async function saveFiling(page: Page): Promise<void> {
   }).toPass({ timeout: 20000 });
 }
 
+/**
+ * Persist draft sections through the only save path there is: the draft never autosaves, so
+ * text is written (and the Draft step lit) only from the All-sections view's Save button. Fills
+ * the given sections there and saves, appending one immutable version. Retries the switch to the
+ * All-sections view so a click that lands before hydration doesn't strand us on a single section.
+ */
+export async function saveDraft(
+  page: Page,
+  sections: Record<string, string> = {},
+): Promise<void> {
+  await expect(async () => {
+    await page.getByRole("button", { name: "All sections", exact: true }).click();
+    await expect(page.getByTestId("save-draft")).toBeVisible({ timeout: 3000 });
+  }).toPass({ timeout: 20000 });
+
+  for (const [key, value] of Object.entries(sections)) {
+    await page.getByTestId(`editor-${key}`).fill(value);
+  }
+
+  await page.getByTestId("save-draft").click();
+  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+}
+
 export async function screenshot(page: Page, name: string): Promise<string> {
   const dir = path.join(process.cwd(), "screenshots");
   fs.mkdirSync(dir, { recursive: true });

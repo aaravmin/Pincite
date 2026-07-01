@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { createMatter } from "./helpers";
+import { createMatter, saveDraft } from "./helpers";
 import AxeBuilder from "@axe-core/playwright";
 import { loginAsTestUser } from "./auth";
 
@@ -20,11 +20,9 @@ test("phase-9: key screens have no serious or critical accessibility violations"
   const id = await createMatter(page, "A11y synthetic");
 
   // Give the screens content + findings to render.
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page
-    .locator("[data-testid^='editor-']")
-    .fill("1. A device comprising means for adjusting a widget.");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, {
+    claims: "1. A device comprising means for adjusting a widget.",
+  });
   await page.goto(`/projects/${id}/review`);
   await page.getByTestId("run-check").click();
   await expect(page.getByText(/Violation|Attention/).first()).toBeVisible();

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -34,12 +33,6 @@ export default async function VersionsPage({
     <div className="flex min-h-screen flex-1 flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <div className="flex items-center gap-3">
-          <Link
-            href={`/projects/${id}`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← {project.name}
-          </Link>
           <span className="text-lg font-semibold tracking-tight text-foreground">
             Version history
           </span>
@@ -49,9 +42,8 @@ export default async function VersionsPage({
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
         <p className="text-sm text-muted-foreground">
-          Every save is an immutable snapshot. You can continue this {unit} from
-          any earlier save. It opens that save into the working draft so you keep
-          editing from there, and never deletes later saves.
+          Every save is a permanent snapshot. Continue this {unit} from any earlier
+          save - it opens into your draft and never deletes later saves.
         </p>
 
         {versions.length === 0 ? (

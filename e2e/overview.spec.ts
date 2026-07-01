@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // The per-matter Readiness overview: opening a matter lands here, it assembles stage +
@@ -18,13 +18,10 @@ test("readiness overview: stage, checklist, live issue count, next step", async 
 
   // Some content plus an over-150-word abstract, so the Issues gate goes red from the
   // live deterministic check without any prior manual run.
-  await page
-    .getByRole("button", { name: "Title of the invention", exact: true })
-    .click();
-  await page.getByTestId("editor-title").fill("A molded fiber container");
-  await page.getByRole("button", { name: "Abstract", exact: true }).click();
-  await page.getByTestId("editor-abstract").fill("word ".repeat(180).trim());
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, {
+    title: "A molded fiber container",
+    abstract: "word ".repeat(180).trim(),
+  });
 
   // Opening the matter from the dashboard lands on the overview. The whole row is clickable
   // now (one save, so it opens directly), so click the name text and retry until it hydrates.

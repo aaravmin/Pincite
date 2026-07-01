@@ -1,8 +1,8 @@
 /**
  * Build the inventor's declaration (37 CFR 1.63 / PTO-AIA-01 style) as a one-page-per-inventor
- * PDF for the inventor to actually sign by hand, then upload back into Pincite. The typed
- * S-signature in the app is a record of the attestation; the operative signature is the one
- * placed on this document. Pure pdf-lib, no native dependency.
+ * PDF - the actual document the inventor signs by hand and uploads back into Pincite, which
+ * then bundles it into the filing package. The signature placed on this document is the only
+ * operative signature; Pincite never asks for one in-app. Pure pdf-lib, no native dependency.
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DECLARATION_STATEMENTS } from "@/lib/export/filing-package";
@@ -70,7 +70,15 @@ export async function buildDeclarationPdf(opts: {
       y -= 4;
     });
 
-    y -= 24;
+    y -= 6;
+    draw(
+      "My residence and mailing address are as stated for me in the Application Data Sheet (37 CFR 1.76) filed with this application.",
+      font,
+      11,
+      10,
+    );
+
+    y -= 18;
     const lineY = (label: string, value: string) => {
       page.drawText(label, { x: margin, y, size: 11, font, color: BLACK });
       page.drawLine({

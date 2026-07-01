@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 test("phase-7: prior-art pinpoint overlaps render with score and disclaimer (deterministic compare)", async ({
@@ -15,13 +15,10 @@ test("phase-7: prior-art pinpoint overlaps render with score and disclaimer (det
   // Create a project and add claims.
   const projectId = await createMatter(page, "Prior-art synthetic");
 
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page
-    .getByTestId("editor-claims")
-    .fill(
+  await saveDraft(page, {
+    claims:
       "1. A widget mount comprising a base and an adjustable arm coupled to the base; wherein the arm rotates about a vertical axis.",
-    );
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  });
 
   // Deterministic compare against a synthetic, overlapping candidate (no BigQuery cost).
   await page.goto(`/projects/${projectId}/prior-art`);

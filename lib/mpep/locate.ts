@@ -21,18 +21,24 @@ export function extractSectionNumbers(text: string): string[] {
   });
 }
 
-/** Keyword/full-text locate over section title + body. */
+/**
+ * Keyword/full-text locate over section title + body, ranked by ts_rank (best first).
+ * Goes through the match_mpep_keyword RPC because the query builder's .textSearch() can't
+ * order by the computed rank, so it would otherwise return matches in physical table order
+ * (which surfaced broad catch-all sections like 101/103 for nearly every question).
+ */
 export async function locateByKeyword(
   query: string,
   limit = 5,
 ): Promise<LocatedSection[]> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("mpep_sections")
-    .select("section_number, title")
-    .textSearch("fts", query, { type: "websearch", config: "english" })
-    .limit(limit);
-  return (data as LocatedSection[]) ?? [];
+  const { data } = await supabase.rpc("match_mpep_keyword", {
+    search_query: query,
+    match_count: limit,
+  });
+  return (
+    (data as { section_number: string; title: string | null }[]) ?? []
+  ).map((r) => ({ section_number: r.section_number, title: r.title }));
 }
 
 /** Semantic locate: embed the query and rank sections by chunk cosine similarity. */

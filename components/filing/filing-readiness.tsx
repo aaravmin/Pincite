@@ -20,7 +20,7 @@ function labelClass(sev: FilingFinding["severity"]): string {
 
 export function FilingReadiness({
   findings,
-  emptyMessage = "No filing issues found. The ADS data and declarations look complete.",
+  emptyMessage = "No filing issues.",
 }: {
   findings: FilingFinding[];
   emptyMessage?: string;

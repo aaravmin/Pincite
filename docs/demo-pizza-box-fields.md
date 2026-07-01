@@ -3,7 +3,7 @@
 What to paste into each Pincite box, in the order the steps appear.
 The text is from the real patent at patents.google.com/patent/US20120024859 (Container, US 2012/0024859 A1, Apple Inc., inventors Francesco Longoni and Mark E. Doutt, filed July 30 2010).
 It is entered as if an outside attorney files on Apple's behalf, so the attorney adds the client and matter while still entering the inventors.
-There is no 3D file in this demo. The figures are PNG drawings uploaded by orientation.
+The figures are PNG drawings uploaded by orientation.
 
 The 23 claims are reproduced close to word for word, so they keep the patent's own punctuation, with three small defects planted on purpose (see the issues list at the end). Everything else here is written without em dashes, semicolons, or colons.
 

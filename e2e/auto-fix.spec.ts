@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { captureErrors, screenshot, assertClean, createMatter } from "./helpers";
+import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
 // Guided auto-fix (Feature 4): per finding, the model proposes the smallest edit, shown as a
@@ -19,11 +19,9 @@ test("guided auto-fix: propose a diff, accept it, the section is corrected", asy
   const id = await createMatter(page, "Auto-fix");
 
   // A claim with no terminal period (a claim must be a single sentence, 37 CFR 1.75).
-  await page.getByRole("button", { name: "Claims", exact: true }).click();
-  await page
-    .getByTestId("editor-claims")
-    .fill("1. A device comprising a widget and a base");
-  await expect(page.getByTestId("save-status")).toHaveText("Saved");
+  await saveDraft(page, {
+    claims: "1. A device comprising a widget and a base",
+  });
 
   await page.goto(`/projects/${id}/review`);
   await page.getByTestId("run-check").click();

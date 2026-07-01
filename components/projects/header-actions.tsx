@@ -21,10 +21,20 @@ import { saveVersion } from "@/lib/projects/actions";
  * Project-level actions shown on the right of every step header: jump to Stage,
  * Version history, and Audit log, and save an immutable version. Rendered on every
  * workspace step (not just the draft) so the controls are consistent throughout.
- * Save version snapshots the saved state from the database, so it is meaningful from
- * any step; on the draft, the editor flushes pending edits on blur before this runs.
+ * Save version snapshots the saved state from the database.
+ *
+ * On the draft itself the editor holds the in-progress text in memory and never autosaves,
+ * so a header button here would snapshot stale database content and silently drop the
+ * user's edits. The draft therefore passes `showSaveVersion={false}` and offers the one and
+ * only save inside the All-sections view, where the live text actually lives.
  */
-export function HeaderActions({ projectId }: { projectId: string }) {
+export function HeaderActions({
+  projectId,
+  showSaveVersion = true,
+}: {
+  projectId: string;
+  showSaveVersion?: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState("");
@@ -57,6 +67,7 @@ export function HeaderActions({ projectId }: { projectId: string }) {
       <Link href={`/projects/${projectId}/audit`} className={linkCls}>
         Audit log
       </Link>
+      {!showSaveVersion ? null : (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button size="sm">Save version</Button>
@@ -65,8 +76,7 @@ export function HeaderActions({ projectId }: { projectId: string }) {
           <DialogHeader>
             <DialogTitle>Save a version</DialogTitle>
             <DialogDescription>
-              Saving appends an immutable snapshot. It never overwrites a
-              previous save.
+              Appends a snapshot; never overwrites a previous save.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
@@ -97,6 +107,7 @@ export function HeaderActions({ projectId }: { projectId: string }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      )}
     </div>
   );
 }

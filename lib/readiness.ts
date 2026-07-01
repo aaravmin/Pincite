@@ -6,7 +6,7 @@
  */
 import { createClient } from "@/lib/supabase/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getDeclarations, getAttachments } from "@/lib/filing/queries";
+import { getInventors, getAttachments } from "@/lib/filing/queries";
 import { getDisclosure } from "@/lib/disclosure/queries";
 import { detectStage } from "@/lib/stage/detect";
 import { runTier1 } from "@/lib/validators/tier1";
@@ -48,14 +48,16 @@ export async function getReadiness(
   if (!project) return null;
   const supabase = await createClient();
 
-  const [sections, inventors, declarations, attachments, disclosure] =
-    await Promise.all([
-      getSectionContent(projectId),
-      getInventors(projectId),
-      getDeclarations(projectId),
-      getAttachments(projectId),
-      getDisclosure(projectId),
-    ]);
+  const [sections, inventors, attachments, disclosure] = await Promise.all([
+    getSectionContent(projectId),
+    getInventors(projectId),
+    getAttachments(projectId),
+    getDisclosure(projectId),
+  ]);
+  // "Signed" means the inventor's hand-signed declaration document has been uploaded - the
+  // operative signature lives on that document, not on any in-app click.
+  const hasSignedDeclaration = attachments.some((a) => a.kind === "declaration");
+  const drawingCount = attachments.filter((a) => a.kind === "drawing").length;
   const [priorArtRes, exportsRes] = await Promise.all([
     supabase.from("prior_art_matches").select("id").eq("project_id", projectId),
     supabase.from("exports").select("id").eq("project_id", projectId).limit(1),
@@ -85,7 +87,7 @@ export async function getReadiness(
     sectionWords,
     hasDisclosure,
     inventorCount: inventors.length,
-    signedCount: declarations.length,
+    hasSignedDeclaration,
   });
 
   // Live deterministic checks so the counts are current without a prior manual run.
@@ -99,7 +101,7 @@ export async function getReadiness(
   const filing = runFilingChecks({
     project,
     inventors,
-    declarations,
+    hasSignedDeclaration,
     role,
     title: sections["title"] ?? "",
   });
@@ -121,8 +123,7 @@ export async function getReadiness(
     inventors.every(
       (i) => i.legal_name.trim() && i.residence.trim() && i.mailing_address.trim(),
     );
-  const signedIds = new Set(declarations.map((d) => d.inventor_id));
-  const signDone = inventors.length > 0 && inventors.every((i) => signedIds.has(i.id));
+  const signDone = inventors.length > 0 && hasSignedDeclaration;
 
   const g = (
     key: string,
@@ -159,10 +160,8 @@ export async function getReadiness(
     g(
       "drawings",
       "Drawings",
-      attachments.length > 0 ? "done" : "todo",
-      attachments.length > 0
-        ? `${attachments.length} uploaded`
-        : "Upload your figures",
+      drawingCount > 0 ? "done" : "todo",
+      drawingCount > 0 ? `${drawingCount} uploaded` : "Upload your figures",
       `${base}/uploads`,
     ),
     g(
@@ -194,7 +193,9 @@ export async function getReadiness(
       "sign",
       "Inventor declarations",
       signDone ? "done" : "todo",
-      signDone ? "All inventors signed" : "Sign the declaration",
+      signDone
+        ? "Signed declaration uploaded"
+        : "Download, sign, and upload the declaration",
       `${base}/sign`,
     ),
     g(

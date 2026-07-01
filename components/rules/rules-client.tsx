@@ -20,6 +20,12 @@ export function RulesClient({
     start(async () => setRule(await getRuleSection(num)));
   }
 
+  // A condition that is already met belongs with the rules that apply now, not under
+  // "may apply next" - otherwise the same card both says "if this happens" and "now
+  // applies", which is the contradiction this screen used to show.
+  const nowApplies = conditional.filter((r) => r.triggered);
+  const mayApply = conditional.filter((r) => !r.triggered);
+
   return (
     <div className="flex h-full">
       <div className="w-1/2 shrink-0 space-y-6 overflow-auto border-r border-border px-6 py-5">
@@ -28,8 +34,7 @@ export function RulesClient({
             Applies now
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Rules that govern your application right now. Each shows why it applies; open the
-            pin to read the source.
+            Rules that govern your draft as it stands today.
           </p>
           <ul className="mt-2 space-y-2">
             {appliesNow.map((r, i) => (
@@ -39,17 +44,33 @@ export function RulesClient({
                     ✓
                   </span>
                   <span className="text-xs font-medium text-pass">Applies</span>
-                  {!r.actionable && <Tag>Informational</Tag>}
+                  {!r.actionable && <Tag>Heads-up only</Tag>}
                 </div>
                 <p className="mt-1 text-sm text-foreground">{r.note}</p>
                 {r.reason && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      Why this applies:{" "}
-                    </span>
-                    {r.reason}
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{r.reason}</p>
                 )}
+                <Pins r={r} onOpen={open} />
+              </li>
+            ))}
+            {nowApplies.map((r, i) => (
+              <li
+                key={`c${i}`}
+                data-triggered="true"
+                className="rounded-md border border-attention bg-attention-bg p-3"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className="inline-block size-2 rounded-full bg-attention"
+                    aria-hidden
+                  />
+                  <span className="text-xs font-medium text-attention-foreground">
+                    Now applies
+                  </span>
+                  {!r.actionable && <Tag>Heads-up only</Tag>}
+                </div>
+                <p className="mt-1 text-sm text-foreground">{r.met}.</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{r.note}</p>
                 <Pins r={r} onOpen={open} />
               </li>
             ))}
@@ -61,14 +82,14 @@ export function RulesClient({
             May apply next
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            These do not apply yet. Each shows the condition that would trigger it; a met
-            condition is marked &quot;now applies.&quot;
+            These don&apos;t apply yet. Each one starts to apply only if the situation
+            described happens.
           </p>
           <ul className="mt-2 space-y-2">
-            {conditional.map((r, i) => (
+            {mayApply.map((r, i) => (
               <li
                 key={i}
-                data-triggered={r.triggered}
+                data-triggered="false"
                 className="rounded-md border border-border p-3"
               >
                 <div className="flex flex-wrap items-center gap-2">
@@ -77,14 +98,9 @@ export function RulesClient({
                     aria-hidden
                   />
                   <span className="text-xs font-medium text-attention-foreground">
-                    Conditional
+                    Not yet
                   </span>
-                  {r.triggered && (
-                    <span className="rounded-full bg-attention-bg px-1.5 py-0.5 text-[10px] font-medium text-attention-foreground">
-                      now applies
-                    </span>
-                  )}
-                  {!r.actionable && <Tag>Informational</Tag>}
+                  {!r.actionable && <Tag>Heads-up only</Tag>}
                 </div>
                 <p className="mt-1 text-sm text-foreground">{r.trigger}.</p>
                 <p className="mt-0.5 text-sm text-muted-foreground">{r.note}</p>

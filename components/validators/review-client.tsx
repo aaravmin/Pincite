@@ -93,9 +93,9 @@ export function ReviewClient({
           onClick={analyze101}
           disabled={pending}
           data-testid="analyze-101"
-          title="Section 101 patent eligibility: whether the claim is even the kind of thing that can be patented (the Alice/Mayo test)."
+          title="Walk the §101 eligibility test for a claim."
         >
-          Analyze §101
+          Check patent eligibility
         </Button>
         {msg && <span className="text-xs text-muted-foreground">{msg}</span>}
         <span className="ml-auto text-xs text-muted-foreground">
@@ -146,8 +146,7 @@ export function ReviewClient({
             <EvidencePane section={rule} span={null} />
           ) : (
             <p className="px-6 py-4 text-sm text-muted-foreground">
-              Pick a finding to see the reasoning and its rule here, or analyze §101
-              eligibility.
+              Pick a finding to see its rule here.
             </p>
           )}
         </div>
@@ -288,7 +287,7 @@ function FindingItem({
           <p className="text-sm text-muted-foreground">{f.explanation}</p>
           {hasSpan && (
             <div className="rounded bg-muted px-2 py-1.5 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">What triggered this: </span>
+              <span className="font-medium text-foreground">Triggered by: </span>
               <span className="font-mono">
                 {ctxBefore && "…"}
                 {ctxBefore}
@@ -348,7 +347,7 @@ function FindingItem({
             )}
             {verdict === "present" && (
               <span className="text-xs font-medium text-attention-foreground">
-                Still present, not resolved yet
+                Still present
               </span>
             )}
           </div>
@@ -430,20 +429,20 @@ function EligibilityPanel({
 }) {
   const a = data.analysis;
   const rows: [string, string][] = [
-    ["Step 1 - statutory category", a.category],
-    ["Step 2A Prong 1 - judicial exception", a.prong_one],
-    ["Step 2A Prong 2 - practical application", a.prong_two],
-    ["Step 2B - significantly more", a.step_2b],
+    ["Step 1 - Is it a process, machine, or thing?", a.category],
+    ["Step 2A - Is it just an abstract idea or law of nature?", a.prong_one],
+    ["Step 2A - Does it apply that idea in a practical way?", a.prong_two],
+    ["Step 2B - Does it add significantly more?", a.step_2b],
     ["Summary", a.summary],
   ];
   return (
     <div className="space-y-3 px-6 py-5">
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          §101 eligibility - the model&apos;s read, verify
+          Patent eligibility - AI read, verify it
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Claim {data.claimNumber} · framework only, not a verdict
+          Claim {data.claimNumber} · a guide, not a verdict
           {data.mpep && (
             <>
               {" · "}
@@ -459,11 +458,8 @@ function EligibilityPanel({
         </p>
       </div>
       <div className="rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs leading-5 text-muted-foreground">
-        <span className="font-medium text-foreground">What is §101? </span>
-        Section 101 asks whether a claim is even eligible for a patent at all. An abstract
-        idea, a law of nature, or a natural phenomenon is not, unless the claim adds enough to
-        apply it in a practical way. The steps below walk the USPTO Alice/Mayo test; this is a
-        framework to verify, not a yes-or-no verdict.
+        An abstract idea or law of nature is patentable only when applied in a practical way.
+        Verify each step.
       </div>
       {rows.map(([label, text]) => (
         <div key={label}>

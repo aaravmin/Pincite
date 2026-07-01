@@ -65,7 +65,7 @@ export function PriorArtClient({
       setMsg(
         r.count === 0
           ? "No overlapping wording found. Your claims and this patent may be genuinely different, or may describe the same idea in different words. The comparison matches shared technical terms, so paste the patent's claims (not a summary) and make sure your Claims section is filled in."
-          : `Found ${r.count} pinpoint overlap(s).`,
+          : `Found ${r.count} place(s) where the wording overlaps.`,
       );
       router.refresh();
     });
@@ -107,9 +107,10 @@ export function PriorArtClient({
             <div>
               <p className="text-xs font-medium text-foreground">Compare against one patent</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Paste a patent number and its text. Its claims work best. Pincite lines up each of
-                your claim limitations against the patent&apos;s wording and shows where they overlap.
-                It matches shared technical terms, so paste the real claim text rather than a summary.
+                Paste a patent number and its text. Its claims work best. Pincite lines up each
+                requirement of your claims against the patent&apos;s wording and shows where they
+                overlap. It compares shared technical terms, so paste the real claim text rather
+                than a summary.
               </p>
             </div>
             <div className="space-y-1">
@@ -181,7 +182,7 @@ export function PriorArtClient({
                         </p>
                       )}
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {m.spans.length} pinpoint overlap(s)
+                        {m.spans.length} wording overlap(s)
                       </p>
                     </button>
                     {url && (
@@ -250,18 +251,18 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
           <span className="font-medium text-foreground">Similarity {pct}%</span>
           <span className="text-muted-foreground">
             {" "}
-            from {match.spans.length} overlapping claim element(s). A similarity signal, not a
-            novelty or validity verdict.
+            from {match.spans.length} place(s) where this patent&apos;s wording overlaps your
+            claims. A similarity signal, not a novelty or validity verdict.
           </span>
         </p>
         <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <span className="inline-block size-2 rounded-full border border-attention bg-attention-bg" />
-            overlap
+            shares wording
           </span>
           <span className="inline-flex items-center gap-1">
             <span className="inline-block size-2 rounded-full bg-violation" />
-            matches a full claim limitation
+            covers a whole requirement of your claim
           </span>
         </div>
       </div>
@@ -365,11 +366,11 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
 
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Description and claims overlap in {match.patent_number}
+          Where {match.patent_number}&apos;s wording overlaps your claims
         </p>
         {match.spans.length === 0 && (
           <p className="mt-1 text-sm text-muted-foreground">
-            No pinpoint overlaps were found between your claims and this patent. They may be
+            No overlapping wording was found between your claims and this patent. They may be
             genuinely different, or use different words for the same idea. Try pasting the
             patent&apos;s full claims rather than its abstract.
           </p>
@@ -389,10 +390,10 @@ function MatchDetail({ claims, match }: { claims: string; match: ResultMatch }) 
               <p className="text-foreground">{s.patent_span_text}</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {s.overlap_type === "claim_limitation"
-                  ? "matches a full claim limitation"
-                  : "overlap"}{" "}
-                · confidence {s.element_confidence?.toFixed(2) ?? "-"} · your
-                element: “{claims.slice(s.user_span_start, s.user_span_end).slice(0, 90)}”
+                  ? "Covers a whole requirement of your claim"
+                  : "Shares wording"}{" "}
+                · confidence {s.element_confidence?.toFixed(2) ?? "-"} · your claim
+                text: “{claims.slice(s.user_span_start, s.user_span_end).slice(0, 90)}”
               </p>
             </li>
           ))}
@@ -440,8 +441,8 @@ function renderClaims(claims: string, spans: ResultSpan[]): ReactNode[] {
         className={cls}
         aria-label={
           s.overlap_type === "claim_limitation"
-            ? "matches a full claim limitation"
-            : "overlap"
+            ? "covers a whole requirement of your claim"
+            : "shares wording"
         }
       >
         {claims.slice(start, end)}

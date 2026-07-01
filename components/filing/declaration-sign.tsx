@@ -9,7 +9,8 @@ import type { Attachment } from "@/lib/filing/types";
 /**
  * The operative signature lives on the document the inventor actually signs. Download the
  * declaration (37 CFR 1.63), sign it by hand, and upload the signed copy here so it is kept
- * with the matter. The in-app S-signature is a record of the attestation, not the filing.
+ * with the matter and bundled into the filing package. Pincite never verifies the signature -
+ * it takes the signed document as the inventor uploads it.
  */
 export function DeclarationSign({
   projectId,
@@ -60,7 +61,7 @@ export function DeclarationSign({
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
         {intro ??
-          "The operative signature is the one on the document you file. Download it, sign it, then upload the signed copy here so everything stays in one place. Pincite does not verify the signature."}
+          "Download the declaration, sign it, and upload the signed copy here."}
       </p>
       <div className="flex flex-wrap items-center gap-2">
         {downloads.map((d) => (

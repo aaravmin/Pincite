@@ -4,10 +4,9 @@
  * declaration text (PTO/AIA/01), and a transmittal + fee checklist. No internal analysis.
  */
 import type { Project } from "@/lib/projects/types";
-import type { Inventor, Declaration } from "@/lib/filing/types";
+import type { Inventor } from "@/lib/filing/types";
 import { ENTITY_STATUS_LABELS } from "@/lib/projects/sections";
 import { applicantName } from "@/lib/filing/ads";
-import { latestDeclarations } from "@/lib/validators/filing";
 
 export function buildAdsText(
   project: Project,
@@ -48,13 +47,16 @@ export const DECLARATION_STATEMENTS = [
   "I acknowledge that willful false statements are punishable under 18 U.S.C. 1001 by fine or imprisonment of up to 5 years, or both.",
 ];
 
+/**
+ * The declaration cover sheet (a reference copy of the 1.63 contents). The operative document
+ * is each inventor's hand-signed declaration, bundled in the package under `declarations/`;
+ * `signedFiles` are those filenames. This text never stands in for the signature.
+ */
 export function buildDeclarationText(
-  project: Project,
   inventors: Inventor[],
-  declarations: Declaration[],
+  signedFiles: string[],
   title: string,
 ): string {
-  const current = latestDeclarations(declarations);
   const lines: string[] = [];
   lines.push("INVENTOR'S DECLARATION (37 CFR 1.63 / PTO-AIA-01)");
   lines.push("");
@@ -63,28 +65,28 @@ export function buildDeclarationText(
   lines.push("Each named inventor declares that:");
   for (const s of DECLARATION_STATEMENTS) lines.push(`  - ${s}`);
   lines.push("");
-  lines.push("Signed declarations recorded in Pincite:");
+  lines.push("Named inventors who must sign the declaration:");
   if (inventors.length === 0) lines.push("  [no inventors entered]");
-  for (const inv of inventors) {
-    const d = current.get(inv.id);
-    if (d) {
-      const date = new Date(d.signed_at).toISOString().slice(0, 10);
-      lines.push(`  Inventor: ${inv.legal_name || "[unnamed]"}`);
-      lines.push(`  Signature: ${d.s_signature || `/${d.legal_name}/`}`);
-      lines.push(`  Name (printed): ${d.legal_name}`);
-      lines.push(`  Date: ${date}`);
-      lines.push("");
-    } else {
-      lines.push(`  Inventor: ${inv.legal_name || "[unnamed]"} - NOT YET SIGNED`);
-      lines.push("");
-    }
+  for (const inv of inventors) lines.push(`  - ${inv.legal_name || "[unnamed]"}`);
+  lines.push("");
+  if (signedFiles.length > 0) {
+    lines.push("Signed declaration document(s) included in this package:");
+    for (const f of signedFiles) lines.push(`  - declarations/${f}`);
+  } else {
+    lines.push(
+      "NO SIGNED DECLARATION INCLUDED. Download the declaration in Pincite, have each inventor",
+    );
+    lines.push(
+      "sign it by hand, and upload the signed copy before you file - that signed copy is the",
+    );
+    lines.push("operative declaration.");
   }
   lines.push("");
   lines.push(
-    "Note: the operative signature for filing is the one you place on the USPTO form you submit.",
+    "The operative signature is the one each inventor places on the signed document; the text",
   );
   lines.push(
-    "Pincite records your attestation and checks it for defects; it does not file for you.",
+    "above is only a reference copy of the declaration's contents. Pincite does not file for you.",
   );
   return lines.join("\n");
 }
@@ -97,7 +99,9 @@ export function buildTransmittalAndFeesText(project: Project): string {
   lines.push("  [x] Specification (specification.docx) - DOCX avoids the non-DOCX surcharge");
   lines.push("  [ ] Drawings (PDF) - upload your figures in Patent Center");
   lines.push("  [x] Application Data Sheet data (application-data-sheet.txt) - enter via Web ADS");
-  lines.push("  [x] Inventor's declaration (inventor-declaration.txt)");
+  lines.push(
+    "  [x] Inventor's declaration - signed copies in declarations/ (PTO/AIA/01, 37 CFR 1.63)",
+  );
   lines.push("  [ ] Fees - pay in Patent Center");
   lines.push("");
   lines.push("FEE SUMMARY (confirm current amounts on the USPTO fee schedule)");
@@ -130,7 +134,7 @@ export function buildReadme(): string {
     "   After upload, review the USPTO-converted PDF - that converted file is the official record.",
     "4. Enter the Application Data Sheet using the Web ADS form, from application-data-sheet.txt.",
     "5. Upload your drawings as a PDF.",
-    "6. Upload the inventor's declaration (PTO/AIA/01), signed by each inventor.",
+    "6. Upload each inventor's signed declaration (PTO/AIA/01) from the declarations/ folder.",
     "7. Pay the fees.",
     "",
     "Pincite does not file for you; you submit these documents yourself. This package contains",
