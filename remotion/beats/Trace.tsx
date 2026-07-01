@@ -44,17 +44,17 @@ export function Trace({ width = 1920, height = 1080 }: { width?: number; height?
 
   return (
     <Scene>
-      <div style={{ position: "absolute", inset: 0, padding: "64px 90px" }}>
+      <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 90px" }}>
         <div className="text-center">
           <KineticText
             text={LINES.receipts}
             startFrame={4}
             className="font-serif"
-            style={{ fontSize: 64, fontWeight: 700, color: COLORS.foreground }}
+            style={{ fontSize: 68, fontWeight: 700, color: COLORS.foreground }}
           />
         </div>
 
-        <div style={{ marginTop: 44, display: "flex", gap: 24, alignItems: "stretch" }}>
+        <div style={{ marginTop: 44, display: "flex", gap: 26, alignItems: "stretch", width: "100%" }}>
           {/* the flag */}
           <div
             style={{ flex: 1, opacity: slide, transform: `translateX(${interpolate(slide, [0, 1], [-50, 0])}px)` }}
@@ -110,15 +110,15 @@ export function Trace({ width = 1920, height = 1080 }: { width?: number; height?
           </div>
         </div>
 
-        <AbsoluteFill className="items-center justify-end" style={{ paddingBottom: 56 }}>
+        <div style={{ marginTop: 34 }}>
           <KineticText
             text="Nothing is guessed."
-            startFrame={230}
+            startFrame={220}
             className="font-serif"
             style={{ fontSize: 40, fontWeight: 600, color: COLORS.mutedForeground }}
           />
-        </AbsoluteFill>
-      </div>
+        </div>
+      </AbsoluteFill>
     </Scene>
   );
 }

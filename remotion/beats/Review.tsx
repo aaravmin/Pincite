@@ -1,4 +1,5 @@
 import {
+  AbsoluteFill,
   useCurrentFrame,
   useVideoConfig,
   interpolate,
@@ -23,73 +24,74 @@ const SPANS: VisualSpan[] = [
   { start: s12, end: s12 + "claims 1 and 2".length, signal: "red", flagId: "md" },
 ];
 const FINDINGS = [
-  "Claim 4 refers to claim 6, which does not exist",
-  "Claim 5 multiple dependent claim must be in the alternative",
+  { area: "Claims", title: "Claim 4 refers to claim 6, which does not exist" },
+  { area: "Claims", title: "Claim 5 multiple dependent claim must be in the alternative" },
 ];
 
-// Beat 1 - the catch (landscape). The two real red violations slide in beside the
-// draft, a counter ticks the issues found. Pincite finds them first.
+// Beat 1 - the catch (landscape, filled frame). The two real red violations slide
+// in beside a large draft, a big counter ticks the issues. Pincite finds them first.
 export function Review({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const count = Math.round(
-    interpolate(frame, [44, 92], [0, 2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+    interpolate(frame, [30, 76], [0, 2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
   );
 
   return (
     <Scene>
-      <div style={{ position: "absolute", inset: 0, padding: "70px 100px" }}>
-        <div className="text-center">
-          <KineticText
-            text={LINES.catch}
-            startFrame={4}
-            className="font-serif"
-            style={{ fontSize: 68, fontWeight: 700, color: COLORS.foreground }}
-          />
-        </div>
+      <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>
+        <KineticText
+          text={LINES.catch}
+          startFrame={4}
+          className="font-serif"
+          style={{ fontSize: 74, fontWeight: 700, color: COLORS.foreground }}
+        />
 
-        <div style={{ marginTop: 56, display: "flex", gap: 40, alignItems: "flex-start" }}>
-          <div style={{ flex: 1.15 }}>
+        <div style={{ marginTop: 44, display: "flex", gap: 48, alignItems: "center", width: "100%" }}>
+          <div style={{ flex: 1.1 }}>
             <AnnotatedEditor
               text={CLAIMS}
               spans={SPANS}
-              activeFlagId={frame > 60 ? "md" : "c6"}
+              activeFlagId={frame > 46 ? "md" : "c6"}
               progress={1}
               caption="US 2012 0024859 A1 . Claims"
-              className="shadow-md"
+              className="shadow-lg"
             />
           </div>
 
-          <div style={{ flex: 0.85 }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <div style={{ flex: 0.9 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
               <span
                 className="font-serif"
-                style={{ fontSize: 88, fontWeight: 700, color: COLORS.violation, lineHeight: 1 }}
+                style={{ fontSize: 128, fontWeight: 700, color: COLORS.violation, lineHeight: 0.9 }}
               >
                 {count}
               </span>
-              <span className="text-muted-foreground" style={{ fontSize: 26 }}>
+              <span className="text-foreground" style={{ fontSize: 34, fontWeight: 600 }}>
                 issues found
               </span>
             </div>
-            <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 14 }}>
-              {FINDINGS.map((t, i) => {
-                const sp = spring({ frame: frame - (58 + i * 22), fps, config: { damping: 200 } });
+            <div style={{ marginTop: 26, display: "flex", flexDirection: "column", gap: 16 }}>
+              {FINDINGS.map((f, i) => {
+                const sp = spring({ frame: frame - (44 + i * 18), fps, config: { damping: 200 } });
                 return (
                   <div
                     key={i}
-                    style={{ opacity: sp, transform: `translateX(${interpolate(sp, [0, 1], [44, 0])}px)` }}
-                    className="rounded-xl border bg-card p-4"
+                    style={{ opacity: sp, transform: `translateX(${interpolate(sp, [0, 1], [48, 0])}px)` }}
+                    className="rounded-2xl border bg-card p-5 shadow-sm"
                   >
-                    <SignalBadge signal="red">Violation</SignalBadge>
-                    <p className="mt-2 text-[19px] font-medium text-foreground">{t}</p>
+                    <div className="flex items-center gap-2">
+                      <SignalBadge signal="red">Violation</SignalBadge>
+                      <span className="text-[15px] text-muted-foreground">{f.area}</span>
+                    </div>
+                    <p className="mt-2.5 text-[22px] font-medium leading-snug text-foreground">{f.title}</p>
                   </div>
                 );
               })}
             </div>
           </div>
         </div>
-      </div>
+      </AbsoluteFill>
     </Scene>
   );
 }

@@ -18,47 +18,41 @@ import {
   APPLE_META,
 } from "@visual/fixtures/apple-example";
 
-const COLS = 16;
-const ROWS = 9;
-const SURV_C = 8;
-const SURV_R = 4;
+const COLS = 15;
+const ROWS = 7;
+const SURV_C = 7;
+const SURV_R = 3;
+const FIELD_TOP = 250;
 
-// Beat 0 - theme and hook. A wide field of applications, almost all flipping red
-// in a staggered wave, then the camera pushes into the single survivor, which
-// resolves into the Apple draft (with its claim 6 flag).
+// Beat 0 - theme and hook. The headline sits in its own clear band up top (never
+// over the red field). Below, a field of applications flips red in a wave, then
+// the camera pushes into the single survivor, which resolves into the Apple draft.
 export function Hook({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
+  const fieldH = height - FIELD_TOP;
   const cellW = width / COLS;
-  const cellH = height / ROWS;
-  const markerSize = Math.min(cellW, cellH) * 0.6;
+  const cellH = fieldH / ROWS;
+  const markerSize = Math.min(cellW, cellH) * 0.62;
   const survX = SURV_C * cellW + cellW / 2;
-  const survY = SURV_R * cellH + cellH / 2;
+  const survY = FIELD_TOP + SURV_R * cellH + cellH / 2;
 
-  const pushT = interpolate(frame, [78, 168], [0, 1], {
+  const pushT = interpolate(frame, [96, 168], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  const scale = interpolate(pushT, [0, 1], [1, 17]);
-  const fieldOpacity = interpolate(frame, [150, 186], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const scale = interpolate(pushT, [0, 1], [1, 18]);
+  const fieldOpacity = interpolate(frame, [150, 184], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const headOut = interpolate(frame, [138, 168], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  const editorT = spring({ frame: frame - 150, fps, config: { damping: 200 } });
-  const editorProgress = interpolate(frame, [168, 210], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const themeOut = interpolate(frame, [132, 166], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const editorT = spring({ frame: frame - 158, fps, config: { damping: 200 } });
+  const editorProgress = interpolate(frame, [176, 220], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <Scene>
+      {/* the field (lower region only, so it never sits under the headline) */}
       <AbsoluteFill style={{ opacity: fieldOpacity }}>
         <div
           style={{
@@ -72,7 +66,7 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
             Array.from({ length: COLS }).map((_, c) => {
               const isSurv = r === SURV_R && c === SURV_C;
               const d = r + c;
-              const flipStart = interpolate(d, [0, ROWS + COLS - 2], [8, 66]);
+              const flipStart = interpolate(d, [0, ROWS + COLS - 2], [24, 96]);
               const flip = isSurv
                 ? 0
                 : interpolate(frame, [flipStart, flipStart + 14], [0, 1], {
@@ -89,7 +83,7 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
                   style={{
                     position: "absolute",
                     left: c * cellW + (cellW - markerSize) / 2,
-                    top: r * cellH + (cellH - markerSize) / 2,
+                    top: FIELD_TOP + r * cellH + (cellH - markerSize) / 2,
                     width: markerSize,
                     height: markerSize,
                     borderRadius: 10,
@@ -105,25 +99,25 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
         </div>
       </AbsoluteFill>
 
-      <AbsoluteFill className="items-center justify-center" style={{ opacity: themeOut }}>
-        <div className="px-24 text-center">
-          <KineticText
-            text={LINES.theme}
-            startFrame={6}
-            className="font-serif"
-            style={{ fontSize: 92, fontWeight: 700, lineHeight: 1.02, color: COLORS.foreground }}
-          />
-        </div>
-      </AbsoluteFill>
-
-      <AbsoluteFill
-        className="items-center justify-center"
-        style={{
-          opacity: editorT,
-          transform: `scale(${interpolate(editorT, [0, 1], [0.88, 1])})`,
-        }}
+      {/* headline, in its own clear band at the top */}
+      <div
+        style={{ position: "absolute", top: 0, left: 0, right: 0, height: FIELD_TOP, opacity: headOut }}
+        className="flex items-center justify-center px-24"
       >
-        <div style={{ width: 1180 }}>
+        <KineticText
+          text={LINES.theme}
+          startFrame={6}
+          className="font-serif"
+          style={{ fontSize: 88, fontWeight: 700, lineHeight: 1.0, color: COLORS.foreground }}
+        />
+      </div>
+
+      {/* the draft resolves in, centered */}
+      <AbsoluteFill
+        className="flex-col items-center justify-center"
+        style={{ opacity: editorT, transform: `scale(${interpolate(editorT, [0, 1], [0.9, 1])})` }}
+      >
+        <div style={{ width: 1240 }}>
           <AnnotatedEditor
             text={APPLE_HERO_CLAIMS}
             spans={APPLE_HERO_SPANS}
@@ -131,13 +125,21 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
             progress={editorProgress}
             caption={APPLE_META.claimsCaption}
           />
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
+          <KineticText
+            text={LINES.themeSub}
+            startFrame={198}
+            className="font-serif"
+            style={{ fontSize: 46, fontWeight: 600, color: COLORS.foreground }}
+          />
+          <div className="mt-2">
             <KineticText
-              text={LINES.themeSub}
-              startFrame={182}
+              text={LINES.themeSub2}
+              startFrame={224}
               className="font-serif"
-              style={{ fontSize: 38, fontWeight: 500, color: COLORS.mutedForeground }}
+              style={{ fontSize: 34, fontWeight: 500, color: COLORS.mutedForeground }}
             />
+          </div>
           </div>
         </div>
       </AbsoluteFill>

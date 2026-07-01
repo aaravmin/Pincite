@@ -1,4 +1,5 @@
 import {
+  AbsoluteFill,
   useCurrentFrame,
   useVideoConfig,
   spring,
@@ -50,7 +51,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
 
   return (
     <Scene>
-      <div style={{ position: "absolute", inset: 0, padding: "64px 100px" }}>
+      <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 100px" }}>
         <div className="text-center">
           <KineticText
             text={LINES.drawings}
@@ -60,7 +61,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
           />
         </div>
 
-        <div style={{ marginTop: 44, display: "flex", gap: 44, alignItems: "stretch" }}>
+        <div style={{ marginTop: 40, display: "flex", gap: 44, alignItems: "stretch", width: "100%" }}>
           {/* the figure */}
           <div style={{ flex: 1.15 }} className="rounded-2xl border bg-card p-6">
             <div className="mb-2 font-mono text-sm text-muted-foreground">FIG. 2</div>
@@ -151,7 +152,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
             </div>
           </div>
         </div>
-      </div>
+      </AbsoluteFill>
     </Scene>
   );
 }

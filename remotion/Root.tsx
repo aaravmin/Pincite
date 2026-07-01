@@ -6,8 +6,8 @@ import { Trace } from "./beats/Trace";
 import { Drawings } from "./beats/Drawings";
 import { PriorArt } from "./beats/PriorArt";
 import { Payoff } from "./beats/Payoff";
-import { PinciteDemo } from "./PinciteDemo";
-import { SIZE, FPS, DURATION, BEAT } from "./theme";
+import { PinciteDemo, TOTAL_FRAMES } from "./PinciteDemo";
+import { SIZE, FPS, BEAT } from "./theme";
 
 const P = { width: SIZE.width, height: SIZE.height };
 
@@ -18,7 +18,7 @@ export function RemotionRoot() {
       <Composition
         id="PinciteDemo"
         component={PinciteDemo}
-        durationInFrames={DURATION}
+        durationInFrames={TOTAL_FRAMES}
         fps={FPS}
         width={SIZE.width}
         height={SIZE.height}

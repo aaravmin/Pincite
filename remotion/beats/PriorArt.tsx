@@ -1,4 +1,5 @@
 import {
+  AbsoluteFill,
   useCurrentFrame,
   interpolate,
   Easing,
@@ -45,8 +46,8 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
 
   return (
     <Scene>
-      <div style={{ position: "absolute", inset: 0, padding: "60px 100px" }}>
-        <div className="text-center">
+      <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 100px" }}>
+        <div className="w-full text-center">
           <KineticText
             text={LINES.priorart}
             startFrame={4}
@@ -56,7 +57,7 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
           <p className="mt-2 text-[22px] text-muted-foreground">{LINES.priorartSub}</p>
         </div>
 
-        <div style={{ marginTop: 40, display: "flex", gap: 28, alignItems: "flex-start" }}>
+        <div style={{ marginTop: 40, display: "flex", gap: 28, alignItems: "flex-start", width: "100%" }}>
           <div style={{ flex: 1, opacity: slide, transform: `translateX(${interpolate(slide, [0, 1], [-40, 0])}px)` }}>
             <AnnotatedEditor text={YOURS} spans={YOUR_SPANS} progress={1} caption="Your claim . element 1" />
           </div>
@@ -68,7 +69,7 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
           </div>
         </div>
 
-        <div style={{ marginTop: 34, maxWidth: 1180, marginLeft: "auto", marginRight: "auto" }} className="rounded-xl border bg-card p-6">
+        <div style={{ marginTop: 34, width: "100%", maxWidth: 1180 }} className="rounded-xl border bg-card p-6">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-[19px] font-semibold text-foreground">Overlap with prior patents</h3>
             <span className="text-[14px] text-muted-foreground">A similarity signal, not a novelty verdict</span>
@@ -78,7 +79,7 @@ export function PriorArt({ width = 1920, height = 1080 }: { width?: number; heig
             No single score. You see every exact overlap and decide.
           </p>
         </div>
-      </div>
+      </AbsoluteFill>
     </Scene>
   );
 }

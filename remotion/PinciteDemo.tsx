@@ -1,35 +1,49 @@
-import { Series } from "remotion";
+import { TransitionSeries, linearTiming } from "@remotion/transitions";
+import { fade } from "@remotion/transitions/fade";
 import { Hook } from "./beats/Hook";
 import { Review } from "./beats/Review";
 import { Trace } from "./beats/Trace";
 import { Drawings } from "./beats/Drawings";
 import { PriorArt } from "./beats/PriorArt";
 import { Payoff } from "./beats/Payoff";
-import { BEAT } from "./theme";
+import { BEAT, XFADE } from "./theme";
 
-// The whole film, six beats, one theme. 1350 frames at 30fps = 45 seconds, 16:9.
+// The whole film, six beats, one theme, 16:9. Beats crossfade into each other so
+// nothing hard-cuts (Snowscroll-style pacing: reveal, brief hold, move on).
 export function PinciteDemo({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
   const p = { width, height };
+  const xfade = () => (
+    <TransitionSeries.Transition presentation={fade()} timing={linearTiming({ durationInFrames: XFADE })} />
+  );
   return (
-    <Series>
-      <Series.Sequence durationInFrames={BEAT.hook}>
+    <TransitionSeries>
+      <TransitionSeries.Sequence durationInFrames={BEAT.hook}>
         <Hook {...p} />
-      </Series.Sequence>
-      <Series.Sequence durationInFrames={BEAT.review}>
+      </TransitionSeries.Sequence>
+      {xfade()}
+      <TransitionSeries.Sequence durationInFrames={BEAT.review}>
         <Review {...p} />
-      </Series.Sequence>
-      <Series.Sequence durationInFrames={BEAT.trace}>
+      </TransitionSeries.Sequence>
+      {xfade()}
+      <TransitionSeries.Sequence durationInFrames={BEAT.trace}>
         <Trace {...p} />
-      </Series.Sequence>
-      <Series.Sequence durationInFrames={BEAT.drawings}>
+      </TransitionSeries.Sequence>
+      {xfade()}
+      <TransitionSeries.Sequence durationInFrames={BEAT.drawings}>
         <Drawings {...p} />
-      </Series.Sequence>
-      <Series.Sequence durationInFrames={BEAT.priorart}>
+      </TransitionSeries.Sequence>
+      {xfade()}
+      <TransitionSeries.Sequence durationInFrames={BEAT.priorart}>
         <PriorArt {...p} />
-      </Series.Sequence>
-      <Series.Sequence durationInFrames={BEAT.payoff}>
+      </TransitionSeries.Sequence>
+      {xfade()}
+      <TransitionSeries.Sequence durationInFrames={BEAT.payoff}>
         <Payoff {...p} />
-      </Series.Sequence>
-    </Series>
+      </TransitionSeries.Sequence>
+    </TransitionSeries>
   );
 }
+
+// Total frames after the 5 crossfades overlap.
+export const TOTAL_FRAMES =
+  BEAT.hook + BEAT.review + BEAT.trace + BEAT.drawings + BEAT.priorart + BEAT.payoff - 5 * XFADE;

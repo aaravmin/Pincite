@@ -6,23 +6,24 @@ export const FPS = 30;
 // 16:9 widescreen is the only cut now (the film was reframed from vertical).
 export const SIZE = { width: 1920, height: 1080 };
 
-// 45 seconds at 30fps.
-export const DURATION = 1350;
-
-// Beat lengths in frames (sum = DURATION). Tighter, no lingering.
+// Beat lengths in frames (sequence durations; TransitionSeries overlaps ~14f each).
 export const BEAT = {
-  hook: 210, // 7.0s
-  review: 210, // 7.0s
-  trace: 270, // 9.0s (hero beat)
-  drawings: 240, // 8.0s
-  priorart: 210, // 7.0s
-  payoff: 210, // 7.0s
+  hook: 300,
+  review: 170,
+  trace: 255,
+  drawings: 215,
+  priorart: 200,
+  payoff: 250,
 } as const;
+
+// Crossfade between beats.
+export const XFADE = 14;
 
 // On-screen lines, one idea each.
 export const LINES = {
   theme: "Nine out of ten patents are rejected.",
   themeSub: "Usually over something a rule already flags.",
+  themeSub2: "Not because it is unpatentable.",
   catch: "Pincite finds them first.",
   receipts: "Every flag opens the exact rule.",
   drawings: "It reads your drawings too.",

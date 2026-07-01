@@ -329,8 +329,12 @@ the end of each session — but be stringent; trim before it bloats.
   trace, 3-column hero), the drawing check (a detailed synthetic patent figure with FOUR planted
   reference-numeral errors circled in red, pinned to 37 CFR 1.84(p)(5)), the prior-art check
   (claim vs prior patent, exact overlap flagged red + a BarList of similar patents, no single
-  score), the payoff (recolor red->green + field callback with one green survivor + export +
-  **logo only** end). Brownfield Remotion 4.0.x + `@remotion/tailwind-v4` wired to the app's
+  score), the payoff (recolor red->green + a real filing-ready patent first page `PatentDoc`
+  (USPTO 1.77 layout, Gelasio serif) + field callback with one green survivor + **logo only**
+  end). Beats crossfade via `@remotion/transitions` TransitionSeries (Snowscroll-style pacing);
+  the theme headline sits in a clear band (never dark-text-on-red); sublines "Usually over
+  something a rule already flags" + "Not because it is unpatentable". Brownfield Remotion 4.0.x +
+  `@remotion/tailwind-v4` wired to the app's
   `globals.css` tokens + `@/` and `@visual/` aliases, so it renders the **real** shared `@visual`
   components (AnnotatedEditor, CitationStack, BarList) driven by a frame-derived `progress` (Part E
   proven). Headlines use **Baloo 2** (rounded, matches the Pincite wordmark, not a formal serif);
