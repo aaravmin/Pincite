@@ -1,15 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { MarketingNav } from "@/components/marketing/nav";
-import { MarketingMotion } from "@/components/marketing/motion-provider";
-import { MarketingFooter } from "@/components/marketing/footer";
-import { Hero } from "@/components/marketing/hero";
-import { SectionStake } from "@/components/marketing/section-stake";
-import { SectionFix } from "@/components/marketing/section-fix";
-import { SectionOnePlace } from "@/components/marketing/section-one-place";
-import { SectionWorkflow } from "@/components/marketing/section-workflow";
-import { SectionTrust } from "@/components/marketing/section-trust";
-import { SectionAudience } from "@/components/marketing/section-audience";
+import { MarketingHome } from "@/components/marketing/marketing-home";
 
 // A signed-in visitor skips the landing and goes straight to their dashboard.
 export const dynamic = "force-dynamic";
@@ -21,21 +12,5 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
 
-  return (
-    <div className="flex flex-1 flex-col">
-      <MarketingNav />
-      <MarketingMotion>
-        <main className="flex-1">
-          <Hero />
-          <SectionStake />
-          <SectionFix />
-          <SectionOnePlace />
-          <SectionWorkflow />
-          <SectionTrust />
-          <SectionAudience />
-        </main>
-      </MarketingMotion>
-      <MarketingFooter />
-    </div>
-  );
+  return <MarketingHome />;
 }

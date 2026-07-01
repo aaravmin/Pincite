@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Play } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { LaunchVideo } from "@/components/marketing/launch-video";
 
 /**
  * Calm marketing top nav. A larger wordmark on the left, a Launch video action,
@@ -15,14 +15,7 @@ export function MarketingNav() {
           <Logo className="h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Launch video - not wired yet; point href at the video when it exists. */}
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            <Play className="size-4" aria-hidden />
-            Launch video
-          </a>
+          <LaunchVideo />
           <Link
             href="/login"
             className="hidden rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent sm:inline-flex"
