@@ -298,6 +298,31 @@ the end of each session — but be stringent; trim before it bloats.
   now-dead `Declaration`/`DeclarationStatements`/`s_signature`/`isValidSSignature`. e2e
   `sign.spec.ts` (rewritten: no certify, statements read-only, package bundles the signed doc).
 
+- [x] UI OVERHAUL (branch `ui-overhaul`): interactive marketing homepage + dashboard command
+  center, presentation-only (no auth/RLS/finding changes). Shared **animation-agnostic** visual
+  layer in `src/visual/` (alias `@visual/*`) driven purely by a `progress` prop so the SAME
+  components render on the site and in a future Remotion video: `AnnotatedEditor`, `CitationStack`
+  (Law/Rule/Guidance, consolidates the old inline dup), `ComplianceTracker`, `KpiStat`,
+  `LifecycleTimeline`, `BarList`, `SignalMark`/`SignalBadge`; web `useReveal`/`useMountProgress`
+  drivers + `prefers-reduced-motion` guards (+ a global CSS safety net). Marketing homepage
+  (`app/page.tsx` + `components/marketing/*`): serif hero (real editor + live claim-6 flag), stake
+  count-ups (sourced, "about" framing), trace (real CitationStack), Magic UI bento, Animated Beam
+  pipeline, trust list, audience+CTA. Only the public Apple example (`src/visual/fixtures/apple-
+  example.ts`) - claim 1 truncated before its colon so the plain-text editor stays sanitizer-clean
+  (the banned-punctuation rule covers all visible text incl. `<pre>`). Overview command center
+  (`components/overview/*`, `/projects/[id]/overview`): animated KPI cards, ComplianceTracker,
+  LifecycleTimeline, TanStack findings table (sortable/filterable + hover-card), Border Beam on the
+  single next-action card. `getReadiness` gained additive `metrics` + live `findings` (KPIs and the
+  table share one source). Global command palette (`components/command/`, Cmd-K, in sidebar +
+  step-rail), Sonner toasts (`ui/sonner.tsx` reads the `.dark` class, mounted in root layout),
+  animated step-rail active pill, stage stepper on `/stage`. Fraunces exposed as `font-serif`
+  (`--font-serif`); **--violation and --muted-foreground darkened** for WCAG AA on tints/muted
+  surfaces (like --pass). New deps via shadcn CLI: shadcn primitives + Magic UI (`@magicui/*`
+  registry) + `@tanstack/react-table` + `motion`/`framer-motion`. Full e2e green (overview/landing
+  specs updated to the new UI), a11y 0 serious/critical across 12 screens. NOT adopted: Tremor
+  (Tailwind-v4/React-19 friction + Remotion-incompatible), 21st.dev blocks (403/unverifiable),
+  paid Aceternity - built those custom instead.
+
 ## Commands
 - `pnpm dev` — dev server on :3100.   `pnpm build` — production build.
 - `pnpm verify` — run all Playwright gates.   `pnpm lint` — eslint.
