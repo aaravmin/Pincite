@@ -72,10 +72,10 @@ export function Hero() {
               <p className="text-xs font-medium text-muted-foreground">
                 We only ever tell you three things
               </p>
-              <div className="mt-3 flex flex-wrap items-center gap-2.5">
-                <SignalBadge signal="red">Violation</SignalBadge>
-                <SignalBadge signal="yellow">Attention</SignalBadge>
-                <SignalBadge signal="green">Pass</SignalBadge>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <SignalBadge signal="red" size="lg">Violation</SignalBadge>
+                <SignalBadge signal="yellow" size="lg">Attention</SignalBadge>
+                <SignalBadge signal="green" size="lg">Pass</SignalBadge>
               </div>
             </div>
           </BlurFade>

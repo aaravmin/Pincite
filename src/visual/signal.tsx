@@ -75,23 +75,30 @@ export function SignalBadge({
   signal,
   children,
   className,
+  size = "sm",
 }: {
   signal: Signal;
   children?: React.ReactNode;
   className?: string;
+  /** "lg" scales the pill and its mark up for prominent placements (e.g. the hero) */
+  size?: "sm" | "lg";
 }) {
   const s = SIGNAL[signal];
+  const sizing =
+    size === "lg" ? "gap-2 px-3.5 py-1.5 text-sm" : "gap-1.5 px-2 py-0.5 text-xs";
+  const markSize = size === "lg" ? (signal === "green" ? "size-4" : "size-3") : undefined;
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-full border font-medium",
+        sizing,
         s.bg,
         s.border,
         s.text,
         className,
       )}
     >
-      <SignalMark signal={signal} />
+      <SignalMark signal={signal} className={markSize} />
       {children ?? s.label}
     </span>
   );
