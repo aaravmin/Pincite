@@ -18,12 +18,6 @@ export function MarketingNav() {
           <LaunchVideo />
           <Link
             href="/login"
-            className="hidden rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent sm:inline-flex"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/login"
             className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             Start a review

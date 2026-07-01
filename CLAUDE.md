@@ -323,26 +323,29 @@ the end of each session — but be stringent; trim before it bloats.
   (Tailwind-v4/React-19 friction + Remotion-incompatible), 21st.dev blocks (403/unverifiable),
   paid Aceternity - built those custom instead.
 
-- [x] HOMEPAGE REFINEMENT PASS (`app/page.tsx` + `components/marketing/*`): trailing periods
-  dropped from all headings; "workbench" -> "dashboard" everywhere (marketing + `/privacy` + footer);
-  "about" removed from every displayed statistic; "flagged" verb reworded ("caught"). Showcased
-  finding switched from the claim-6 non-existent-claim ref to the more interesting **multiple
+- [x] HOMEPAGE REFINEMENT PASS (`components/marketing/*`, body extracted to `marketing-home.tsx`
+  rendered by both `/` and `/home`): trailing periods dropped from all headings; "workbench" ->
+  "dashboard" everywhere (marketing + `/privacy` + footer); "about" removed from every displayed
+  statistic; "flagged" reworded ("caught" / "needs a fix"). Showcased finding is the **multiple
   dependent claim** (claim 5 joins "claims 1 and 2" with "and" - 35 U.S.C. 112(e), `APPLE_MULTI_*`
-  in the apple fixture) in the hero + trace; the compare slider keeps claim-6 -> claim-3 (its
-  same-length before/after wipe needs it). Page flow now Hero -> Stake -> Fix -> OnePlace -> Workflow
-  -> Trust -> Audience. Sections: **`rejection-explorer.tsx`** rebuilt - selectable grounds routed to
-  three checks (Rule check, **Prior patents check**, **Drawing check**), each detail pane shows a
-  2-line "how" + a "How Pincite fixes it" mini-preview (and->or, red/yellow overlap, red numeral
-  chips) + a "How often it comes up in rejections" bar; **trace merged into `section-one-place`** as
-  the "Rule trace" lead (standalone `section-trace.tsx` deleted); prior-art card renamed **Prior
-  successful patents**, "Exact limitation match" pill removed, bars show % overlap, both claim
-  editors hover-lift and the earlier-patent one is offset right to hang past yours; `section-fix.tsx`
-  "Watch a finding resolve" (badge "Needs a fix"); workflow keeps the **Compare** step (5, rail draws
-  in) and steps hover-lift; hero pills fronted by "We only ever tell you three things". Nav: bigger
-  wordmark, section links removed, **Launch video** action (href placeholder - wire to the video).
-  Contact email -> `aaravmin@pincite.net` (`/privacy` + `/terms`). Footer drops "Verify anything time
-  sensitive". Citation marquee + `ui/marquee.tsx` + marquee keyframes REMOVED. `tsc`/eslint clean,
-  landing e2e green, 0 console errors, no overflow 390-1440.
+  in the apple fixture) in hero + rule trace. **Final page flow: Hero -> Stake -> Workflow (How it
+  works) -> OnePlace (Every step to filing) -> Trust.** The Fix/compare-slider section and the
+  Audience section were both REMOVED (files `section-fix.tsx`, `section-audience.tsx`,
+  `ui/compare-slider.tsx` deleted); the citation marquee (`ui/marquee.tsx` + keyframes) was removed
+  earlier; standalone `section-trace.tsx` deleted (trace merged into `section-one-place` as the
+  "Rule trace" lead). **`rejection-explorer.tsx`**: selectable grounds routed to three checks (Rule
+  check, Prior patents check, Drawing check); each detail pane shows a ~2-line "how" (fills to end of
+  line 2) + a preview labeled per engine - **rule = "How Pincite fixes it"** with a distinct
+  correction per ground (112(b) the->a plurality of antecedent, 112(a) narrow overbroad scope, 101
+  abstract method -> concrete article; NOT the old and->or), **art/drawing = "What Pincite points
+  out"** (art shows yours/theirs, an exact-word overlap AND a same-idea-different-words overlap to
+  prove it is not a text search; drawing shows the numeral chips). "Every ground has a check" and
+  "not a score" phrasings removed; §101 "how" de-jargoned (no "Alice and Mayo"). Prior-art card in
+  one-place renamed **Prior successful patents**, bars show % overlap, editors hover-lift + offset;
+  workflow **Compare** step (5, rail draws in) + steps hover-lift; hero pills fronted by "We only
+  ever tell you three things". Nav: bigger wordmark, section links removed, **Launch video** action
+  (href placeholder - wire to the video). Contact email -> `aaravmin@pincite.net`. `tsc`/eslint
+  clean, landing e2e green, 0 console errors, no overflow 390-1440.
 
 - [x] REMOTION DEMO (`remotion/`, `remotion.config.ts`): a silent ~45s **16:9** (1920x1080) film,
   one theme ("Nine out of ten patents are rejected."), SIX beats - hook (wide field of markers,
