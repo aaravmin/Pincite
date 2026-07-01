@@ -40,7 +40,9 @@ export function DashboardSidebar({
   return (
     <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border bg-secondary/20 p-3 md:flex">
       <div className="px-2 py-2">
-        <Logo className="h-8 w-auto" />
+        <Link href="/" aria-label="Pincite home" className="inline-block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Logo className="h-8 w-auto" />
+        </Link>
       </div>
 
       <div className="mt-3 px-0.5">
