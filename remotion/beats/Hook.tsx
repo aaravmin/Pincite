@@ -121,9 +121,12 @@ export function Hook({ width = 1920 }: { width?: number }) {
         </div>
       </AbsoluteFill>
 
-      {/* headline, in a clear band up top */}
-      <div style={{ position: "absolute", top: 84, left: 0, right: 0, textAlign: "center", opacity: headOut }} className="px-24">
+      {/* headline + qualifier, in a clear band up top */}
+      <div style={{ position: "absolute", top: 74, left: 0, right: 0, textAlign: "center", opacity: headOut }} className="px-24">
         <KineticText text={LINES.theme} startFrame={8} className="font-serif" style={{ fontSize: 86, fontWeight: 700, lineHeight: 1.0, color: COLORS.foreground }} />
+        <div className="mt-2.5">
+          <KineticText text={LINES.themeFirst} startFrame={20} className="font-serif" style={{ fontSize: 38, fontWeight: 500, color: COLORS.mutedForeground }} />
+        </div>
       </div>
 
       {/* the survivor morphing into the patent card */}

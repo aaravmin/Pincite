@@ -23,6 +23,7 @@ export const XFADE = 14;
 // On-screen lines, one idea each. Titles flow, and say the specific thing.
 export const LINES = {
   theme: "Nine out of ten patents are rejected",
+  themeFirst: "on the first application",
   themeSub: "Usually over a rule violation that could easily have been caught and fixed",
   themeSub2: "Not because they are unpatentable",
   catch: "Pincite finds them first",
