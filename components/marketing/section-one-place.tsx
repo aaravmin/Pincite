@@ -11,7 +11,6 @@ import { PatentFigure } from "@/components/marketing/patent-figure";
 import { MiniPatentPage } from "@/components/marketing/mini-patent-page";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
-import { BarList } from "@visual/bar-list";
 import { SignalBadge } from "@visual/signal";
 import { useReveal } from "@visual/reveal";
 import {
@@ -36,13 +35,12 @@ const PRIOR_SPANS = [{ start: ps, end: ps + PHRASE.length, signal: "red" as cons
 const YOURS_MEANING = "ridges that isolate the food from the base";
 const PRIOR_MEANING = "ribs that lift the item off the tray floor";
 
-const MATCHES = [
-  { label: "US 6,983,542 B2", value: 0.88, display: "88% overlap", signal: "red" as const },
-  { label: "US 5,743,110 A", value: 0.56, display: "56% overlap", signal: "yellow" as const },
-  { label: "US 7,204,388 B2", value: 0.4, display: "40% overlap", signal: "yellow" as const },
-];
+// One pinpoint overlap for the hypothetical example (a per-patent overlap, not a
+// single patentability score - the product never collapses prior art to one number).
+const OVERLAP_PCT = 88;
+const OVERLAP_PATENT = "US 6,983,542 B2";
 
-const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"];
+const DOCS =["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"];
 
 // Inline overlap highlight for the semantic pair (yellow = your claim, red = the
 // matching prior limitation). Same token classes as the annotated editor marks.
@@ -250,8 +248,21 @@ export function SectionOnePlace() {
                 No words in common, but the same idea. A plain text search would slide right past it.
               </p>
 
-              <div className="mt-6 border-t pt-5">
-                <BarList items={MATCHES} progress={1} />
+              <div className="mt-auto border-t pt-5">
+                <div className="flex items-end justify-between gap-4">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Overlap with the closest granted patent, {OVERLAP_PATENT}
+                  </p>
+                  <p className="shrink-0 font-rounded text-3xl font-semibold tracking-tight text-foreground">
+                    {OVERLAP_PCT}%
+                  </p>
+                </div>
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-foreground/80"
+                    style={{ width: `${OVERLAP_PCT}%` }}
+                  />
+                </div>
               </div>
             </div>
           </BlurFade>
@@ -270,8 +281,12 @@ export function SectionOnePlace() {
               <h3 className="mt-4 text-balance font-rounded text-2xl font-semibold tracking-tight text-foreground">
                 The full set, in the order the USPTO expects
               </h3>
+              <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
+                Every document the office needs, in the right format and the order the rules
+                require.
+              </p>
               <MiniPatentPage className="mt-5" />
-              <div className="mt-4 flex flex-1 flex-wrap content-center gap-2">
+              <div className="mt-auto flex flex-wrap gap-2 pt-6">
                 {DOCS.map((d) => (
                   <div key={d} className="flex items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5">
                     <span className="text-pass" aria-hidden>
