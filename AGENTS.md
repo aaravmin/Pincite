@@ -225,16 +225,10 @@ the end of each session — but be stringent; trim before it bloats.
     to Auto-detect; a wrong label is correctable per figure (`setAttachmentView` dropdown +
     Detect view re-run in FigureNavigator). e2e `orientation.spec.ts` (deterministic + guarded
     `ORIENT_VISION`).
-  - [~] F2 drawing editor: editable annotation layer (migration 0015
-    `project_attachments.annotations` = movable numeral labels + lead lines + figure label).
-    `DrawingEditor` (replaces DrawingAnalysis) shows errors overlaid by default; Edit drawing makes
-    labels draggable (add/edit-text/lead/delete) and the issue list recomputes LIVE vs the draft
-    text (delete an undescribed numeral or add the figure label and it clears). `analyzeDrawing`
-    seeds the layer from detected numerals; `saveDrawingAnnotations` persists. DONE: F2.1
-    edit/live-clear/persist; F2.2 export edited figures to PNG/SVG per figure + into the filing
-    package as `drawings/figure-NN.svg` (shared `lib/export/figure-svg.ts` buildFigureSvg/imageSize;
-    overlay drawn BLACK not review-red; editor img uses `?raw=1` same-origin to avoid canvas taint).
-    e2e `drawing-editor`/`drawing-export`.
+  - [x] F2 drawing review: the drawing edit/vectorize surface was removed after poor real-world
+    results. `DrawingEditor` is now read-only: it displays the uploaded figure/PDF, lets the user
+    run the manual vision check, and exports the original image. Filing packages preserve uploaded
+    drawing bytes rather than derived editable scenes. e2e `drawing-editor`/`drawing-export`.
   - [x] F3 real signing: USPTO S-signature (37 CFR 1.4(d)) on the inventor declaration - the
     signer's name between slashes /First M. Last/ + printed name + the 1.63 statements;
     `isValidSSignature` (lib/filing/types) shared by the sign action, filing validator (MPEP
@@ -250,31 +244,14 @@ the end of each session — but be stringent; trim before it bloats.
   (preamble macros `\psection`/`\ppar`/`\padpara`/`\pclaim`, ulem `\uline`) so it compiles on
   Overleaf/pdflatex with no special package: 1.77 order, centered underlined headings, [0001]
   paragraphs, auto Brief Description of the Drawings from each figure's view, "What is claimed is:"
-  + numbered claims, abstract + drawings each own page. Figures are baked into vector PDFs via
-  **pdf-lib** (`lib/export/figure-pdf.ts`: raster + numerals + lead lines, halo'd; FIG. N caption
-  from LaTeX) so the typeset patent shows the EDITED drawings. Button on Submission; migration 0017
+  + numbered claims, abstract + drawings each own page. Figures are baked into PDFs via
+  **pdf-lib** (`lib/export/figure-pdf.ts`; FIG. N caption from LaTeX) using the uploaded drawing
+  bytes. Button on Submission; migration 0017
   adds 'latex'. e2e `latex-export.spec.ts`. (No server-side TeX engine; user compiles.)
 
-- [x] VECTOR DRAWING EDITOR (drawings become editable objects): every uploaded drawing (image OR
-  PDF) has two views in `components/uploads/vector-drawing-editor.tsx` - "Original" (untouched
-  upload, the record) and "Edit" (a vectorized copy). Server-side pipeline `lib/vector/*`
-  (rasterize via `@napi-rs/canvas` + `pdfjs-dist` legacy; adaptive+hard-dark binarize handles
-  shaded CAD renders and noisy scans; 8-connectivity connected-components; marching-squares
-  boundary trace + RDP) turns the line-art into independent path objects the user can move,
-  resize (8 handles, opposite edge pinned), hide, delete, plus an "Add line" tool for
-  described-but-undrawn leads; undo + keyboard. Deterministic, AI-free, soft CPU cap
-  `drawing_vectorize`. Scene body is a Storage object `{projectId}/scenes/{attachmentId}.json`
-  (can be MBs); only a `vector_scene_meta` jsonb pointer + `page_index` on the row (migration
-  0019); served same-origin via the `.../scene` route. Actions `seedVectorScene`/`saveVectorScene`
-  (sanitized, `edited` gates re-seed). Multi-page PDFs split into one figure row per page at upload
-  (pdf-lib page count; shared storage_path; `deleteAttachment` only removes bytes when it's the
-  last referencing row). The EDITED scene is the drawing of record: the filing package files
-  `buildSceneSvg` (`lib/export/scene-svg.ts`) as `drawings/figure-NN.svg` when a scene exists.
-  Native modules are in next.config `serverExternalPackages` (turbopack must not bundle the .node
-  binding) + `serverActions.bodySizeLimit: 8mb` (scenes are large). e2e `vector-{editor,pdf,export}`.
-  DEFERRED (optional): LaTeX `buildScenePdf` + client PNG/SVG download from the scene; multi-angle
-  capture from a 3D model. Granularity note: objects are connected ink islands, so strokes that
-  physically touch move together (no ML segmentation of a single connected drawing).
+- [x] VECTOR DRAWING EDITOR REMOVED: the object editor produced noisy, untrustworthy traced
+  scenes on real patent drawings. Removed the UI, scene API, vector pipeline, native deps, and
+  vector-specific tests. Existing `vector_scene_meta` data may remain in old rows but is ignored.
 
 - [x] Dashboard rows open on click (`components/dashboard/openable-row.tsx`): both the attorney
   portfolio and the inventor list make the whole matter row clickable except `[data-no-open]`

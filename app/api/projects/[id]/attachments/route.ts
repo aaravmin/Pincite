@@ -13,17 +13,6 @@ const ALLOWED = [
 ];
 const MAX_BYTES = 26214400; // 25 MB, matches the bucket limit
 
-/** Page count of a PDF (pdf-lib is already a dependency); 1 on any failure. */
-async function pdfPageCount(bytes: Buffer): Promise<number> {
-  try {
-    const { PDFDocument } = await import("pdf-lib");
-    const doc = await PDFDocument.load(bytes, { updateMetadata: false });
-    return Math.max(1, doc.getPageCount());
-  } catch {
-    return 1;
-  }
-}
-
 // Upload a drawing or supporting document into the private US-region Storage bucket
 // under `{projectId}/...`. RLS enforces ownership; we also fail clearly on bad input.
 export async function POST(
@@ -81,20 +70,18 @@ export async function POST(
     .upload(path, bytes, { contentType: mime, upsert: false });
   if (upErr) return NextResponse.json({ error: upErr.message }, { status: 400 });
 
-  // A multi-page PDF drawing becomes one figure (row) per page, all sharing this PDF's bytes;
-  // each page vectorizes independently. Images and single-page PDFs are one row.
-  const pageCount =
-    mime === "application/pdf" && kind === "drawing" ? await pdfPageCount(bytes) : 1;
-  const rows = Array.from({ length: pageCount }, (_, p) => ({
-    project_id: projectId,
-    kind,
-    view,
-    storage_path: path,
-    filename: pageCount > 1 ? `${file.name} (p${p + 1})` : file.name,
-    mime,
-    size_bytes: file.size,
-    page_index: mime === "application/pdf" ? p : null,
-  }));
+  const rows = [
+    {
+      project_id: projectId,
+      kind,
+      view,
+      storage_path: path,
+      filename: file.name,
+      mime,
+      size_bytes: file.size,
+      page_index: null,
+    },
+  ];
 
   const { data: inserted, error: insErr } = await supabase
     .from("project_attachments")

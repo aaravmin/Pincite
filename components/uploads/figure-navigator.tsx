@@ -17,7 +17,7 @@ import {
   classifyOrientation,
   setAttachmentView,
 } from "@/lib/filing/actions";
-import { VectorDrawingEditor } from "@/components/uploads/vector-drawing-editor";
+import { DrawingEditor } from "@/components/uploads/drawing-editor";
 import {
   ATTACHMENT_VIEWS,
   ATTACHMENT_VIEW_LABELS,
@@ -288,15 +288,13 @@ export function FigureNavigator({
         </div>
 
         <div className="mt-3">
-          <VectorDrawingEditor
+          <DrawingEditor
             key={sel.id}
             projectId={projectId}
             attachmentId={sel.id}
             filename={sel.filename}
             mime={sel.mime}
             initialReview={sel.analysis}
-            initialAnnotations={sel.annotations}
-            initialSceneMeta={sel.vector_scene_meta}
           />
         </div>
       </div>

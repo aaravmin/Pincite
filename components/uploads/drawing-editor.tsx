@@ -1,103 +1,38 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { analyzeDrawing, saveDrawingAnnotations } from "@/lib/filing/actions";
-import { buildFigureSvg } from "@/lib/export/figure-svg";
-import type { DrawingAnnotations, DrawingReview } from "@/lib/filing/types";
-
-const EMPTY: DrawingAnnotations = { labels: [], figureLabel: null };
-
-function clamp01(n: number): number {
-  return Math.min(1, Math.max(0, Number.isFinite(n) ? n : 0));
-}
+import { analyzeDrawing } from "@/lib/filing/actions";
+import type { DrawingReview } from "@/lib/filing/types";
 
 /**
- * The drawing editor (Feature 2). By default it shows the figure with the saved reference
- * numerals as movable labels. "Edit drawing" lets you drag them, adjust lead lines, and add or
- * delete labels, then Save persists the layer. Errors never auto-compute; they appear only
- * after a manual "Check drawing (vision)".
+ * Read-only figure review. The old drawing edit/vectorize surface was intentionally removed:
+ * uploaded figures stay as their original files, and Pincite only checks and reports issues.
  */
 export function DrawingEditor({
   projectId,
   attachmentId,
   filename = "figure",
+  mime,
   initialReview = null,
-  initialAnnotations = null,
 }: {
   projectId: string;
   attachmentId: string;
   filename?: string;
+  mime: string;
   initialReview?: DrawingReview | null;
-  initialAnnotations?: DrawingAnnotations | null;
 }) {
-  const router = useRouter();
-  const boxRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const dragRef = useRef<{ id: string; kind: "label" | "lead" | "fig" } | null>(null);
-
   const [review, setReview] = useState<DrawingReview | null>(initialReview);
-  const [ann, setAnn] = useState<DrawingAnnotations>(initialAnnotations ?? EMPTY);
-  const [mode, setMode] = useState<"view" | "edit">("view");
-  const [selected, setSelected] = useState<string | null>(null);
   const [checking, start] = useTransition();
-  const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  // Stream same-origin (?raw=1) so the canvas/SVG export reads the bytes without a
-  // cross-origin taint (the default URL redirects to a signed Storage URL).
   const imgUrl = `/api/projects/${projectId}/attachments/${attachmentId}?raw=1`;
-
-  // Errors come only from a manual vision check, never automatically. These are exactly what
-  // the model saw on the last check (so it never falsely claims a missing figure label).
+  const fileUrl = `/api/projects/${projectId}/attachments/${attachmentId}`;
   const visionIssues = review?.findings ?? [];
-  const hasFigureLabel = !!ann.figureLabel?.text?.trim();
-
-  // Drag the selected label, its lead endpoint, or the figure label while in edit mode.
-  useEffect(() => {
-    if (mode !== "edit") return;
-    function toNorm(e: PointerEvent) {
-      const box = boxRef.current?.getBoundingClientRect();
-      if (!box || box.width === 0) return { x: 0, y: 0 };
-      return {
-        x: clamp01((e.clientX - box.left) / box.width),
-        y: clamp01((e.clientY - box.top) / box.height),
-      };
-    }
-    function move(e: PointerEvent) {
-      const d = dragRef.current;
-      if (!d) return;
-      const { x, y } = toNorm(e);
-      setAnn((prev) => {
-        if (d.kind === "fig") {
-          return prev.figureLabel
-            ? { ...prev, figureLabel: { ...prev.figureLabel, x, y } }
-            : prev;
-        }
-        return {
-          ...prev,
-          labels: prev.labels.map((l) =>
-            l.id === d.id
-              ? d.kind === "lead"
-                ? { ...l, lead: { x, y } }
-                : { ...l, x, y }
-              : l,
-          ),
-        };
-      });
-    }
-    function up() {
-      dragRef.current = null;
-    }
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-    return () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-    };
-  }, [mode]);
+  const isImage = mime.startsWith("image/");
+  const baseName = filename.replace(/\.[^.]+$/, "") || "figure";
 
   function runCheck() {
     setErr(null);
@@ -105,71 +40,9 @@ export function DrawingEditor({
       const r = await analyzeDrawing({ projectId, attachmentId });
       if ("error" in r) return setErr(r.error);
       setReview(r);
-      router.refresh(); // picks up the seeded annotation layer
     });
   }
 
-  function enterEdit() {
-    setAnn(initialAnnotations ?? ann);
-    setMode("edit");
-    setSelected(null);
-  }
-  function cancel() {
-    setAnn(initialAnnotations ?? EMPTY);
-    setMode("view");
-    setSelected(null);
-  }
-  async function save() {
-    setSaving(true);
-    setErr(null);
-    const r = await saveDrawingAnnotations({ projectId, attachmentId, annotations: ann });
-    setSaving(false);
-    if ("error" in r) return setErr(r.error);
-    setMode("view");
-    setSelected(null);
-    router.refresh();
-  }
-
-  function addNumeral() {
-    const t = window.prompt("Reference numeral (for example 12)");
-    if (!t || !t.trim()) return;
-    const id = `l-${Math.round(performance.now())}-${ann.labels.length}`;
-    setAnn((p) => ({
-      ...p,
-      labels: [...p.labels, { id, text: t.trim().slice(0, 40), x: 0.5, y: 0.5, lead: null }],
-    }));
-    setSelected(id);
-  }
-  function editText(id: string) {
-    const cur = ann.labels.find((l) => l.id === id);
-    const t = window.prompt("Label text", cur?.text ?? "");
-    if (t == null) return;
-    setAnn((p) => ({
-      ...p,
-      labels: p.labels.map((l) => (l.id === id ? { ...l, text: t.trim().slice(0, 40) } : l)),
-    }));
-  }
-  function toggleLead(id: string) {
-    setAnn((p) => ({
-      ...p,
-      labels: p.labels.map((l) =>
-        l.id === id
-          ? { ...l, lead: l.lead ? null : { x: clamp01(l.x + 0.12), y: clamp01(l.y + 0.12) } }
-          : l,
-      ),
-    }));
-  }
-  function del(id: string) {
-    setAnn((p) => ({ ...p, labels: p.labels.filter((l) => l.id !== id) }));
-    setSelected(null);
-  }
-  function addFigureLabel() {
-    const t = window.prompt("Figure label (for example FIG. 1)", "FIG. 1");
-    if (!t || !t.trim()) return;
-    setAnn((p) => ({ ...p, figureLabel: { text: t.trim().slice(0, 40), x: 0.5, y: 0.93 } }));
-  }
-
-  const baseName = filename.replace(/\.[^.]+$/, "") || "figure";
   function downloadBlob(blob: Blob, name: string) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -180,87 +53,16 @@ export function DrawingEditor({
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  // Wait for the figure to be decoded before exporting (it may still be loading after a save).
-  async function readyImage(): Promise<HTMLImageElement | null> {
-    const img = imgRef.current;
-    if (!img) return null;
-    if (!img.complete || !img.naturalWidth) {
-      try {
-        await img.decode();
-      } catch {
-        /* fall through to the naturalWidth check */
-      }
-    }
-    return img.naturalWidth ? img : null;
-  }
-  // Export the figure with the annotation layer baked in. Black on a white halo, since a filed
-  // drawing is black-and-white line art.
-  async function exportPng() {
-    const img = await readyImage();
-    if (!img) return;
-    const W = img.naturalWidth;
-    const H = img.naturalHeight;
-    const canvas = document.createElement("canvas");
-    canvas.width = W;
-    canvas.height = H;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.drawImage(img, 0, 0, W, H);
-    const font = Math.max(12, Math.round(Math.min(W, H) * 0.03));
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = Math.max(1, font / 12);
-    for (const l of ann.labels) {
-      if (l.lead) {
-        ctx.beginPath();
-        ctx.moveTo(l.x * W, l.y * H);
-        ctx.lineTo(l.lead.x * W, l.lead.y * H);
-        ctx.stroke();
-      }
-    }
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    const draw = (t: string, x: number, y: number, size: number) => {
-      ctx.font = `bold ${size}px Arial, Helvetica, sans-serif`;
-      ctx.lineWidth = size / 2.5;
-      ctx.strokeStyle = "#ffffff";
-      ctx.strokeText(t, x, y);
-      ctx.fillStyle = "#000000";
-      ctx.fillText(t, x, y);
-    };
-    for (const l of ann.labels) draw(l.text || "?", l.x * W, l.y * H, font);
-    if (ann.figureLabel?.text)
-      draw(ann.figureLabel.text, ann.figureLabel.x * W, ann.figureLabel.y * H, Math.round(font * 1.1));
-    canvas.toBlob((b) => {
-      if (b) downloadBlob(b, `${baseName}.png`);
-    }, "image/png");
-  }
-  async function exportSvg() {
-    const img = await readyImage();
-    if (!img) return;
-    const blob = await (await fetch(imgUrl)).blob();
-    const dataUrl = await new Promise<string>((res) => {
-      const fr = new FileReader();
-      fr.onload = () => res(fr.result as string);
-      fr.readAsDataURL(blob);
-    });
-    const svg = buildFigureSvg({
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-      imageHref: dataUrl,
-      annotations: ann,
-    });
-    downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${baseName}.svg`);
-  }
 
-  const editing = mode === "edit";
+  async function exportOriginal() {
+    const blob = await (await fetch(imgUrl)).blob();
+    const ext = filename.split(".").pop()?.toLowerCase() || "png";
+    downloadBlob(blob, `${baseName}.${ext}`);
+  }
 
   return (
     <div>
-      <div
-        ref={boxRef}
-        className="relative inline-block max-w-full select-none"
-        style={{ touchAction: editing ? "none" : undefined }}
-      >
+      {isImage ? (
         <img
           ref={imgRef}
           src={imgUrl}
@@ -268,182 +70,41 @@ export function DrawingEditor({
           className="max-h-[460px] w-auto rounded border border-border"
           draggable={false}
         />
-
-        {/* Lead lines. */}
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute inset-0 size-full"
-          aria-hidden
-        >
-          {ann.labels.map((l) =>
-            l.lead ? (
-              <line
-                key={l.id}
-                x1={l.x * 100}
-                y1={l.y * 100}
-                x2={l.lead.x * 100}
-                y2={l.lead.y * 100}
-                stroke="var(--foreground)"
-                strokeWidth={1}
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null,
-          )}
-        </svg>
-
-        {/* Numeral labels. */}
-        {ann.labels.map((l) => {
-          const sel = selected === l.id;
-          return (
-            <button
-              key={l.id}
-              type="button"
-              disabled={!editing}
-              onPointerDown={(e) => {
-                if (!editing) return;
-                dragRef.current = { id: l.id, kind: "label" };
-                setSelected(l.id);
-                e.currentTarget.setPointerCapture?.(e.pointerId);
-              }}
-              style={{ left: `${l.x * 100}%`, top: `${l.y * 100}%` }}
-              className={
-                "absolute flex min-w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-foreground bg-background/80 px-1.5 text-[11px] font-semibold text-foreground" +
-                (editing ? " cursor-grab active:cursor-grabbing" : "") +
-                (sel ? " ring-2 ring-foreground ring-offset-1" : "")
-              }
-            >
-              {l.text || "?"}
-            </button>
-          );
-        })}
-
-        {/* Lead-line endpoint handles (edit mode only). */}
-        {editing &&
-          ann.labels.map((l) =>
-            l.lead ? (
-              <span
-                key={`h-${l.id}`}
-                onPointerDown={(e) => {
-                  dragRef.current = { id: l.id, kind: "lead" };
-                  setSelected(l.id);
-                  (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
-                }}
-                style={{ left: `${l.lead.x * 100}%`, top: `${l.lead.y * 100}%` }}
-                className="absolute size-3 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border border-foreground bg-background"
-              />
-            ) : null,
-          )}
-
-        {/* Figure label. */}
-        {ann.figureLabel?.text && (
-          <button
-            type="button"
-            disabled={!editing}
-            onPointerDown={(e) => {
-              if (!editing) return;
-              dragRef.current = { id: "fig", kind: "fig" };
-              e.currentTarget.setPointerCapture?.(e.pointerId);
-            }}
-            style={{ left: `${ann.figureLabel.x * 100}%`, top: `${ann.figureLabel.y * 100}%` }}
-            className={
-              "absolute -translate-x-1/2 -translate-y-1/2 rounded bg-background/80 px-1.5 text-xs font-semibold text-foreground " +
-              (editing ? "cursor-grab active:cursor-grabbing" : "")
-            }
-          >
-            {ann.figureLabel.text}
-          </button>
-        )}
-      </div>
-
-      {/* Toolbar. */}
-      <div className="mt-2 flex flex-wrap items-center gap-2">
-        {!editing ? (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={runCheck}
-              disabled={checking}
-              data-testid="describe-drawing"
-            >
-              {checking
-                ? "Reading the figure…"
-                : review
-                  ? "Re-check this figure"
-                  : "Check this figure"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={enterEdit}
-              data-testid="edit-drawing"
-            >
-              Edit drawing
-            </Button>
-            <span className="mx-1 h-5 w-px bg-border" aria-hidden />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={exportPng}
-              data-testid="export-png"
-            >
-              Export PNG
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={exportSvg}
-              data-testid="export-svg"
-            >
-              Export SVG
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="outline" size="sm" onClick={addNumeral} data-testid="add-numeral">
-              Add numeral
-            </Button>
-            <Button variant="outline" size="sm" onClick={addFigureLabel} disabled={hasFigureLabel}>
-              Add figure label
-            </Button>
-            {selected && (
-              <>
-                <Button variant="outline" size="sm" onClick={() => editText(selected)}>
-                  Edit text
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => toggleLead(selected)}>
-                  {ann.labels.find((l) => l.id === selected)?.lead
-                    ? "Remove lead line"
-                    : "Add lead line"}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => del(selected)}
-                  data-testid="delete-label"
-                >
-                  Delete
-                </Button>
-              </>
-            )}
-            <span className="mx-1 h-5 w-px bg-border" aria-hidden />
-            <Button size="sm" onClick={save} disabled={saving} data-testid="save-drawing">
-              {saving ? "Saving…" : "Save"}
-            </Button>
-            <Button variant="outline" size="sm" onClick={cancel} disabled={saving}>
-              Cancel
-            </Button>
-          </>
-        )}
-      </div>
-
-      {editing && (
-        <p className="mt-2 text-xs text-muted-foreground">
-          Drag a numeral to reposition it. Select one to edit its text, add or move a lead line
-          to the part, or delete it, then Save.
-        </p>
+      ) : (
+        <iframe
+          title={filename}
+          src={fileUrl}
+          className="h-[520px] w-full rounded border border-border"
+        />
       )}
+
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {isImage && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={runCheck}
+            disabled={checking}
+            data-testid="describe-drawing"
+          >
+            {checking
+              ? "Reading the figure..."
+              : review
+                ? "Re-check this figure"
+                : "Check this figure"}
+          </Button>
+        )}
+        {isImage && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportOriginal}
+            data-testid="export-original"
+          >
+            Export original
+          </Button>
+        )}
+      </div>
 
       {err && (
         <p className="mt-2 text-sm text-violation" role="alert">
@@ -451,16 +112,14 @@ export function DrawingEditor({
         </p>
       )}
 
-      {/* Make it obvious the figure is read, and tied to the draft, before any check has run. */}
-      {!review && !editing && (
+      {isImage && !review && (
         <p className="mt-2 text-xs text-muted-foreground">
           Not checked yet. Checking reads this figure and flags any reference numerals that
           aren&apos;t described in your draft.
         </p>
       )}
 
-      {/* Issues only appear after a manual drawing check, never automatically. */}
-      {review && !editing && (
+      {review && (
         <div className="mt-3 space-y-3">
           {visionIssues.length === 0 ? (
             <p className="flex items-center gap-1.5 text-sm text-pass">
@@ -470,7 +129,7 @@ export function DrawingEditor({
           ) : (
             <div>
               <p
-                className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                className="text-xs font-medium uppercase text-muted-foreground"
                 data-testid="drawing-issue-count"
               >
                 Drawing issues ({visionIssues.length})
@@ -500,7 +159,7 @@ export function DrawingEditor({
 
           {review.summary && (
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <p className="text-xs font-medium uppercase text-muted-foreground">
                 What the figure shows
               </p>
               <p className="text-sm text-muted-foreground">{review.summary}</p>

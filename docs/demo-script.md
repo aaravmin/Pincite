@@ -38,9 +38,9 @@ Do. Open the Claims section. Point at the tree, trace claim 1 down to its depend
 
 ### 1.35 Drawings
 
-Say. "Now the drawings. The patent drew most of these sheets sideways, so I just rotate one upright, and the straightened version is what gets saved and checked. When I open the editor, every reference number on the figure becomes a label I can drag, each with a lead line to the part it points at. And the issue list updates live. So if I delete a number the spec never describes, that error clears on the spot. I can also have Pincite read a figure and set its view for me, and run a check across every figure at once. Each figure exports on its own, and they all flow into the final filing."
+Say. "Now the drawings. The patent drew most of these sheets sideways, so I just rotate one upright, and the straightened version is what gets saved and checked. I can have Pincite read a figure and set its view for me, and run a check across every figure at once. The drawings stay as the uploaded files; Pincite checks them, but it does not rewrite the artwork."
 
-Do. Rotate a sideways figure upright. Open Edit drawing, drag a numeral, add a lead line, delete one and watch the issue clear, then Save. Click Check all drawings and let the red circles land on the undescribed numbers. Show Export PNG and Export SVG on a figure.
+Do. Rotate a sideways figure upright. Click Check all drawings and let the issue list land on the undescribed numbers. Show Export original on a figure.
 
 ### 2.25 Review, the main event
 

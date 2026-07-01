@@ -13,8 +13,6 @@ import {
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getAttachments } from "@/lib/filing/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { buildFigureSvg, imageSize } from "@/lib/export/figure-svg";
-import { buildSceneSvg } from "@/lib/export/scene-svg";
 import {
   buildPatentLatex,
   buildLatexReadme,
@@ -78,7 +76,7 @@ async function renderPatentPdf(id: string): Promise<Uint8Array | null> {
     const pdf = await buildFigurePdf({
       bytes,
       mime: a.mime,
-      annotations: a.annotations,
+      annotations: null,
       includeFigureLabel: false,
     });
     if (pdf) {
@@ -215,7 +213,7 @@ export async function GET(
       const pdf = await buildFigurePdf({
         bytes,
         mime: a.mime,
-        annotations: a.annotations,
+        annotations: null,
         includeFigureLabel: false,
       });
       if (pdf) {
@@ -270,47 +268,27 @@ export async function GET(
     );
     zip.file("transmittal-and-fees.txt", buildTransmittalAndFeesText(project));
 
-    // Drawings, in order. A figure the user has vectorized is filed as its EDITED vector scene
-    // (the drawing of record); this is what carries edits into the filed output and lets a
-    // vectorized PDF into the package. An un-vectorized image falls back to the raster with its
-    // annotation layer baked in; a raw PDF (which can't be embedded here) is skipped.
-    const figures = attachments.filter(
-      (a) => a.kind === "drawing" && (a.vector_scene_meta || a.mime.startsWith("image/")),
-    );
+    // Drawings, in order. The edit/vectorize surface was removed, so the filing package keeps
+    // the user's uploaded drawing files as-is instead of filing derived editable scenes.
+    const figures = attachments.filter((a) => a.kind === "drawing");
     if (figures.length > 0) {
       let n = 0;
       for (const f of figures) {
         n++;
-        const stem = `drawings/figure-${String(n).padStart(2, "0")}`;
-        if (f.vector_scene_meta) {
-          const { data: sceneBlob } = await admin.storage
-            .from("project-files")
-            .download(f.vector_scene_meta.storagePath);
-          if (!sceneBlob) continue;
-          zip.file(`${stem}.svg`, buildSceneSvg(JSON.parse(await sceneBlob.text())));
-          continue;
-        }
         const { data: blob } = await admin.storage
           .from("project-files")
           .download(f.storage_path);
         if (!blob) continue;
         const bytes = new Uint8Array(await blob.arrayBuffer());
-        const dims = imageSize(bytes);
-        if (dims) {
-          const dataUrl = `data:${f.mime};base64,${Buffer.from(bytes).toString("base64")}`;
-          zip.file(
-            `${stem}.svg`,
-            buildFigureSvg({
-              width: dims.width,
-              height: dims.height,
-              imageHref: dataUrl,
-              annotations: f.annotations,
-            }),
-          );
-        } else {
-          const ext = (f.filename.split(".").pop() || "img").toLowerCase();
-          zip.file(`${stem}.${ext}`, bytes);
-        }
+        const ext =
+          f.mime === "application/pdf"
+            ? "pdf"
+            : f.mime === "image/png"
+              ? "png"
+              : f.mime === "image/jpeg"
+                ? "jpg"
+                : (f.filename.split(".").pop() || "img").toLowerCase();
+        zip.file(`drawings/figure-${String(n).padStart(2, "0")}.${ext}`, bytes);
       }
     }
 
