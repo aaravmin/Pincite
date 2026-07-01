@@ -64,14 +64,17 @@ export function Review() {
 
   return (
     <Scene
-      // headline, over to the issue counter as it ticks, down to the checks grid
+      // headline, over to the issue counter as it ticks, down to the two
+      // violations, then to the checks grid
       hue={[
         { f: 0, x: 50, y: 16 },
-        { f: 22, x: 50, y: 16 },
-        { f: 50, x: 66, y: 34 },
-        { f: 82, x: 66, y: 34 },
-        { f: 116, x: 50, y: 74 },
-        { f: 165, x: 50, y: 72 },
+        { f: 20, x: 50, y: 16 },
+        { f: 46, x: 68, y: 42 },
+        { f: 68, x: 68, y: 42 },
+        { f: 92, x: 50, y: 60 },
+        { f: 110, x: 50, y: 60 },
+        { f: 132, x: 50, y: 76 },
+        { f: 165, x: 50, y: 76 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>
@@ -82,10 +85,10 @@ export function Review() {
           style={{ fontSize: 74, fontWeight: 700, color: COLORS.foreground }}
         />
 
-        {/* same 1560 rail as the checks grid below, top edges shared, so the
-            editor lines up with everything else in the scene */}
-        <div style={{ marginTop: 44, display: "flex", gap: 48, alignItems: "flex-start", width: "100%", maxWidth: 1560 }}>
-          <div style={{ flex: 1.1 }}>
+        {/* same 1560 rail as the rows below, top edges shared, so the editor
+            lines up with everything else in the scene */}
+        <div style={{ marginTop: 40, display: "flex", gap: 48, alignItems: "center", width: "100%", maxWidth: 1560 }}>
+          <div style={{ flex: 1.15 }}>
             <AnnotatedEditor
               text={CLAIMS}
               spans={SPANS}
@@ -96,7 +99,7 @@ export function Review() {
             />
           </div>
 
-          <div style={{ flex: 0.9 }}>
+          <div style={{ flex: 0.85 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
               <span
                 className="font-serif"
@@ -108,28 +111,31 @@ export function Review() {
                 issues found
               </span>
             </div>
-            <div style={{ marginTop: 26, display: "flex", flexDirection: "column", gap: 16 }}>
-              {FINDINGS.map((f, i) => {
-                const sp = spring({ frame: frame - (44 + i * 18), fps, config: { damping: 200 } });
-                return (
-                  <div
-                    key={i}
-                    style={{ opacity: sp, transform: `translateX(${interpolate(sp, [0, 1], [48, 0])}px)` }}
-                    className="rounded-2xl border bg-card p-5 shadow-sm"
-                  >
-                    <div className="flex items-center gap-2">
-                      <SignalBadge signal="red">Violation</SignalBadge>
-                      <span className="text-[15px] text-muted-foreground">{f.area}</span>
-                    </div>
-                    <p className="mt-2.5 text-[22px] font-medium leading-snug text-foreground">{f.title}</p>
-                  </div>
-                );
-              })}
-            </div>
+            <p className="mt-3 text-[20px] text-muted-foreground">Each one traces to the exact rule it breaks</p>
           </div>
         </div>
 
-        <div style={{ marginTop: 48, width: "100%", maxWidth: 1560, opacity: trackerT }}>
+        {/* the two violations, laid horizontally right above the checks */}
+        <div style={{ marginTop: 30, width: "100%", maxWidth: 1560 }} className="grid grid-cols-2 gap-4">
+          {FINDINGS.map((f, i) => {
+            const sp = spring({ frame: frame - (44 + i * 16), fps, config: { damping: 200 } });
+            return (
+              <div
+                key={i}
+                style={{ opacity: sp, transform: `translateY(${interpolate(sp, [0, 1], [16, 0])}px)` }}
+                className="rounded-2xl border bg-card p-5 shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <SignalBadge signal="red">Violation</SignalBadge>
+                  <span className="text-[15px] text-muted-foreground">{f.area}</span>
+                </div>
+                <p className="mt-2.5 text-[22px] font-medium leading-snug text-foreground">{f.title}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ marginTop: 22, width: "100%", maxWidth: 1560, opacity: trackerT }}>
           <div className="mb-4 text-[22px] font-medium text-muted-foreground">Checks Pincite ran on the claims</div>
           <div className="grid grid-cols-3 gap-4">
             {CHECKS.map((c, i) => {

@@ -50,16 +50,18 @@ export function PriorArt() {
 
   return (
     <Scene
-      // headline, onto your claim, down to the prior patent as it lands, then
-      // over to the ranked overlap list as the bars fill
+      // headline, onto your claim, down to the prior patent, onto the violation
+      // banner as it lands, then over to the ranked overlap list as bars fill
       hue={[
         { f: 0, x: 50, y: 14 },
-        { f: 24, x: 50, y: 14 },
-        { f: 58, x: 34, y: 42 },
-        { f: 92, x: 34, y: 58 },
-        { f: 130, x: 76, y: 50 },
-        { f: 172, x: 76, y: 52 },
-        { f: 205, x: 62, y: 48 },
+        { f: 22, x: 50, y: 14 },
+        { f: 50, x: 32, y: 40 },
+        { f: 78, x: 32, y: 52 },
+        { f: 100, x: 50, y: 80 },
+        { f: 118, x: 50, y: 80 },
+        { f: 140, x: 76, y: 46 },
+        { f: 190, x: 76, y: 48 },
+        { f: 205, x: 60, y: 60 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "44px 90px" }}>
@@ -73,65 +75,80 @@ export function PriorArt() {
           <p className="mt-2 text-[22px] text-muted-foreground">{LINES.priorartSub}</p>
         </div>
 
-        <div style={{ marginTop: 34, display: "flex", gap: 26, alignItems: "stretch", width: "100%", maxWidth: 1480 }}>
-          {/* LEFT: the overlap, made explicit and readable */}
-          <div style={{ flex: 1.4 }} className="rounded-2xl border bg-card p-7">
-            {/* your claim */}
-            <div style={{ opacity: leftIn, transform: `translateY(${interpolate(leftIn, [0, 1], [16, 0])}px)` }}>
-              <div className="mb-2 flex items-center gap-2.5">
-                <span className="rounded-md bg-foreground px-2.5 py-1 text-[15px] font-semibold text-background">Your claim</span>
-                <span className="text-[15px] text-muted-foreground">a limitation you drafted</span>
+        {/* two cards (your claim + the ranked list) share a top edge, and the
+            violation reads full width across the bottom, spanning both */}
+        <div style={{ marginTop: 30, display: "flex", flexDirection: "column", gap: 22, width: "100%", maxWidth: 1480 }}>
+          <div style={{ display: "flex", gap: 26, alignItems: "stretch" }}>
+            {/* LEFT: the overlap, made explicit and readable */}
+            <div style={{ flex: 1.4 }} className="rounded-2xl border bg-card p-7">
+              {/* your claim */}
+              <div style={{ opacity: leftIn, transform: `translateY(${interpolate(leftIn, [0, 1], [16, 0])}px)` }}>
+                <div className="mb-2 flex items-center gap-2.5">
+                  <span className="rounded-md bg-foreground px-2.5 py-1 text-[15px] font-semibold text-background">Your claim</span>
+                  <span className="text-[15px] text-muted-foreground">a limitation you drafted</span>
+                </div>
+                <p className="text-[25px] font-medium leading-snug text-foreground">
+                  a plurality of <span style={yellowMark}>openings arranged to carry moisture</span> out of the container
+                </p>
               </div>
-              <p className="text-[25px] font-medium leading-snug text-foreground">
-                a plurality of <span style={yellowMark}>openings arranged to carry moisture</span> out of the container
-              </p>
-            </div>
 
-            {/* connector */}
-            <div className="my-5 flex items-center gap-4" style={{ opacity: priorIn }}>
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-[16px] font-medium text-muted-foreground">already disclosed by a granted patent</span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-
-            {/* the prior patent */}
-            <div style={{ opacity: priorIn, transform: `translateY(${interpolate(priorIn, [0, 1], [16, 0])}px)` }}>
-              <div className="mb-2 flex items-center gap-2.5">
-                <span className="rounded-md border px-2.5 py-1 font-mono text-[15px] font-semibold text-foreground">US 5,947,321</span>
-                <span className="text-[15px] text-muted-foreground">Vented food container, granted 1999</span>
+              {/* connector */}
+              <div className="my-5 flex items-center gap-4" style={{ opacity: priorIn }}>
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-[16px] font-medium text-muted-foreground">already disclosed by a granted patent</span>
+                <div className="h-px flex-1 bg-border" />
               </div>
-              <p className="text-[25px] font-medium leading-snug text-foreground">
-                elongated <span style={redMark}>slots dimensioned to release moisture</span> from the enclosed space
-              </p>
+
+              {/* the prior patent */}
+              <div style={{ opacity: priorIn, transform: `translateY(${interpolate(priorIn, [0, 1], [16, 0])}px)` }}>
+                <div className="mb-2 flex items-center gap-2.5">
+                  <span className="rounded-md border px-2.5 py-1 font-mono text-[15px] font-semibold text-foreground">US 5,947,321</span>
+                  <span className="text-[15px] text-muted-foreground">Vented food container, granted 1999</span>
+                </div>
+                <p className="text-[25px] font-medium leading-snug text-foreground">
+                  elongated <span style={redMark}>slots dimensioned to release moisture</span> from the enclosed space
+                </p>
+              </div>
             </div>
 
-            {/* the reason it matters (replaces the pill) */}
+            {/* RIGHT: where else you overlap, ranked - top aligned with the left */}
             <div
-              style={{ opacity: explainIn, transform: `translateY(${interpolate(explainIn, [0, 1], [14, 0])}px)` }}
-              className="mt-7 flex items-start gap-3.5 rounded-xl border border-violation bg-violation-bg p-4"
+              style={{ flex: 1, opacity: rightIn, transform: `translateX(${interpolate(rightIn, [0, 1], [40, 0])}px)` }}
+              className="flex flex-col rounded-2xl border bg-card p-7"
             >
-              <div className="shrink-0">
-                <SignalBadge signal="red">Overlapping limitation</SignalBadge>
+              <div className="mb-4">
+                <h3 className="text-[20px] font-semibold text-foreground">Overlap with prior patents</h3>
+                <span className="text-[14px] text-muted-foreground">A similarity signal, not a novelty verdict</span>
               </div>
-              <p className="text-[18px] leading-snug text-foreground">
-                Your element reads onto what US 5,947,321 already claims, so it cannot make the invention novel on its own. Narrow it, or point to what is genuinely different.
+              <BarList items={MATCHES} progress={barProgress} />
+              <p className="mt-5 text-[15px] text-muted-foreground">
+                No single score, you see exactly where you overlap and decide
               </p>
             </div>
           </div>
 
-          {/* RIGHT: where else you overlap, ranked */}
+          {/* the violation, full width across the bottom: it is a near-identical
+              overlap - the same limitation in different words */}
           <div
-            style={{ flex: 1, opacity: rightIn, transform: `translateX(${interpolate(rightIn, [0, 1], [40, 0])}px)` }}
-            className="flex flex-col justify-center rounded-2xl border bg-card p-6"
+            style={{ opacity: explainIn, transform: `translateY(${interpolate(explainIn, [0, 1], [14, 0])}px)` }}
+            className="flex items-center gap-6 rounded-2xl border border-violation bg-violation-bg px-6 py-5"
           >
-            <div className="mb-4">
-              <h3 className="text-[20px] font-semibold text-foreground">Overlap with prior patents</h3>
-              <span className="text-[14px] text-muted-foreground">A similarity signal, not a novelty verdict</span>
+            <div className="flex shrink-0 flex-col items-start gap-2">
+              <SignalBadge signal="red">Violation</SignalBadge>
+              <div className="text-[26px] font-bold leading-tight text-violation">Almost a direct overlap</div>
             </div>
-            <BarList items={MATCHES} progress={barProgress} />
-            <p className="mt-5 text-[15px] text-muted-foreground">
-              No single score, you see exactly where you overlap and decide
-            </p>
+            <div className="h-16 w-px shrink-0 bg-violation/25" />
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="rounded-md border bg-card px-2.5 py-1 text-[16px] font-medium text-foreground">openings to carry moisture</span>
+                <span className="text-[22px] font-bold text-foreground">≈</span>
+                <span className="rounded-md border bg-card px-2.5 py-1 text-[16px] font-medium text-foreground">slots to release moisture</span>
+                <span className="text-[15px] text-muted-foreground">the same limitation, worded differently</span>
+              </div>
+              <p className="mt-2.5 text-[17px] leading-snug text-foreground">
+                It reads onto what US 5,947,321 already claims, so it cannot make the invention novel on its own. Narrow it, or point to what is genuinely different.
+              </p>
+            </div>
           </div>
         </div>
       </AbsoluteFill>
