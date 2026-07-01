@@ -1,26 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { BlurFade } from "@/components/ui/blur-fade";
-import { AnimatedBeam } from "@/components/ui/animated-beam";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { cn } from "@/lib/utils";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
 import { SignalBadge } from "@visual/signal";
 import { useReveal } from "@visual/reveal";
 import {
-  APPLE_MULTI_CLAIMS,
-  APPLE_MULTI_SPANS,
+  APPLE_HERO_CLAIMS,
+  APPLE_HERO_SPANS,
   APPLE_META,
-  MULTI_DEPENDENT_FINDING,
+  CLAIM6_FINDING,
+  CLAIM6_FLAG_ID,
 } from "@visual/fixtures/apple-example";
-
-const FLAG_ID = "multi-dependent";
 
 export function Hero() {
   return (
@@ -43,13 +40,14 @@ export function Hero() {
             as="h1"
             by="word"
             animation="blurInUp"
+            duration={0.9}
             once
             className="mt-5 text-balance font-rounded text-4xl font-semibold leading-[1.03] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
           >
             Nine in ten applications get rejected the first time
           </TextAnimate>
 
-          <BlurFade delay={0.35} inView>
+          <BlurFade delay={0.5} inView>
             <p className="mt-6 max-w-lg text-pretty text-xl leading-relaxed text-muted-foreground">
               Most of them for preventable rule violations. Pincite catches those in your draft and
               pins each one to the real MPEP and CFR text. It also compares your claims against prior
@@ -57,7 +55,7 @@ export function Hero() {
             </p>
           </BlurFade>
 
-          <BlurFade delay={0.5} inView>
+          <BlurFade delay={0.65} inView>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/login"
@@ -69,7 +67,7 @@ export function Hero() {
             </div>
           </BlurFade>
 
-          <BlurFade delay={0.65} inView>
+          <BlurFade delay={0.8} inView>
             <div className="mt-9">
               <p className="text-xs font-medium text-muted-foreground">
                 We only ever tell you three things
@@ -83,126 +81,157 @@ export function Hero() {
           </BlurFade>
         </div>
 
-        {/* right: the live mini-demo (real product component) */}
-        <HeroDemo />
+        {/* right: one live review surface (real product components) */}
+        <BlurFade delay={0.3} inView className="lg:pl-2">
+          <HeroReview />
+        </BlurFade>
       </div>
     </section>
   );
 }
 
-function HeroDemo() {
-  const { ref, progress } = useReveal({ amount: 0.15, duration: 1100 });
-  // Default the flag open so the value reads instantly; hover keeps control.
-  const [active, setActive] = useState<string | null>(FLAG_ID);
-  // Two-way link: hovering the flagged text OR the finding card lights both up,
-  // making the "this flag opens this rule" connection tangible.
-  const [linked, setLinked] = useState(false);
-  const finding = MULTI_DEPENDENT_FINDING;
-
-  const container = useRef<HTMLDivElement>(null);
-  const fromRef = useRef<HTMLDivElement>(null);
-  const toRef = useRef<HTMLDivElement>(null);
-  const revealed = progress > 0.45;
+// One seamless surface: the draft at the top, and the review that reads off it
+// attached directly below. The flag opens into its exact rule at three levels,
+// and the guidance resolves to the real MPEP passage you can pull up in place.
+function HeroReview() {
+  const { ref, progress } = useReveal({ amount: 0.2, duration: 1200 });
+  const f = CLAIM6_FINDING;
 
   return (
-    <div ref={ref as React.Ref<HTMLDivElement>} className="relative">
-      <div ref={container} className="relative">
-        {/* the draft, with the live flag */}
-        <div className="group relative transition-transform duration-300 will-change-transform hover:-translate-y-0.5">
-          <AnnotatedEditor
-            text={APPLE_MULTI_CLAIMS}
-            spans={APPLE_MULTI_SPANS}
-            activeFlagId={active}
-            progress={progress}
-            caption={APPLE_META.claimsCaption}
-            onActivateFlag={(id) => {
-              setActive(id ?? FLAG_ID);
-              setLinked(id != null);
-            }}
-            className="shadow-md"
-          />
-          {/* connector origin, a neutral port sitting on the editor's lower edge */}
-          <span
-            ref={fromRef}
-            aria-hidden
-            className={cn(
-              "absolute -bottom-1.5 left-8 size-3 rounded-full border-2 bg-card transition-colors duration-300",
-              linked ? "border-foreground" : "border-border",
-            )}
-          />
-        </div>
+    <div
+      ref={ref as React.Ref<HTMLDivElement>}
+      className="overflow-hidden rounded-2xl border bg-card shadow-xl"
+    >
+      {/* the draft, flush at the top of the surface */}
+      <AnnotatedEditor
+        text={APPLE_HERO_CLAIMS}
+        spans={APPLE_HERO_SPANS}
+        activeFlagId={CLAIM6_FLAG_ID}
+        progress={progress}
+        caption={APPLE_META.claimsCaption}
+        className="rounded-none border-0 shadow-none"
+      />
 
-        {/* the finding peek, wired to the flag above */}
-        <motion.div
-          initial={false}
-          animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : 12 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          onMouseEnter={() => setLinked(true)}
-          onMouseLeave={() => setLinked(false)}
-          className={cn(
-            "relative mx-3 mt-9 rounded-xl border bg-card p-4 shadow-lg transition-all duration-300 sm:mx-6",
-            linked
-              ? "-translate-y-0.5 shadow-xl ring-2 ring-violation/35"
-              : "ring-1 ring-transparent",
-          )}
-        >
-          {/* matching connector port, so the trace beam plugs into the finding */}
-          <span
-            ref={toRef}
-            aria-hidden
-            className={cn(
-              "absolute -top-1.5 left-8 size-3 rounded-full border-2 bg-card transition-colors duration-300",
-              linked ? "border-foreground" : "border-border",
-            )}
-          />
-          {revealed ? (
-            <BorderBeam
-              size={90}
-              duration={8}
-              className="opacity-60"
-              colorFrom="var(--muted-foreground)"
-              colorTo="var(--foreground)"
-            />
-          ) : null}
-
-          <div className="mb-2 flex items-center gap-2">
+      {/* the review, attached with no seam */}
+      <div className="space-y-5 border-t p-5 sm:p-6">
+        {/* the finding */}
+        <div>
+          <div className="flex items-center gap-2">
             <SignalBadge signal="red">Violation</SignalBadge>
             <span className="text-xs text-muted-foreground">Claims</span>
           </div>
-          <p className="text-sm font-medium text-foreground">{finding.title}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{finding.explanation}</p>
+          <p className="mt-2.5 text-[15px] font-semibold leading-snug text-foreground">{f.title}</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{f.explanation}</p>
+        </div>
 
-          <div className="mt-3.5 border-t pt-3.5">
-            <CitationStack
-              dense
-              law={finding.citation.law}
-              cfr={finding.citation.cfr}
-              mpep={finding.citation.mpep}
-              guidance={finding.citation.guidance}
-              excerpt={finding.citation.excerpt}
-              progress={progress}
-              hideSource
-              helperLine="The same requirement at three levels."
-            />
-          </div>
-        </motion.div>
+        {/* the same rule, at three levels */}
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            The same rule, at three levels
+          </p>
+          <CitationStack
+            dense
+            law={f.citation.law}
+            cfr={f.citation.cfr}
+            mpep={f.citation.mpep}
+            guidance={f.citation.guidance}
+            progress={progress}
+            hideSource
+            helperLine=""
+          />
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+            The law and the rule set the requirement. The guidance is the part that tells you exactly
+            how to fix it.
+          </p>
+        </div>
 
-        {/* the trace line: a light travels from the flagged draft into its finding */}
-        <AnimatedBeam
-          containerRef={container}
-          fromRef={fromRef}
-          toRef={toRef}
-          curvature={0}
-          duration={4}
-          pathColor="var(--border)"
-          pathWidth={2}
-          pathOpacity={1}
-          gradientStartColor="var(--foreground)"
-          gradientStopColor="var(--muted-foreground)"
-          startYOffset={3}
-          endYOffset={-3}
-        />
+        {/* pull up the exact MPEP text the guidance rests on */}
+        <MpepReveal mpep={f.citation.mpep!} passage={f.citation.excerpt!} progress={progress} />
       </div>
+    </div>
+  );
+}
+
+// The proof that nothing is guessed: open the exact MPEP passage the citation
+// resolves to, highlighted to the clause that governs. Collapsed by default, so
+// the surface stays calm until you ask for the receipt.
+function MpepReveal({
+  mpep,
+  passage,
+  progress,
+}: {
+  mpep: string;
+  passage: string;
+  progress: number;
+}) {
+  const [open, setOpen] = useState(false);
+  // the governing clause inside the verbatim passage
+  const key = "referring back to and further limiting another claim";
+  const at = passage.indexOf(key);
+  const before = at >= 0 ? passage.slice(0, at) : passage;
+  const hit = at >= 0 ? passage.slice(at, at + key.length) : "";
+  const after = at >= 0 ? passage.slice(at + key.length) : "";
+
+  return (
+    <div
+      style={{ opacity: progress > 0.75 ? 1 : 0 }}
+      className="rounded-xl border bg-muted/20 transition-opacity duration-500"
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition-colors hover:bg-muted/40"
+      >
+        <span className="flex items-center gap-2.5">
+          <span className="flex size-7 items-center justify-center rounded-md border bg-card text-muted-foreground">
+            <BookOpen className="size-4" aria-hidden />
+          </span>
+          <span className="text-sm font-medium text-foreground">Open the exact MPEP text</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="hidden font-mono text-xs text-muted-foreground sm:inline">MPEP {mpep}</span>
+          <ChevronDown
+            className={cn("size-4 text-muted-foreground transition-transform duration-300", open && "rotate-180")}
+            aria-hidden
+          />
+        </span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open ? (
+          <motion.div
+            key="mpep"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4">
+              <div className="overflow-hidden rounded-lg border bg-card">
+                <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-3 py-2">
+                  <span className="font-mono text-[11px] text-muted-foreground">
+                    MPEP {mpep} . Dependent Claims
+                  </span>
+                  <span className="font-mono text-[11px] text-muted-foreground">USPTO corpus</span>
+                </div>
+                <p className="px-3 py-3 font-mono text-[12.5px] leading-relaxed text-foreground/90">
+                  {before}
+                  <mark className="rounded-[3px] bg-attention-bg px-0.5 text-attention-foreground underline decoration-2 decoration-attention underline-offset-4">
+                    {hit}
+                  </mark>
+                  {after}
+                </p>
+              </div>
+              <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
+                The pinned passage, word for word. Every citation resolves to real text, never a
+                paraphrase.
+              </p>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

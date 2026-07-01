@@ -30,6 +30,11 @@ const ps = PRIOR.indexOf(PHRASE);
 const YOUR_SPANS = [{ start: ys, end: ys + PHRASE.length, signal: "yellow" as const }];
 const PRIOR_SPANS = [{ start: ps, end: ps + PHRASE.length, signal: "red" as const, flagId: "x" }];
 
+// The second overlap has no words in common, so a plain text search misses it.
+// Pincite matches it on meaning (semantic similarity over the embeddings).
+const YOURS_MEANING = "ridges that isolate the food from the base";
+const PRIOR_MEANING = "ribs that lift the item off the tray floor";
+
 const MATCHES = [
   { label: "US 6,983,542 B2", value: 0.88, display: "88% overlap", signal: "red" as const },
   { label: "US 5,743,110 A", value: 0.56, display: "56% overlap", signal: "yellow" as const },
@@ -37,6 +42,20 @@ const MATCHES = [
 ];
 
 const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "LaTeX source"];
+
+// Inline overlap highlight for the semantic pair (yellow = your claim, red = the
+// matching prior limitation). Same token classes as the annotated editor marks.
+function PriorMark({ signal, children }: { signal: "yellow" | "red"; children: React.ReactNode }) {
+  const map = {
+    yellow: "bg-attention-bg text-attention-foreground decoration-attention",
+    red: "bg-violation-bg text-violation decoration-violation",
+  } as const;
+  return (
+    <mark className={`rounded-[3px] px-0.5 underline decoration-2 underline-offset-2 ${map[signal]}`}>
+      {children}
+    </mark>
+  );
+}
 
 // The lead feature: a real violation opening into its Law, Rule, Guidance stack.
 // One card (matching the other feature cards) with the label and heading inside;
@@ -176,9 +195,19 @@ export function SectionOnePlace() {
                 </span>
               </div>
               <h3 className="mt-4 text-balance font-rounded text-2xl font-semibold tracking-tight text-foreground">
-                See the exact overlaps
+                Matched on wording and meaning
               </h3>
-              <div className="mt-5 space-y-3">
+              <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
+                Not a text search. Each limitation is lined up against granted patents by the exact
+                words and by the idea underneath them.
+              </p>
+
+              {/* exact wording overlap - the earlier patent hangs offset so the shared
+                  phrase visibly lines up */}
+              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Exact wording
+              </p>
+              <div className="mt-2.5 space-y-3">
                 <AnnotatedEditor
                   text={YOURS}
                   spans={YOUR_SPANS}
@@ -186,20 +215,41 @@ export function SectionOnePlace() {
                   caption="Your claim"
                   className="mr-10 transition duration-200 hover:-translate-y-1 hover:shadow-md"
                 />
-                {/* the earlier patent sits offset to the right, so the exact overlap
-                    visibly hangs past your claim above it */}
                 <div className="relative z-10 translate-x-6 sm:translate-x-12">
                   <AnnotatedEditor
                     text={PRIOR}
                     spans={PRIOR_SPANS}
                     activeFlagId="x"
                     progress={1}
-                    caption="US 6,983,542 B2  .  granted patent"
+                    caption="US 6,983,542 B2  .  granted"
                     className="shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-lg"
                   />
                 </div>
               </div>
-              <div className="mt-5 border-t pt-5">
+
+              {/* semantic overlap - no shared words, matched on meaning */}
+              <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Same idea, different words
+              </p>
+              <div className="mt-2.5 rounded-xl border bg-background p-4 font-mono text-[13px] leading-relaxed">
+                <div className="flex items-baseline gap-3">
+                  <span className="w-24 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">
+                    Your claim
+                  </span>
+                  <PriorMark signal="yellow">{YOURS_MEANING}</PriorMark>
+                </div>
+                <div className="mt-2 flex items-baseline gap-3">
+                  <span className="w-24 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">
+                    US 5,743,110 A
+                  </span>
+                  <PriorMark signal="red">{PRIOR_MEANING}</PriorMark>
+                </div>
+              </div>
+              <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
+                No words in common, but the same idea. A plain text search would slide right past it.
+              </p>
+
+              <div className="mt-6 border-t pt-5">
                 <BarList items={MATCHES} progress={1} />
               </div>
             </div>

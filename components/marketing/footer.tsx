@@ -17,17 +17,30 @@ export function MarketingFooter() {
               similar public patents, and pins every rule it cites to real MPEP and CFR text.
             </p>
           </div>
-          <nav className="flex flex-col gap-3 text-sm">
-            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Legal
-            </span>
-            <Link href="/privacy" className="text-muted-foreground transition-colors hover:text-foreground">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-muted-foreground transition-colors hover:text-foreground">
-              Terms of Service
-            </Link>
-          </nav>
+          <div className="flex gap-12 sm:gap-16">
+            <nav className="flex flex-col gap-3 text-sm">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Contact
+              </span>
+              <a
+                href="mailto:aaravmin@pincite.net"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                aaravmin@pincite.net
+              </a>
+            </nav>
+            <nav className="flex flex-col gap-3 text-sm">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Legal
+              </span>
+              <Link href="/privacy" className="text-muted-foreground transition-colors hover:text-foreground">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="text-muted-foreground transition-colors hover:text-foreground">
+                Terms of Service
+              </Link>
+            </nav>
+          </div>
         </div>
         <p className="mt-10 max-w-2xl text-xs leading-relaxed text-muted-foreground">
           A legal research aid, not legal advice. You are responsible for the confidentiality of

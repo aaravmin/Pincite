@@ -80,15 +80,16 @@ export type StaticFinding = {
 // governing law for dependent-claim form; the app persists the CFR + MPEP pins.
 export const CLAIM6_FINDING: StaticFinding = {
   id: CLAIM6_FLAG_ID,
-  title: "Claim 4 refers to claim 6, which does not exist",
-  explanation: "Refer to an existing, earlier claim.",
+  title: "Claim 4 depends on claim 6, which the application never sets out",
+  explanation:
+    "There is no claim 6 in the application, so claim 4 has nothing to build on and its scope is left undefined.",
   area: "Claims",
   citation: {
     law: "35 U.S.C. 112(d)",
     cfr: "37 CFR 1.75(c)",
     mpep: "608.01(n)",
     guidance:
-      "A dependent claim has to point back to a real, earlier claim. Claim 4 points to claim 6, but the application has no claim 6.",
+      "Point claim 4 back to a claim you actually wrote. It narrows the openings introduced in claim 1, so make it depend on claim 1.",
     // Verbatim first sentence of 37 CFR 1.75(c) as carried in MPEP 608.01(n)
     // (snapshotted from the corpus). Commas only, so it survives the sanitizer.
     excerpt:
