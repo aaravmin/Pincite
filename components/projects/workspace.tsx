@@ -179,9 +179,10 @@ export function Workspace({
                   >
                     <span className="truncate">{SECTION_LABELS[k]}</span>
                     {words > 0 && (
-                      <span className="ml-2 shrink-0 text-xs text-muted-foreground">
-                        {words}
-                      </span>
+                      <span
+                        aria-label="has content"
+                        className="ml-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/50"
+                      />
                     )}
                   </button>
                 </li>

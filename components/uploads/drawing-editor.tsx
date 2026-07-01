@@ -100,8 +100,9 @@ export function DrawingEditor({
             size="sm"
             onClick={exportOriginal}
             data-testid="export-original"
+            className="ml-auto"
           >
-            Export original
+            Export
           </Button>
         )}
       </div>
