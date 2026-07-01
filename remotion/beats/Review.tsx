@@ -25,12 +25,12 @@ const CHECKS = [
 
 function Mark({ ok }: { ok: boolean }) {
   return ok ? (
-    <svg viewBox="0 0 20 20" className="size-6 shrink-0">
+    <svg viewBox="0 0 20 20" className="size-9 shrink-0">
       <circle cx="10" cy="10" r="9" fill={COLORS.pass} />
       <path d="M6 10.5l2.6 2.6 5.6-6.2" stroke="#fff" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ) : (
-    <svg viewBox="0 0 20 20" className="size-6 shrink-0">
+    <svg viewBox="0 0 20 20" className="size-9 shrink-0">
       <circle cx="10" cy="10" r="9" fill={COLORS.violation} />
       <path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="#fff" strokeWidth={2} strokeLinecap="round" />
     </svg>
@@ -117,19 +117,19 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
           </div>
         </div>
 
-        <div style={{ marginTop: 44, width: "100%", maxWidth: 1180, opacity: trackerT }}>
-          <div className="mb-3 text-[16px] font-medium text-muted-foreground">Checks Pincite ran on the claims</div>
-          <div className="grid grid-cols-3 gap-3">
+        <div style={{ marginTop: 48, width: "100%", maxWidth: 1560, opacity: trackerT }}>
+          <div className="mb-4 text-[22px] font-medium text-muted-foreground">Checks Pincite ran on the claims</div>
+          <div className="grid grid-cols-3 gap-4">
             {CHECKS.map((c, i) => {
               const sp = spring({ frame: frame - (72 + i * 5), fps, config: { damping: 200 } });
               return (
                 <div
                   key={c.name}
                   style={{ opacity: sp, transform: `translateY(${interpolate(sp, [0, 1], [12, 0])}px)` }}
-                  className={`flex items-center gap-3 rounded-xl border p-4 ${c.ok ? "bg-card" : "border-violation bg-violation-bg"}`}
+                  className={`flex items-center gap-4 rounded-2xl border p-6 ${c.ok ? "bg-card" : "border-violation bg-violation-bg"}`}
                 >
                   <Mark ok={c.ok} />
-                  <span className={`text-[19px] font-medium ${c.ok ? "text-foreground" : "text-violation"}`}>{c.name}</span>
+                  <span className={`text-[27px] font-medium ${c.ok ? "text-foreground" : "text-violation"}`}>{c.name}</span>
                 </div>
               );
             })}

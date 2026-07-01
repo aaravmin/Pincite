@@ -31,13 +31,13 @@ export function Trace({ width = 1920, height = 1080 }: { width?: number; height?
   const frame = useCurrentFrame();
   const f = CLAIM6_FINDING;
 
-  const slide = interpolate(frame, [22, 88], [0, 1], {
+  const slide = interpolate(frame, [14, 56], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
   });
-  const hl = interpolate(frame, [92, 128], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const stackProgress = interpolate(frame, [120, 250], [0, 1], {
+  const hl = interpolate(frame, [58, 84], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const stackProgress = interpolate(frame, [80, 158], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -113,7 +113,7 @@ export function Trace({ width = 1920, height = 1080 }: { width?: number; height?
         <div style={{ marginTop: 34 }}>
           <KineticText
             text="Nothing is guessed"
-            startFrame={220}
+            startFrame={172}
             className="font-serif"
             style={{ fontSize: 40, fontWeight: 600, color: COLORS.mutedForeground }}
           />

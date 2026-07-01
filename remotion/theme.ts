@@ -10,7 +10,7 @@ export const SIZE = { width: 1920, height: 1080 };
 export const BEAT = {
   hook: 300,
   review: 165,
-  trace: 270,
+  trace: 214,
   autofix: 205,
   drawings: 215,
   priorart: 205,
