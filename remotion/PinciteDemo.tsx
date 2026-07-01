@@ -3,6 +3,7 @@ import { fade } from "@remotion/transitions/fade";
 import { Hook } from "./beats/Hook";
 import { Review } from "./beats/Review";
 import { Trace } from "./beats/Trace";
+import { AutoFix } from "./beats/AutoFix";
 import { Drawings } from "./beats/Drawings";
 import { PriorArt } from "./beats/PriorArt";
 import { Payoff } from "./beats/Payoff";
@@ -29,6 +30,10 @@ export function PinciteDemo({ width = 1920, height = 1080 }: { width?: number; h
         <Trace {...p} />
       </TransitionSeries.Sequence>
       {xfade()}
+      <TransitionSeries.Sequence durationInFrames={BEAT.autofix}>
+        <AutoFix {...p} />
+      </TransitionSeries.Sequence>
+      {xfade()}
       <TransitionSeries.Sequence durationInFrames={BEAT.drawings}>
         <Drawings {...p} />
       </TransitionSeries.Sequence>
@@ -44,6 +49,6 @@ export function PinciteDemo({ width = 1920, height = 1080 }: { width?: number; h
   );
 }
 
-// Total frames after the 5 crossfades overlap.
+// Total frames after the 6 crossfades overlap.
 export const TOTAL_FRAMES =
-  BEAT.hook + BEAT.review + BEAT.trace + BEAT.drawings + BEAT.priorart + BEAT.payoff - 5 * XFADE;
+  BEAT.hook + BEAT.review + BEAT.trace + BEAT.autofix + BEAT.drawings + BEAT.priorart + BEAT.payoff - 6 * XFADE;

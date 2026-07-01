@@ -11,7 +11,13 @@ import { COLORS } from "../colors";
 import { LINES } from "../theme";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { SignalBadge } from "@visual/signal";
+import { ComplianceTracker, type TrackerBlock } from "@visual/compliance-tracker";
 import type { VisualSpan } from "@visual/types";
+
+// The checks Pincite ran: most pass (green), two are the violations (red).
+const CHECKS: TrackerBlock[] = [
+  "green", "green", "red", "green", "green", "green", "green", "red", "green", "green", "green", "green",
+].map((signal, i) => ({ id: `c${i}`, signal: signal as "green" | "red", label: `check ${i + 1}` }));
 
 const CLAIMS =
   "3. The container of claim 1, wherein the ridges are arranged concentrically.\n" +
@@ -36,6 +42,8 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
   const count = Math.round(
     interpolate(frame, [30, 76], [0, 2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
   );
+  const trackerP = interpolate(frame, [70, 118], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const trackerT = interpolate(frame, [68, 90], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <Scene>
@@ -90,6 +98,14 @@ export function Review({ width = 1920, height = 1080 }: { width?: number; height
               })}
             </div>
           </div>
+        </div>
+
+        <div style={{ marginTop: 44, width: "100%", maxWidth: 1120, opacity: trackerT }}>
+          <div className="mb-3 flex items-center justify-between text-[16px] text-muted-foreground">
+            <span>Checks run on this draft</span>
+            <span>2 of 12 flagged</span>
+          </div>
+          <ComplianceTracker blocks={CHECKS} progress={trackerP} showLegend={false} />
         </div>
       </AbsoluteFill>
     </Scene>

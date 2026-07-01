@@ -9,25 +9,27 @@ export const SIZE = { width: 1920, height: 1080 };
 // Beat lengths in frames (sequence durations; TransitionSeries overlaps ~14f each).
 export const BEAT = {
   hook: 300,
-  review: 170,
-  trace: 255,
+  review: 165,
+  trace: 250,
+  autofix: 205,
   drawings: 215,
-  priorart: 200,
-  payoff: 250,
+  priorart: 205,
+  payoff: 255,
 } as const;
 
 // Crossfade between beats.
 export const XFADE = 14;
 
-// On-screen lines, one idea each.
+// On-screen lines, one idea each. Titles flow, and say the specific thing.
 export const LINES = {
   theme: "Nine out of ten patents are rejected.",
-  themeSub: "Usually over something a rule already flags.",
+  themeSub: "Usually over a rule violation that could easily have been fixed.",
   themeSub2: "Not because it is unpatentable.",
   catch: "Pincite finds them first.",
-  receipts: "Every flag opens the exact rule.",
-  drawings: "It reads your drawings too.",
-  priorart: "It checks the prior art.",
-  priorartSub: "So you can prove your invention is genuinely new.",
-  payoff: "Then it exports, filing ready.",
+  receipts: "Every violation opens its exact rule.",
+  autofix: "And proposes the exact fix.",
+  drawings: "Right down to the reference numerals.",
+  priorart: "Weighed against the prior art.",
+  priorartSub: "So you can prove your invention is genuinely unique.",
+  payoff: "Then it exports, ready to file to the USPTO.",
 } as const;

@@ -117,7 +117,7 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
         className="flex-col items-center justify-center"
         style={{ opacity: editorT, transform: `scale(${interpolate(editorT, [0, 1], [0.9, 1])})` }}
       >
-        <div style={{ width: 1240 }}>
+        <div style={{ width: 1440, transform: "scale(1.05)" }}>
           <AnnotatedEditor
             text={APPLE_HERO_CLAIMS}
             spans={APPLE_HERO_SPANS}
@@ -125,19 +125,19 @@ export function Hook({ width = 1920, height = 1080 }: { width?: number; height?:
             progress={editorProgress}
             caption={APPLE_META.claimsCaption}
           />
-          <div className="mt-8 text-center">
+          <div className="mt-11 text-center">
           <KineticText
             text={LINES.themeSub}
             startFrame={198}
             className="font-serif"
-            style={{ fontSize: 46, fontWeight: 600, color: COLORS.foreground }}
+            style={{ fontSize: 56, fontWeight: 700, color: COLORS.foreground }}
           />
-          <div className="mt-2">
+          <div className="mt-3">
             <KineticText
               text={LINES.themeSub2}
-              startFrame={224}
+              startFrame={226}
               className="font-serif"
-              style={{ fontSize: 34, fontWeight: 500, color: COLORS.mutedForeground }}
+              style={{ fontSize: 40, fontWeight: 500, color: COLORS.mutedForeground }}
             />
           </div>
           </div>

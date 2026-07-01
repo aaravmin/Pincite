@@ -119,6 +119,22 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
           <div style={{ flex: 0.85 }}>
             <div className="rounded-xl border bg-card p-5">
               <div className="flex items-center gap-2">
+                <SignalMark signal="green" />
+                <span className="text-[17px] font-medium text-muted-foreground">
+                  Described in the specification
+                </span>
+              </div>
+              <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {["100", "102", "104", "106", "110"].map((n) => (
+                  <span
+                    key={n}
+                    className="rounded-lg border border-pass bg-pass-bg px-3 py-1.5 font-mono text-[17px] font-medium text-pass"
+                  >
+                    {n}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-5 flex items-center gap-2 border-t pt-5">
                 <SignalMark signal="red" />
                 <span className="text-[20px] font-semibold text-foreground">
                   4 reference numerals not in the specification

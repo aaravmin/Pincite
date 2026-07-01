@@ -5,6 +5,7 @@ import {
   interpolate,
   interpolateColors,
   spring,
+  Easing,
   Img,
   staticFile,
 } from "remotion";
@@ -21,7 +22,7 @@ const RECOLOR = [
 ];
 const DOCS = ["Specification DOCX", "Application data sheet", "Declaration", "Transmittal", "Fee summary", "Drawings"];
 
-function FieldCallback({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+function FieldCallback({ width = 1920, height = 1080, zoom = 1 }: { width?: number; height?: number; zoom?: number }) {
   const COLS = 16;
   const ROWS = 8;
   const SC = 8;
@@ -32,29 +33,33 @@ function FieldCallback({ width = 1920, height = 1080 }: { width?: number; height
   const gridH = ROWS * cell;
   const offX = (width - gridW) / 2;
   const offY = (height - gridH) / 2;
+  const survCX = offX + SC * cell + cell / 2;
+  const survCY = offY + SR * cell + cell / 2;
   return (
-    <div style={{ position: "absolute", left: offX, top: offY, width: gridW, height: gridH }}>
-      {Array.from({ length: ROWS }).map((_, r) =>
-        Array.from({ length: COLS }).map((_, c) => {
-          const isSurv = r === SR && c === SC;
-          return (
-            <div
-              key={`${r}-${c}`}
-              style={{
-                position: "absolute",
-                left: c * cell + (cell - size) / 2,
-                top: r * cell + (cell - size) / 2,
-                width: size,
-                height: size,
-                borderRadius: 8,
-                background: isSurv ? COLORS.pass : COLORS.violation,
-                border: isSurv ? `2px solid ${COLORS.foreground}` : "none",
-                boxShadow: isSurv ? "0 6px 20px rgba(0,0,0,0.18)" : "none",
-              }}
-            />
-          );
-        }),
-      )}
+    <div style={{ position: "absolute", inset: 0, transform: `scale(${zoom})`, transformOrigin: `${survCX}px ${survCY}px` }}>
+      <div style={{ position: "absolute", left: offX, top: offY, width: gridW, height: gridH }}>
+        {Array.from({ length: ROWS }).map((_, r) =>
+          Array.from({ length: COLS }).map((_, c) => {
+            const isSurv = r === SR && c === SC;
+            return (
+              <div
+                key={`${r}-${c}`}
+                style={{
+                  position: "absolute",
+                  left: c * cell + (cell - size) / 2,
+                  top: r * cell + (cell - size) / 2,
+                  width: size,
+                  height: size,
+                  borderRadius: 8,
+                  background: isSurv ? COLORS.pass : COLORS.violation,
+                  border: isSurv ? `2px solid ${COLORS.foreground}` : "none",
+                  boxShadow: isSurv ? "0 6px 20px rgba(0,0,0,0.18)" : "none",
+                }}
+              />
+            );
+          }),
+        )}
+      </div>
     </div>
   );
 }
@@ -66,11 +71,18 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const aOut = interpolate(frame, [130, 150], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const aOut = interpolate(frame, [128, 148], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const bIn = interpolate(frame, [140, 162], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const bOut = interpolate(frame, [192, 212], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cIn = interpolate(frame, [208, 232], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const logoT = spring({ frame: frame - 210, fps, config: { damping: 200 } });
+  // zoom the camera into the one green survivor (successfully filed), until it fills the frame.
+  const zoom = interpolate(frame, [182, 226], [1, 20], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.cubic),
+  });
+  const bOut = interpolate(frame, [224, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const pill = interpolate(frame, [152, 170, 182, 196], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cIn = interpolate(frame, [232, 252], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoT = spring({ frame: frame - 234, fps, config: { damping: 200 } });
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
 
   return (
@@ -134,10 +146,10 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         </div>
       </AbsoluteFill>
 
-      {/* B: field callback */}
+      {/* B: field callback, then zoom into the one green survivor */}
       <AbsoluteFill style={{ opacity: bIn * bOut }}>
-        <FieldCallback width={width} height={height} />
-        <AbsoluteFill className="items-center justify-end" style={{ paddingBottom: 90 }}>
+        <FieldCallback width={width} height={height} zoom={zoom} />
+        <AbsoluteFill className="items-center justify-end" style={{ paddingBottom: 90, opacity: pill }}>
           <div className="rounded-full border border-pass bg-pass-bg px-6 py-2.5 text-[22px] font-medium text-pass">
             One application, filed clean
           </div>
