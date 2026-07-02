@@ -84,19 +84,26 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
   const aIn = interpolate(frame, [8, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const aOut = interpolate(frame, [116, 136], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const bIn = interpolate(frame, [128, 150], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  // zoom the camera into the one green survivor (successfully filed) until it fills
-  // the frame, then hold the green disc still (clamped) while the line sits on it.
+  // Mirror the opening Hook move in reverse: zoom the camera into the one green
+  // survivor (successfully filed) until it fills the frame, then hold the green
+  // fill still (>=15f), then whiten it out - the green fill dissolves into clean
+  // white and the logo fades up on that white, the same seamless feel as the
+  // Hook's dot-to-draft morph.
   const zoom = interpolate(frame, [170, 214], [1, 20], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  // the disc + line hold fully still 228-248, fade out 248-262, then the logo
-  // fades in over clean white (262-278) so it never sits over the disc text, and
-  // lingers at full opacity for ~50 frames through the end of the beat.
-  const bOut = interpolate(frame, [248, 262], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cIn = interpolate(frame, [262, 278], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const logoT = spring({ frame: frame - 264, fps, config: { damping: 200 } });
+  // the green fill fully fills the frame by 214 and holds still 214-232 (>=15f),
+  // then whitens out 232-252 (the green dissolves into white). The logo fades up
+  // on that clean white 240-256 and lingers at full opacity through the end of
+  // the beat (~49 frames).
+  const bOut = interpolate(frame, [232, 252], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // a white veil rises over the green fill as it whitens, so the transition reads
+  // as green dissolving into white rather than simply vanishing.
+  const whiten = interpolate(frame, [230, 252], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cIn = interpolate(frame, [240, 256], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoT = spring({ frame: frame - 242, fps, config: { damping: 200 } });
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
 
   return (
@@ -112,9 +119,9 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         { f: 116, x: 68, y: 50 },
         { f: 146, x: 68, y: 52 },
         { f: 188, x: 50, y: 30 },
-        { f: 248, x: 50, y: 30 },
-        { f: 284, x: 50, y: 22 },
-        { f: 328, x: 50, y: 22 },
+        { f: 232, x: 50, y: 30 },
+        { f: 256, x: 50, y: 22 },
+        { f: 305, x: 50, y: 22 },
       ]}
     >
       {/* A: recolor + the real filing-ready document */}
@@ -186,29 +193,18 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         </div>
       </AbsoluteFill>
 
-      {/* B: field callback, then zoom into the one green survivor */}
+      {/* B: field callback, then zoom into the one green survivor until it fills
+          the frame (mirrors the opening dot zoom in reverse) */}
       <AbsoluteFill style={{ opacity: bIn * bOut }}>
         <FieldCallback width={width} height={height} zoom={zoom} />
       </AbsoluteFill>
 
-      {/* the closing line, sitting fully inside the green disc. It only appears
-          once the zoom is essentially complete (disc large), wraps to two lines,
-          and is width- and size-capped so no letter reaches the white gutters. */}
-      <AbsoluteFill
-        className="items-center justify-center"
-        style={{ opacity: interpolate(frame, [216, 228, 248, 262], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
-      >
-        <div
-          className="font-serif text-center"
-          style={{ maxWidth: 720, fontSize: 68, fontWeight: 700, lineHeight: 1.12, color: "#ffffff" }}
-        >
-          Be the one that
-          <br />
-          gets accepted
-        </div>
-      </AbsoluteFill>
+      {/* the white veil: as the green fill holds and then releases, clean white
+          rises over it so the green dissolves into white (the same seamless whiten
+          as the Hook's dot morph) rather than simply vanishing */}
+      <AbsoluteFill style={{ background: "#ffffff", opacity: whiten, pointerEvents: "none" }} />
 
-      {/* C: logo only */}
+      {/* C: logo only, fading up on the clean white and lingering at full opacity */}
       <AbsoluteFill className="items-center justify-center" style={{ opacity: cIn }}>
         <Img
           src={staticFile("pincite-logo.png")}

@@ -11,18 +11,18 @@ export { FPS, SIZE } from "../theme";
 // Beat lengths in frames (sequence durations; TransitionSeries overlaps XFADE each).
 // Each length holds the fully composed beat still for at least 15 frames after its
 // last element lands, before the crossfade to the next (the payoff, being last,
-// instead lingers on the logo ~50 frames). See the pacing note in the revision.
+// instead lingers on the logo ~49 frames). See the pacing note in the revision.
 export const BEAT = {
   hook: 315,
   clerical: 250,
   search: 244,
   positioning: 198,
   review: 148,
-  trace: 162,
+  trace: 170,
   autofix: 190,
   drawings: 218,
   priorart: 196,
-  payoff: 328,
+  payoff: 305,
 } as const;
 
 // Crossfade between beats.
@@ -55,7 +55,7 @@ export const LINES = {
   receiptsSub: "Quoted from the patent office's own manual",
   autofix: "And proposes the exact fix",
   drawings: "Right down to the numerals on your drawings",
-  priorart: "It compares your draft to granted patents in seconds",
+  priorart: "Then it compares your draft to granted patents in seconds",
   priorartSub: "Every line of your draft, checked against existing patents",
   payoff: "Then it exports, ready to file to the USPTO",
 } as const;
