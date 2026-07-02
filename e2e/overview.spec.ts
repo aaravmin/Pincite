@@ -2,9 +2,10 @@ import { test, expect } from "@playwright/test";
 import { captureErrors, screenshot, assertClean, createMatter, saveDraft } from "./helpers";
 import { loginAsTestUser } from "./auth";
 
-// The per-matter Readiness overview: opening a matter lands here, it assembles stage +
-// completeness + a checklist of every step with a live status, and points to the next step.
-test("readiness overview: stage, checklist, live issue count, next step", async ({
+// The slimmed per-matter overview: the page header (stage heading), the interactive
+// findings table, and a checklist of every step with a live status + link. The old
+// KPI cards / next-action beam / Compliance + Lifecycle blocks were removed.
+test("readiness overview: stage heading, findings table, checklist", async ({
   page,
 }) => {
   const errs = captureErrors(page);
@@ -34,9 +35,24 @@ test("readiness overview: stage, checklist, live issue count, next step", async 
     });
   }).toPass({ timeout: 20000 });
 
+  // The page header stays: the "Where this stands" eyebrow + the serif stage heading.
   await expect(page.getByText("Where this stands")).toBeVisible();
+
+  // The removed top block: no KPI cards, no "Do this next" beam, no Compliance / Lifecycle.
+  await expect(page.getByText("Open red issues")).toHaveCount(0);
+  await expect(page.getByText("Examiner readiness")).toHaveCount(0);
+  await expect(page.getByText("Do this next")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Compliance", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Lifecycle", exact: true })).toHaveCount(0);
+
+  // The findings table renders with the renamed "Status" column, and the over-long
+  // abstract is a Description-area finding (the "Specification" label is shown as
+  // "Description"), so both labels appear.
+  await expect(page.getByRole("columnheader", { name: "Status" })).toBeVisible();
+  await expect(page.getByText("Description", { exact: true }).first()).toBeVisible();
+
+  // The checklist of every step stays, each card links to its screen.
   await expect(page.getByText("Checklist", { exact: true })).toBeVisible();
-  await expect(page.getByText("Completeness")).toBeVisible();
   for (const g of [
     "Draft",
     "Invention disclosure",
@@ -51,18 +67,14 @@ test("readiness overview: stage, checklist, live issue count, next step", async 
     await expect(page.getByText(g, { exact: true }).first()).toBeVisible();
   }
 
-  // Color discipline: the over-long abstract is a violation, so Issues is red, and a
-  // genuine filing defect (no inventors yet) keeps Filing readiness red too.
+  // Color discipline: the over-long abstract is a violation, so the Issues gate card
+  // is red and reads "to fix"; it is a link to its screen.
   const issues = page
     .locator('a[data-status="violation"]')
     .filter({ hasText: "Issues" });
   await expect(issues).toBeVisible();
   await expect(issues).toContainText("to fix");
-
-  // The next-step CTA routes to the first thing that needs action. In the
-  // rebuilt command center this is the "Do this next" card with a Go there link.
-  await expect(page.getByText("Do this next")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Go there/i })).toBeVisible();
+  await expect(issues).toHaveAttribute("href", new RegExp(`/projects/${id}/review`));
 
   await screenshot(page, "overview-readiness");
   assertClean(errs);

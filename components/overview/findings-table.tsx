@@ -29,6 +29,19 @@ import type { OverviewFinding } from "@/lib/readiness";
 
 const SEV_RANK: Record<string, number> = { violation: 0, attention: 1, pass: 2 };
 
+// "Specification" is jargon: these findings live in the written-description
+// sections (background, summary, detailed description), not prior patents.
+// Show a plainer label without changing the underlying area value.
+const AREA_LABEL: Record<OverviewFinding["area"], string> = {
+  Claims: "Claims",
+  Specification: "Description",
+  Filing: "Filing",
+};
+
+function areaLabel(area: OverviewFinding["area"] | "all"): string {
+  return area === "all" ? "All areas" : AREA_LABEL[area];
+}
+
 function Th({ children, onClick, sortable }: { children: React.ReactNode; onClick?: () => void; sortable?: boolean }) {
   return (
     <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
@@ -64,7 +77,7 @@ export function FindingsTable({ findings }: { findings: OverviewFinding[] }) {
     () => [
       {
         accessorKey: "severity",
-        header: "Signal",
+        header: "Status",
         sortingFn: (a, b) => SEV_RANK[a.original.severity] - SEV_RANK[b.original.severity],
         cell: ({ row }) => (
           <SignalBadge signal={signalFromSeverity(row.original.severity)}>
@@ -105,7 +118,7 @@ export function FindingsTable({ findings }: { findings: OverviewFinding[] }) {
           );
         },
       },
-      { accessorKey: "area", header: "Area", cell: ({ row }) => <span className="text-muted-foreground">{row.original.area}</span> },
+      { accessorKey: "area", header: "Area", cell: ({ row }) => <span className="text-muted-foreground">{AREA_LABEL[row.original.area]}</span> },
       {
         id: "rule",
         header: "Rule",
@@ -145,7 +158,7 @@ export function FindingsTable({ findings }: { findings: OverviewFinding[] }) {
           <span className="mx-1 h-4 w-px bg-border" aria-hidden />
           {areas.map((a) => (
             <Chip key={a} active={area === a} onClick={() => setArea(a)}>
-              {a === "all" ? "All areas" : a}
+              {areaLabel(a)}
             </Chip>
           ))}
         </div>
