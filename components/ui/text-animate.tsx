@@ -348,7 +348,10 @@ const TextAnimateBase = ({
   let segments: string[] = []
   switch (by) {
     case "word":
-      segments = children.split(/(\s+)/)
+      // Keep each word together with its trailing space. Splitting the space
+      // into its own inline-block segment strands a lone space box at the start
+      // of the next line whenever the heading soft-wraps at that space.
+      segments = children.match(/\S+\s*/g) ?? [children]
       break
     case "character":
       segments = children.split("")
