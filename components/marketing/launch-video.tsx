@@ -44,7 +44,9 @@ export function LaunchVideo({
         {open && (
           <video
             className="aspect-video w-full bg-black"
-            src="/pincite-demo.mp4"
+            // Cache-buster: bump this when public/pincite-demo.mp4 is re-rendered so
+            // browsers do not replay an old cached copy (the file name is stable).
+            src="/pincite-demo.mp4?v=3"
             controls
             autoPlay
             playsInline
