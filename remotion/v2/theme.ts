@@ -9,22 +9,33 @@
 export { FPS, SIZE } from "../theme";
 
 // Beat lengths in frames (sequence durations; TransitionSeries overlaps XFADE each).
-// Each length holds the fully composed beat still for ~15 frames after its last
-// element lands, before the crossfade to the next - no idle waiting, nothing
-// rushed (the payoff, being last, instead lingers on the logo ~47 frames at full
-// opacity). Retimed in the pacing pass: every beat's footer / closing line now
-// follows promptly after its content lands, so there is no dead air, and the
-// static holds were trimmed to the ~15f standard. See the per-beat notes.
+// Pacing rule (0.4s rest): after a crossfading beat's LAST element has fully,
+// visibly settled, the beat sits COMPLETELY STILL - fully composed, nothing
+// animating, not yet crossfading - for exactly 12 frames = 0.4s, and only THEN
+// begins the XFADE=14 crossfade to the next. Since the crossfade eats the last
+// XFADE frames, a beat is static and alone during [lastSettle, D - 14], so
+// D = lastSettle + 12 + 14 = lastSettle + 26 for every crossfading beat.
+// lastSettle is measured conservatively per element (springs at damping 200 have
+// a long tail: settled 30f after their start; KineticText's last word clears
+// blur+translate ~30f after its spring starts; an interpolate settles at its end
+// frame). The payoff is last (no crossfade after it), so it keeps its own ending
+// structure and lingers on the logo ~45+ frames instead. Per-beat lastSettle:
+//   hook 286, clerical 182, search 225, positioning 163, review 127, trace 154,
+//   autofix 162, drawings 188, priorart 166 -> each + 26 below.
+// Two beats settle later than their headline copy: Search's background document
+// wall drifts until frame 225 (its drift interpolate ends there), and AutoFix's
+// click cursor fades out through frame 162, so those (not the closing line) are
+// the true last thing moving and set lastSettle.
 export const BEAT = {
-  hook: 288,
-  clerical: 184,
-  search: 208,
-  positioning: 164,
-  review: 128,
-  trace: 156,
-  autofix: 176,
-  drawings: 204,
-  priorart: 182,
+  hook: 312,
+  clerical: 208,
+  search: 251,
+  positioning: 189,
+  review: 153,
+  trace: 180,
+  autofix: 188,
+  drawings: 214,
+  priorart: 192,
   payoff: 305,
 } as const;
 
