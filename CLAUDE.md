@@ -213,9 +213,13 @@ the end of each session — but be stringent; trim before it bloats.
       Demo aids: `docs/demo-script.md` + `docs/demo-pizza-box-fields.md`.
 - [x] Readiness overview (`/projects/[id]/overview`, `lib/readiness.ts`): the per-matter home
       you land on when you open a matter (dashboard cards + a step-rail Overview link route
-      here; new-project create still lands on Draft). Assembles stage + what-to-advance + a
-      depth-weighted completeness bar (neutral fill) + a checklist of all nine steps each with a
-      live status and link + a Next-step CTA. Issue/filing counts are computed live by reusing
+      here; new-project create still lands on Draft). SLIMMED 2026-07-02 (user direction): the
+      screen is now just the stage heading + the findings table + the nine-step checklist (each
+      with a live status and link); the KPI cards, Do-this-next beam, Compliance tracker, and
+      Lifecycle timeline were REMOVED from this screen (getReadiness still computes everything,
+      only the client renders less). Findings table wording: column "Signal" -> "Status"; the
+      "Specification" area DISPLAYS as "Description" (display map in `findings-table.tsx`; the
+      `OverviewFinding.area` value is unchanged). Issue/filing counts are computed live by reusing
       detectStage/runTier1-3/runFilingChecks/runCrossRefChecks, so the overview never disagrees
       with the detail screens. Color discipline: red dot = violation only. e2e `overview.spec.ts`.
 - [~] DRAWING EDITOR EPIC (4 features, built one by one):
