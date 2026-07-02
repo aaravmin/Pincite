@@ -35,18 +35,18 @@ const GROUNDS: Ground[] = [
     name: "Obviousness",
     share: 0.85,
     engine: "art",
-    how: "Your claims are lined up against earlier patents one limitation at a time.",
+    how: "Your claims are checked one limitation at a time, including where two earlier patents only cover a claim together.",
   },
   {
     ref: "35 USC 112(b)",
-    name: "Indefiniteness and antecedent basis",
+    name: "Indefiniteness",
     share: 0.4,
     engine: "rule",
-    how: "Vague terms and missing first mentions are caught and tied to the exact passage they break.",
-    // Antecedent basis: the first mention of a feature needs "a", not "the".
+    how: "A term of degree like substantially is caught when the specification gives no way to measure it.",
+    // Term of degree: an unmeasurable word narrowed to a definite limit (2173.05(b)).
     fix: {
-      was: ["wherein ", "the openings", " comprise slots"],
-      now: ["wherein ", "a plurality of openings", " comprise slots"],
+      was: ["a ", "substantially flat", " lid"],
+      now: ["a lid ", "flat to within 0.5 millimeters", ""],
     },
   },
   {
@@ -54,7 +54,7 @@ const GROUNDS: Ground[] = [
     name: "Novelty",
     share: 0.3,
     engine: "art",
-    how: "Anything already found in one earlier patent is shown side by side with your claim.",
+    how: "Anything already in one earlier patent is shown next to your claim, matched by meaning and not just words.",
   },
   {
     ref: "35 USC 112(a)",
@@ -132,35 +132,41 @@ function Preview({ ground }: { ground: Ground }) {
     return (
       <div className="rounded-lg border bg-muted/30 p-3">
         <div className="font-mono text-[13px] leading-relaxed">
-          <div className="flex items-center gap-2">
-            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">yours</span>
-            <span>
-              <Mark signal="yellow">a plurality of ridges</Mark> on the base
-            </span>
-          </div>
-          <div className="mt-1.5 flex items-center gap-2">
-            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">theirs</span>
-            <span>
-              <Mark signal="red">a plurality of ridges</Mark> on the tray
-            </span>
-          </div>
-          <div className="my-2.5 border-t border-dashed border-border" />
-          <div className="flex items-center gap-2">
-            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">yours</span>
-            <span>
-              <Mark signal="yellow">ridges that isolate the food</Mark>
-            </span>
-          </div>
-          <div className="mt-1.5 flex items-center gap-2">
-            <span className="w-12 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">theirs</span>
-            <span>
-              <Mark signal="red">ribs that lift the item off the floor</Mark>
-            </span>
-          </div>
+          {ground.ref === "35 USC 103" ? (
+            <>
+              {/* one claim covered by two earlier patents together (obviousness) */}
+              <div>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">yours </span>
+                a <Mark signal="yellow">molded fiber base</Mark> with{" "}
+                <Mark signal="yellow">concentric ridges</Mark>
+              </div>
+              <div className="mt-1.5">
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">US 5,743,110 </span>
+                <Mark signal="red">the molded fiber base</Mark>
+              </div>
+              <div className="mt-1.5">
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">US 6,983,542 </span>
+                <Mark signal="red">the concentric ridges</Mark>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* same idea, different words (novelty matched by meaning, not text) */}
+              <div>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">yours </span>
+                <Mark signal="yellow">ridges that isolate the food</Mark>
+              </div>
+              <div className="mt-1.5">
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">US 5,743,110 </span>
+                <Mark signal="red">ribs that lift the item off the floor</Mark>
+              </div>
+            </>
+          )}
         </div>
         <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
-          The first pair shares words. The second shares only the idea, which a text search would
-          miss.
+          {ground.ref === "35 USC 103"
+            ? "Neither patent covers your claim alone, but together they may make it obvious if there is a reason to combine them."
+            : "No words in common, but the same idea, which a plain text search would miss."}
         </p>
       </div>
     );

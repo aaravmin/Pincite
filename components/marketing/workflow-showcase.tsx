@@ -124,7 +124,8 @@ export function WorkflowVisual({ step }: { step: number }) {
         </div>
       );
     case 2:
-      // Compare - yours (yellow) over theirs (red), the same phrase overlapping.
+      // Compare - matched by meaning, not words. Your claim (yellow) and a granted
+      // patent (red) share no words but describe the same feature.
       return (
         <div className="rounded-xl border bg-background p-5 font-mono text-[13px] leading-relaxed">
           <div className="flex items-baseline gap-3">
@@ -132,7 +133,7 @@ export function WorkflowVisual({ step }: { step: number }) {
               yours
             </span>
             <span>
-              a lid with <Mark signal="yellow">a plurality of openings</Mark>
+              a lid with <Mark signal="yellow">vents that let steam escape</Mark>
             </span>
           </div>
           <div className="my-3 border-t border-dashed border-border" />
@@ -141,20 +142,20 @@ export function WorkflowVisual({ step }: { step: number }) {
               theirs
             </span>
             <span>
-              a cover having <Mark signal="red">a plurality of openings</Mark>
+              a cover with <Mark signal="red">perforations that release built up pressure</Mark>
             </span>
           </div>
           <p className="mt-3 font-sans text-xs leading-relaxed text-muted-foreground">
             US 6,983,542 B2, granted
           </p>
           <p className="mt-2 font-sans text-[13px] leading-relaxed text-foreground/80">
-            The same wording already appears in a granted patent, so this part may
-            not be new
+            No words in common, but the same idea, so this part may not be new
           </p>
         </div>
       );
     case 3:
-      // Fix - was (red) over now (green), one accepted correction.
+      // Fix - an indefinite term of degree narrowed to a measurable limit
+      // (MPEP 2173.05(b)). was (red) over now (green).
       return (
         <div className="rounded-xl border bg-background p-5 font-mono text-[13px] leading-relaxed">
           <div className="flex items-baseline gap-3">
@@ -162,7 +163,7 @@ export function WorkflowVisual({ step }: { step: number }) {
               was
             </span>
             <span>
-              wherein <Mark signal="red">the openings</Mark> comprise slots
+              a <Mark signal="red">substantially flat</Mark> lid
             </span>
           </div>
           <div className="my-3 border-t border-dashed border-border" />
@@ -171,14 +172,11 @@ export function WorkflowVisual({ step }: { step: number }) {
               now
             </span>
             <span>
-              wherein <Mark signal="green">a plurality of openings</Mark> comprise slots
+              a lid <Mark signal="green">flat to within 0.5 millimeters</Mark>
             </span>
           </div>
-          <p className="mt-3 font-sans text-xs leading-relaxed text-muted-foreground">
-            One suggested fix, reviewed and applied
-          </p>
-          <p className="mt-2 font-sans text-[13px] leading-relaxed text-foreground/80">
-            The first time a part is named it needs a, not the
+          <p className="mt-3 font-sans text-[13px] leading-relaxed text-foreground/80">
+            A word like substantially may have no clear line, so Pincite pins it to a measurable one
           </p>
         </div>
       );

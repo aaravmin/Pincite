@@ -21,11 +21,6 @@ import {
 
 const FLAGGED = ["108", "203", "216", "224"];
 
-const YOURS = "a plurality of openings";
-const PRIOR = "a plurality of openings";
-const YOUR_MEANING = "ridges that isolate the food";
-const PRIOR_MEANING = "ribs that lift the item off the floor";
-
 const DOCS = [
   "Specification DOCX",
   "Application data sheet",
@@ -166,41 +161,51 @@ export function SectionOnePlace() {
             <div className="flex h-full flex-col rounded-2xl border bg-card p-6">
               <TileHead icon={<Layers className="size-5" aria-hidden />} label="Prior art overlap" />
               <h3 className="mt-4 text-balance font-rounded text-xl font-semibold tracking-tight text-foreground">
-                Matched on wording and meaning
+                Matched by meaning, not just words
               </h3>
               <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-                Each claim part is lined up against granted patents by the exact words and by the
-                idea underneath.
+                Overlaps are found by the idea underneath your wording, even when two earlier patents
+                only cover a claim together.
               </p>
 
-              <div className="mt-5 rounded-xl border bg-background p-4 font-mono text-xs leading-relaxed">
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Yours
+              <div className="mt-5 space-y-4 rounded-xl border bg-background p-4 font-mono text-xs leading-relaxed">
+                {/* same idea, different words */}
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    Same idea, different words
+                  </div>
+                  <div className="mt-1.5">
+                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Yours </span>
+                    <Mark signal="yellow">ridges that isolate the food</Mark>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground">US 5,743,110 </span>
+                    <Mark signal="red">ribs that lift the item off the floor</Mark>
+                  </div>
                 </div>
-                <div className="mt-1">
-                  <Mark signal="yellow">{YOURS}</Mark>
-                </div>
-                <div className="mt-2.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Theirs
-                </div>
-                <div className="mt-1">
-                  <Mark signal="red">{PRIOR}</Mark>
-                </div>
-                <div className="mt-1.5 text-[10px] text-muted-foreground">US 6,983,542 B2</div>
 
-                <div className="my-3 border-t border-dashed" />
+                <div className="border-t border-dashed" />
 
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Yours
-                </div>
-                <div className="mt-1">
-                  <Mark signal="yellow">{YOUR_MEANING}</Mark>
-                </div>
-                <div className="mt-2.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Theirs
-                </div>
-                <div className="mt-1">
-                  <Mark signal="red">{PRIOR_MEANING}</Mark>
+                {/* split across two patents (obviousness) */}
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    Split across two patents
+                  </div>
+                  <div className="mt-1.5 text-foreground">
+                    a <Mark signal="yellow">molded fiber base</Mark> with{" "}
+                    <Mark signal="yellow">concentric ridges</Mark>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground">US 5,743,110 </span>
+                    <Mark signal="red">the molded fiber base</Mark>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground">US 6,983,542 </span>
+                    <Mark signal="red">the concentric ridges</Mark>
+                  </div>
+                  <p className="mt-2 font-sans text-[11px] leading-relaxed text-muted-foreground">
+                    With a reason to combine them, the claim may be obvious under 35 U.S.C. 103
+                  </p>
                 </div>
               </div>
 
