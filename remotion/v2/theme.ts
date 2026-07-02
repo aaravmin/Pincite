@@ -20,14 +20,14 @@ export { FPS, SIZE } from "../theme";
 // blur+translate ~30f after its spring starts; an interpolate settles at its end
 // frame). The payoff is last (no crossfade after it), so it keeps its own ending
 // structure and lingers on the logo ~45+ frames instead. Per-beat lastSettle:
-//   hook 286, clerical 182, search 225, positioning 163, review 127, trace 154,
+//   hook 289, clerical 182, search 225, positioning 163, review 127, trace 154,
 //   autofix 162, drawings 188, priorart 166 -> each + 26 below.
 // Two beats settle later than their headline copy: Search's background document
 // wall drifts until frame 225 (its drift interpolate ends there), and AutoFix's
 // click cursor fades out through frame 162, so those (not the closing line) are
 // the true last thing moving and set lastSettle.
 export const BEAT = {
-  hook: 312,
+  hook: 315,
   clerical: 208,
   search: 251,
   positioning: 189,
@@ -49,7 +49,7 @@ export const LINES = {
   theme: "Nine out of ten patents are rejected",
   themeFirst: "on the first application",
   themeSub: "Not because the ideas are bad",
-  themeSub2: "Many over avoidable formatting and wording mistakes",
+  themeSub2: "Usually for an avoidable formatting or wording mistake",
   // Beat 2 - clerical mistakes made concrete.
   clerical: "Mistakes like these",
   clericalFoot1: "Any one of these can sink the whole application",
