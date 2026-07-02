@@ -41,14 +41,14 @@ export function AutoFix() {
 
   const cardT = spring({ frame: frame - 24, fps, config: { damping: 200 } });
   const afterT = interpolate(frame, [58, 84], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const btnT = spring({ frame: frame - 92, fps, config: { damping: 200 } });
-  // the accept fires around frame 150
-  const accept = interpolate(frame, [148, 176], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cursorT = interpolate(frame, [104, 146], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
+  const btnT = spring({ frame: frame - 88, fps, config: { damping: 200 } });
+  // the accept fires around frame 140
+  const accept = interpolate(frame, [138, 160], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cursorT = interpolate(frame, [104, 136], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
 
   const dot = interpolateColors(accept, [0, 1], [COLORS.violation, COLORS.pass]);
-  const btnPress = interpolate(frame, [146, 152, 160], [1, 0.94, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const clickScale = interpolate(frame, [145, 150, 157], [1, 0.82, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const btnPress = interpolate(frame, [136, 142, 150], [1, 0.94, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const clickScale = interpolate(frame, [135, 140, 147], [1, 0.82, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <Scene
@@ -58,10 +58,10 @@ export function AutoFix() {
         { f: 0, x: 50, y: 16 },
         { f: 22, x: 50, y: 16 },
         { f: 54, x: 50, y: 46 },
-        { f: 90, x: 50, y: 46 },
-        { f: 128, x: 70, y: 58 },
-        { f: 160, x: 70, y: 58 },
-        { f: 194, x: 50, y: 48 },
+        { f: 88, x: 50, y: 46 },
+        { f: 118, x: 70, y: 58 },
+        { f: 148, x: 70, y: 58 },
+        { f: 180, x: 50, y: 48 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>
@@ -117,7 +117,7 @@ export function AutoFix() {
                   top: interpolate(cursorT, [0, 1], [64, 12]),
                   transform: `scale(${clickScale})`,
                   transformOrigin: "top left",
-                  opacity: interpolate(frame, [104, 118, 160, 172], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+                  opacity: interpolate(frame, [104, 118, 150, 162], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
                 }}
               >
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none">

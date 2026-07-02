@@ -82,21 +82,21 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
   // completes, so this beat's green-resolved content does not stack on the
   // outgoing prior-art beat's red banner at the transition midpoint.
   const aIn = interpolate(frame, [8, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const aOut = interpolate(frame, [128, 148], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const bIn = interpolate(frame, [140, 162], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const aOut = interpolate(frame, [116, 136], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const bIn = interpolate(frame, [128, 150], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   // zoom the camera into the one green survivor (successfully filed) until it fills
   // the frame, then hold the green disc still (clamped) while the line sits on it.
-  const zoom = interpolate(frame, [182, 226], [1, 20], {
+  const zoom = interpolate(frame, [170, 214], [1, 20], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  // the disc + line hold fully still 240-260, fade out 260-274, then the logo
-  // fades in over clean white (274-290) so it never sits over the disc text, and
-  // lingers at full opacity through the end of the beat.
-  const bOut = interpolate(frame, [260, 274], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cIn = interpolate(frame, [274, 290], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const logoT = spring({ frame: frame - 276, fps, config: { damping: 200 } });
+  // the disc + line hold fully still 228-248, fade out 248-262, then the logo
+  // fades in over clean white (262-278) so it never sits over the disc text, and
+  // lingers at full opacity for ~50 frames through the end of the beat.
+  const bOut = interpolate(frame, [248, 262], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cIn = interpolate(frame, [262, 278], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoT = spring({ frame: frame - 264, fps, config: { damping: 200 } });
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
 
   return (
@@ -109,12 +109,12 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         { f: 24, x: 50, y: 14 },
         { f: 56, x: 28, y: 48 },
         { f: 90, x: 28, y: 52 },
-        { f: 122, x: 68, y: 50 },
-        { f: 152, x: 68, y: 52 },
-        { f: 200, x: 50, y: 30 },
-        { f: 260, x: 50, y: 30 },
-        { f: 296, x: 50, y: 22 },
-        { f: 340, x: 50, y: 22 },
+        { f: 116, x: 68, y: 50 },
+        { f: 146, x: 68, y: 52 },
+        { f: 188, x: 50, y: 30 },
+        { f: 248, x: 50, y: 30 },
+        { f: 284, x: 50, y: 22 },
+        { f: 328, x: 50, y: 22 },
       ]}
     >
       {/* A: recolor + the real filing-ready document */}
@@ -196,7 +196,7 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
           and is width- and size-capped so no letter reaches the white gutters. */}
       <AbsoluteFill
         className="items-center justify-center"
-        style={{ opacity: interpolate(frame, [228, 240, 260, 274], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
+        style={{ opacity: interpolate(frame, [216, 228, 248, 262], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
       >
         <div
           className="font-serif text-center"

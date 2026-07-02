@@ -46,7 +46,7 @@ export function PriorArt() {
   const priorIn = interpolate(frame, [44, 84], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
   const explainIn = interpolate(frame, [78, 104], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const rightIn = interpolate(frame, [34, 80], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
-  const barProgress = interpolate(frame, [104, 196], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const barProgress = interpolate(frame, [104, 166], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <Scene
@@ -60,8 +60,7 @@ export function PriorArt() {
         { f: 100, x: 50, y: 80 },
         { f: 118, x: 50, y: 80 },
         { f: 140, x: 76, y: 46 },
-        { f: 190, x: 76, y: 48 },
-        { f: 215, x: 60, y: 60 },
+        { f: 182, x: 76, y: 48 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "44px 90px" }}>

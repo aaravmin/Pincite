@@ -169,7 +169,7 @@ function SpecCrossCheck() {
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-between border-t px-4 py-3.5">
+      <div className="flex items-center justify-center gap-8 border-t px-4 py-3.5">
         {/* rides the first numeral's own highlight so a green mark never sits
             beside a zero tally */}
         <div className="flex items-center gap-2" style={{ opacity: firstLit ?? 0 }}>

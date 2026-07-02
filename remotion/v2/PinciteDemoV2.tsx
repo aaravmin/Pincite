@@ -14,7 +14,7 @@ import { Payoff } from "./beats/Payoff";
 import { BEAT, XFADE } from "./theme";
 
 // Total frames after the 9 crossfades overlap. Ten beats, nine transitions.
-// Sum of the v2 BEAT values is 2340; minus 9 * 14 = 126 gives 2214 (~73.8s at
+// Sum of the v2 BEAT values is 2249; minus 9 * 14 = 126 gives 2123 (~70.8s at
 // 30fps), comfortably under the 90s (2700-frame) hard cap.
 export const TOTAL_FRAMES_V2 =
   BEAT.hook +

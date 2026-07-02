@@ -17,12 +17,12 @@ export const BEAT = {
   clerical: 250,
   search: 244,
   positioning: 198,
-  review: 165,
-  trace: 178,
-  autofix: 206,
+  review: 148,
+  trace: 162,
+  autofix: 190,
   drawings: 218,
-  priorart: 226,
-  payoff: 340,
+  priorart: 196,
+  payoff: 328,
 } as const;
 
 // Crossfade between beats.
@@ -55,7 +55,7 @@ export const LINES = {
   receiptsSub: "Quoted from the patent office's own manual",
   autofix: "And proposes the exact fix",
   drawings: "Right down to the numerals on your drawings",
-  priorart: "That patent search runs in seconds",
+  priorart: "It compares your draft to granted patents in seconds",
   priorartSub: "Every line of your draft, checked against existing patents",
   payoff: "Then it exports, ready to file to the USPTO",
 } as const;
