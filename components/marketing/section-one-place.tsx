@@ -7,8 +7,10 @@
 import { PenLine, Layers, FileDown, BookOpen } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { AnimatedHeading } from "@/components/marketing/animated-heading";
+import { SectionEyebrow } from "@/components/marketing/section-eyebrow";
 import { PatentFigure } from "@/components/marketing/patent-figure";
 import { MiniPatentPage } from "@/components/marketing/mini-patent-page";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
 import { SignalBadge } from "@visual/signal";
@@ -67,8 +69,14 @@ function TraceLead() {
   return (
     <div
       ref={ref as React.Ref<HTMLDivElement>}
-      className="rounded-2xl border bg-card p-8 shadow-sm"
+      className="relative overflow-hidden rounded-2xl border bg-card p-8 shadow-sm"
     >
+      <BorderBeam
+        duration={14}
+        size={90}
+        colorFrom="rgba(255,138,42,0.8)"
+        colorTo="rgba(255,168,80,0)"
+      />
       <div className="flex items-center gap-2.5">
         <span className="flex size-9 items-center justify-center rounded-lg border bg-muted/50 text-foreground">
           <BookOpen className="size-5" aria-hidden />
@@ -80,9 +88,6 @@ function TraceLead() {
       <h3 className="mt-4 text-balance font-rounded text-3xl font-semibold tracking-tight text-foreground">
         Every violation opens its exact rule
       </h3>
-      <p className="mt-3 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-        The same requirement, at three levels. Nothing is guessed.
-      </p>
 
       <div className="mt-7 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
         {/* the flag */}
@@ -128,12 +133,10 @@ function TraceLead() {
 
 export function SectionOnePlace() {
   return (
-    <section id="one-place" className="scroll-mt-20 overflow-x-clip border-t bg-muted/20">
+    <section id="one-place" className="scroll-mt-20 overflow-x-clip bg-muted/20">
       <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
         <BlurFade inView>
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Features
-          </p>
+          <SectionEyebrow n="0004">Features</SectionEyebrow>
         </BlurFade>
         <AnimatedHeading className="mt-3 max-w-3xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
           Every step to filing, in one dashboard
@@ -164,8 +167,8 @@ export function SectionOnePlace() {
                   Right down to the reference numerals
                 </h3>
                 <p className="mt-3 text-pretty text-lg leading-relaxed text-muted-foreground">
-                  It catches reference numerals that appear in a figure but never in the
-                  specification.
+                  Reference numerals that appear in a figure but never in the text are caught before
+                  an examiner sees them.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2.5">
                   {FLAGGED.map((n) => (
@@ -197,8 +200,8 @@ export function SectionOnePlace() {
                 Matched on wording and meaning
               </h3>
               <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
-                Not a text search. Each limitation is lined up against granted patents by the exact
-                words and by the idea underneath them.
+                Each limitation is lined up against granted patents by the exact words and by the
+                idea underneath.
               </p>
 
               {/* exact wording overlap - the earlier patent hangs offset so the shared
@@ -245,7 +248,7 @@ export function SectionOnePlace() {
                 </div>
               </div>
               <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
-                No words in common, but the same idea. A plain text search would slide right past it.
+                No words in common, but the same idea. A text search would slide right past it.
               </p>
 
               <div className="mt-auto border-t pt-5">
@@ -282,8 +285,7 @@ export function SectionOnePlace() {
                 The full set, in the order the USPTO expects
               </h3>
               <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
-                Every document the office needs, in the right format and the order the rules
-                require.
+                Every document the office needs, in the format and order the rules require.
               </p>
               <MiniPatentPage className="mt-5" />
               <div className="mt-auto flex flex-wrap gap-2 pt-6">

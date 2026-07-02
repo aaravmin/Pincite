@@ -6,6 +6,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { SectionEyebrow } from "@/components/marketing/section-eyebrow";
+import { LaunchVideo } from "@/components/marketing/launch-video";
 import { cn } from "@/lib/utils";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
@@ -22,18 +25,30 @@ import {
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* calm background wash, no loud effects */}
+      {/* Layered, deliberately quiet background. A drawing-sheet dot field that
+          fades out toward the page, plus a single sanctioned warm wash behind
+          the review card and a mirrored counterweight in the far corner. A
+          visitor should feel warmth, not see orange. */}
+      <DotPattern
+        aria-hidden
+        width={22}
+        height={22}
+        cr={1}
+        className="pointer-events-none -z-10 text-foreground/[0.05] [mask-image:radial-gradient(65%_55%_at_60%_0%,black,transparent)]"
+      />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,var(--accent),transparent_70%)] opacity-60"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_78%_8%,rgba(255,138,42,0.09),transparent_70%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_12%_95%,rgba(255,168,80,0.05),transparent_70%)]"
       />
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-start gap-12 px-6 py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:py-24">
         {/* left: the stake */}
         <div className="max-w-xl">
           <BlurFade delay={0} inView>
-            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Patent review dashboard
-            </p>
+            <SectionEyebrow n="0001">Patent review dashboard</SectionEyebrow>
           </BlurFade>
 
           <TextAnimate
@@ -49,9 +64,9 @@ export function Hero() {
 
           <BlurFade delay={0.5} inView>
             <p className="mt-6 max-w-lg text-pretty text-xl leading-relaxed text-muted-foreground">
-              Most of them for preventable rule violations. Pincite catches those in your draft and
-              pins each one to the real MPEP and CFR text. It also compares your claims against prior
-              patents, so you can judge your idea on novelty and obviousness before you file.
+              Most of them for preventable rule violations. Pincite catches each one in your draft,
+              pins it to the real MPEP and CFR text, and compares your claims against granted patents
+              before you file.
             </p>
           </BlurFade>
 
@@ -64,6 +79,9 @@ export function Hero() {
                 Start a review
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
+              <LaunchVideo className="rounded-md border border-border bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+                Watch the demo
+              </LaunchVideo>
             </div>
           </BlurFade>
 
@@ -100,7 +118,7 @@ function HeroReview() {
   return (
     <div
       ref={ref as React.Ref<HTMLDivElement>}
-      className="overflow-hidden rounded-2xl border bg-card shadow-xl"
+      className="overflow-hidden rounded-2xl border bg-card shadow-2xl shadow-foreground/[0.08] ring-1 ring-foreground/5"
     >
       {/* the draft, flush at the top of the surface */}
       <AnnotatedEditor

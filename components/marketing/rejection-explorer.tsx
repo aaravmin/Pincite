@@ -35,14 +35,14 @@ const GROUNDS: Ground[] = [
     name: "Obviousness",
     share: 0.85,
     engine: "art",
-    how: "Your claims are lined up against earlier patents one limitation at a time, so what is genuinely new is easy to see.",
+    how: "Your claims are lined up against earlier patents one limitation at a time.",
   },
   {
     ref: "35 USC 112(b)",
     name: "Indefiniteness and antecedent basis",
     share: 0.4,
     engine: "rule",
-    how: "Vague terms and missing antecedent basis are caught against MPEP 2173, each one tied to the exact passage it breaks.",
+    how: "Vague terms and missing first mentions are caught and tied to the exact passage they break.",
     // Antecedent basis: the first mention of a feature needs "a", not "the".
     fix: {
       was: ["wherein ", "the openings", " comprise slots"],
@@ -54,14 +54,14 @@ const GROUNDS: Ground[] = [
     name: "Novelty",
     share: 0.3,
     engine: "art",
-    how: "Any limitation already found in one earlier patent is surfaced side by side, the exact wording and the same idea reworded.",
+    how: "Anything already found in one earlier patent is shown side by side with your claim.",
   },
   {
     ref: "35 USC 112(a)",
     name: "Written description and enablement",
     share: 0.2,
     engine: "rule",
-    how: "Where a claim reaches past what the specification actually supports, the gap is marked so you can narrow it before filing.",
+    how: "Where a claim reaches past what your description supports, the gap is marked.",
     // Written description: narrow an overbroad claim to what the spec supports.
     fix: {
       was: ["formed from ", "any resilient material", ""],
@@ -73,14 +73,14 @@ const GROUNDS: Ground[] = [
     name: "Drawings and reference numerals",
     share: 0.2,
     engine: "drawing",
-    how: "Every reference numeral in a figure is matched against the specification, so a number that is missing from the text is caught.",
+    how: "Every numeral in a figure is matched against the text, so a missing one is caught.",
   },
   {
     ref: "35 USC 101",
     name: "Subject matter eligibility",
     share: 0.15,
     engine: "rule",
-    how: "Pincite tests whether your claims are eligible subject matter and not just an abstract idea, the way an examiner would under MPEP 2106.",
+    how: "Your claims are tested the way an examiner would test them, step by step.",
     // Eligibility: tie an abstract step to the concrete article that carries it.
     fix: {
       was: ["", "a method of choosing", " a ridge layout"],
@@ -93,17 +93,17 @@ const ENGINES: Record<Engine, { label: string; icon: typeof Layers; blurb: strin
   rule: {
     label: "Rule check",
     icon: BookOpenCheck,
-    blurb: "We read your draft against the rulebook and show the exact rule it breaks.",
+    blurb: "We show the exact rule your draft breaks.",
   },
   art: {
     label: "Prior patents check",
     icon: Layers,
-    blurb: "We compare your claims to earlier patents, by wording and by meaning.",
+    blurb: "We compare your claims to earlier patents.",
   },
   drawing: {
     label: "Drawing check",
     icon: PenLine,
-    blurb: "We match every figure and its reference numerals against the specification.",
+    blurb: "We match every figure against your text.",
   },
 };
 
@@ -159,8 +159,8 @@ function Preview({ ground }: { ground: Ground }) {
           </div>
         </div>
         <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
-          The first pair is the same words. The second is the same idea in different words, which a
-          plain text search would miss.
+          The first pair shares words. The second shares only the idea, which a text search would
+          miss.
         </p>
       </div>
     );
@@ -235,7 +235,7 @@ export function RejectionExplorer() {
                   className={
                     "group w-full rounded-xl border px-3.5 py-3 text-left transition-colors " +
                     (isActive
-                      ? "border-foreground/25 bg-muted/50"
+                      ? "border-border bg-card shadow-xs"
                       : "border-transparent hover:border-border hover:bg-muted/30")
                   }
                 >
@@ -295,27 +295,14 @@ export function RejectionExplorer() {
                 <Preview ground={active} />
               </div>
 
-              <div className="mt-auto pt-5">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>How often it comes up in rejections</span>
-                  <span className="tabular-nums">{pct(active.share)}%</span>
-                </div>
-                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-foreground/80 transition-all duration-500 ease-out"
-                    style={{ width: `${pct(active.share)}%` }}
-                  />
-                </div>
-                <p className="mt-3 text-xs text-muted-foreground">{engine.blurb}</p>
-              </div>
+              <p className="mt-auto pt-5 text-xs text-muted-foreground">{engine.blurb}</p>
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
       <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-        Grounds overlap, so shares do not add up. Sources USPTO filing and pendency reporting and
-        published rejection basis data.
+        Grounds overlap, so shares do not add up. Source USPTO reporting.
       </p>
     </div>
   );
