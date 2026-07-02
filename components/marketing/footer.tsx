@@ -18,25 +18,25 @@ export function MarketingFooter() {
             </p>
           </div>
           <div className="flex gap-12 sm:gap-16">
-            <nav className="flex flex-col gap-3 text-sm">
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <nav className="flex flex-col gap-1 text-sm">
+              <span className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Contact
               </span>
               <a
                 href="mailto:hello@pincite.net"
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="-my-1 inline-block py-2 text-muted-foreground transition-colors hover:text-foreground"
               >
                 hello@pincite.net
               </a>
             </nav>
-            <nav className="flex flex-col gap-3 text-sm">
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <nav className="flex flex-col gap-1 text-sm">
+              <span className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Legal
               </span>
-              <Link href="/privacy" className="text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="/privacy" className="-my-1 inline-block py-2 text-muted-foreground transition-colors hover:text-foreground">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="/terms" className="-my-1 inline-block py-2 text-muted-foreground transition-colors hover:text-foreground">
                 Terms of Service
               </Link>
             </nav>

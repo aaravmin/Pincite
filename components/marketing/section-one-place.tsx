@@ -228,7 +228,7 @@ export function SectionOnePlace() {
               </p>
 
               <div className="mt-5 overflow-hidden rounded-xl border bg-background p-3">
-                <PatentFigure className="mx-auto max-h-28" />
+                <PatentFigure className="mx-auto w-full max-w-[280px] sm:w-auto sm:max-h-28 sm:max-w-none" />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {FLAGGED.map((n) => (

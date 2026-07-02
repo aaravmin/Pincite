@@ -17,7 +17,7 @@ export function MarketingHome() {
       <TravelingHue />
       <MarketingNav />
       <MarketingMotion>
-        <main className="flex-1">
+        <main className="flex-1 overflow-x-clip">
           <Hero />
           <SectionStake />
           <SectionWorkflow />
