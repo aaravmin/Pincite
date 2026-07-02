@@ -8,7 +8,12 @@ import { Drawings } from "./beats/Drawings";
 import { PriorArt } from "./beats/PriorArt";
 import { Payoff } from "./beats/Payoff";
 import { PinciteDemo, TOTAL_FRAMES } from "./PinciteDemo";
+import { PinciteDemoV2, TOTAL_FRAMES_V2 } from "./v2/PinciteDemoV2";
+import { Clerical } from "./v2/beats/Clerical";
+import { Search } from "./v2/beats/Search";
+import { Positioning } from "./v2/beats/Positioning";
 import { SIZE, FPS, BEAT } from "./theme";
+import { BEAT as BEAT_V2 } from "./v2/theme";
 
 const P = { width: SIZE.width, height: SIZE.height };
 
@@ -25,6 +30,22 @@ export function RemotionRoot() {
         height={SIZE.height}
         defaultProps={P}
       />
+
+      {/* The V2 cut, 16:9 widescreen - problem-first, ten beats. */}
+      <Composition
+        id="PinciteDemoV2"
+        component={PinciteDemoV2}
+        durationInFrames={TOTAL_FRAMES_V2}
+        fps={FPS}
+        width={SIZE.width}
+        height={SIZE.height}
+        defaultProps={P}
+      />
+
+      {/* The three new V2 beats, for iteration. */}
+      <Composition id="V2Clerical" component={Clerical} durationInFrames={BEAT_V2.clerical} fps={FPS} width={SIZE.width} height={SIZE.height} />
+      <Composition id="V2Search" component={Search} durationInFrames={BEAT_V2.search} fps={FPS} width={SIZE.width} height={SIZE.height} />
+      <Composition id="V2Positioning" component={Positioning} durationInFrames={BEAT_V2.positioning} fps={FPS} width={SIZE.width} height={SIZE.height} />
 
       {/* Individual beats, for iteration. */}
       <Composition id="Hook" component={Hook} durationInFrames={BEAT.hook} fps={FPS} width={SIZE.width} height={SIZE.height} defaultProps={{ width: SIZE.width }} />
