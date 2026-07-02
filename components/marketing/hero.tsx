@@ -38,7 +38,7 @@ export function Hero() {
             once
             className="mt-5 text-balance font-rounded text-4xl font-semibold leading-[1.03] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
           >
-            Nine in ten applications get rejected the first time
+            Nine in ten applications get rejected on their first application
           </TextAnimate>
 
           <BlurFade delay={0.5} inView>
