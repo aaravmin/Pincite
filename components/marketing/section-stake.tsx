@@ -35,7 +35,7 @@ function Stat({
 export function SectionStake() {
   return (
     <section className="bg-muted/20">
-      <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-28">
+      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
         <BlurFade inView>
           <SectionEyebrow n="0002">The stake</SectionEyebrow>
         </BlurFade>

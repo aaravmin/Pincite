@@ -222,7 +222,7 @@ export function RejectionExplorer() {
   const previewLabel = active.engine === "rule" ? "How Pincite fixes it" : "What Pincite points out";
 
   return (
-    <div className="rounded-2xl border bg-card p-6 shadow-sm sm:p-7">
+    <div className="rounded-2xl border bg-card p-4 shadow-sm sm:p-7">
       <h3 className="text-base font-semibold text-foreground">Where rejections come from</h3>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -274,7 +274,7 @@ export function RejectionExplorer() {
         </ul>
 
         {/* right: the check that catches the selected ground, and the preview */}
-        <div className="flex flex-col rounded-xl border bg-background p-5">
+        <div className="flex flex-col rounded-xl border bg-background p-4 sm:p-5">
           <AnimatePresence mode="wait">
             <motion.div
               key={active.ref}
@@ -288,8 +288,8 @@ export function RejectionExplorer() {
                 <EngineIcon className="size-4" aria-hidden />
                 {engine.label}
               </span>
-              <div className="mt-4 flex items-baseline gap-3">
-                <span className="font-mono text-2xl font-medium text-foreground">{active.ref}</span>
+              <div className="mt-4 flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                <span className="font-mono text-xl font-medium text-foreground sm:text-2xl">{active.ref}</span>
                 <span className="text-sm text-muted-foreground">{active.name}</span>
               </div>
               <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/90">{active.how}</p>
