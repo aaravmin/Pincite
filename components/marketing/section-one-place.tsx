@@ -210,7 +210,7 @@ export function SectionOnePlace() {
               </div>
 
               <p className="mt-auto pt-4 text-xs leading-relaxed text-muted-foreground">
-                No single patentability score, you judge the overlaps yourself.
+                Every overlap is itemized so you can weigh it yourself.
               </p>
             </div>
           </BlurFade>
@@ -220,15 +220,15 @@ export function SectionOnePlace() {
             <div className="flex h-full flex-col rounded-2xl border bg-card p-6">
               <TileHead icon={<PenLine className="size-5" aria-hidden />} label="Drawing check" />
               <h3 className="mt-4 text-balance font-rounded text-xl font-semibold tracking-tight text-foreground">
-                Down to the reference numerals
+                Numerals matched to the text
               </h3>
               <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-                Numerals that appear in a figure but never in the text are caught before an examiner
-                sees them.
+                A numeral on a figure that never appears in the text is caught before an examiner
+                sees it.
               </p>
 
               <div className="mt-5 overflow-hidden rounded-xl border bg-background p-3">
-                <PatentFigure className="mx-auto max-h-40" />
+                <PatentFigure className="mx-auto max-h-28" />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {FLAGGED.map((n) => (
@@ -282,7 +282,7 @@ export function SectionOnePlace() {
                 Versioned and audited
               </h3>
               <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-                Every save is an immutable snapshot with a full audit trail.
+                Every save is logged with an audit trail.
               </p>
 
               <div className="mt-5 rounded-xl border bg-background p-4">
