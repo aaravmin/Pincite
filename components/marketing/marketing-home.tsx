@@ -6,13 +6,15 @@ import { SectionStake } from "@/components/marketing/section-stake";
 import { SectionWorkflow } from "@/components/marketing/section-workflow";
 import { SectionOnePlace } from "@/components/marketing/section-one-place";
 import { SectionTrust } from "@/components/marketing/section-trust";
-import { SectionCta } from "@/components/marketing/section-cta";
+import { TravelingHue } from "@/components/marketing/traveling-hue";
 
 // The public landing page body. Rendered at `/` for signed-out visitors and at
 // `/home` for signed-in users who click the wordmark to revisit the homepage.
 export function MarketingHome() {
   return (
     <div className="flex flex-1 flex-col">
+      {/* one warm hue that travels with the reader down the whole page */}
+      <TravelingHue />
       <MarketingNav />
       <MarketingMotion>
         <main className="flex-1">
@@ -21,7 +23,6 @@ export function MarketingHome() {
           <SectionWorkflow />
           <SectionOnePlace />
           <SectionTrust />
-          <SectionCta />
         </main>
       </MarketingMotion>
       <MarketingFooter />

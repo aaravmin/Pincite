@@ -6,9 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { BlurFade } from "@/components/ui/blur-fade";
-import { DotPattern } from "@/components/ui/dot-pattern";
 import { SectionEyebrow } from "@/components/marketing/section-eyebrow";
-import { LaunchVideo } from "@/components/marketing/launch-video";
 import { cn } from "@/lib/utils";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
@@ -24,26 +22,7 @@ import {
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
-      {/* Layered, deliberately quiet background. A drawing-sheet dot field that
-          fades out toward the page, plus a single sanctioned warm wash behind
-          the review card and a mirrored counterweight in the far corner. A
-          visitor should feel warmth, not see orange. */}
-      <DotPattern
-        aria-hidden
-        width={22}
-        height={22}
-        cr={1}
-        className="pointer-events-none -z-10 text-foreground/[0.05] [mask-image:radial-gradient(65%_55%_at_60%_0%,black,transparent)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_78%_8%,rgba(255,138,42,0.09),transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(50%_40%_at_12%_95%,rgba(255,168,80,0.05),transparent_70%)]"
-      />
+    <section className="overflow-hidden">
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-start gap-12 px-6 py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:py-24">
         {/* left: the stake */}
         <div className="max-w-xl">
@@ -79,9 +58,6 @@ export function Hero() {
                 Start a review
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
-              <LaunchVideo className="rounded-md border border-border bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent">
-                Watch the demo
-              </LaunchVideo>
             </div>
           </BlurFade>
 
