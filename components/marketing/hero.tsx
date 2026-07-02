@@ -152,7 +152,7 @@ function HeroReview() {
             law={f.citation.law}
             cfr={f.citation.cfr}
             mpep={f.citation.mpep}
-            guidance="The law and the rule set the requirement. The guidance is the part that tells you exactly how to fix it."
+            guidance="The guidebook for how to abide by the rule and the law."
             progress={progress}
             hideSource
             helperLine=""

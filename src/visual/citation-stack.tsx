@@ -40,7 +40,7 @@ export function CitationStack({
   excerpt,
   progress = 1,
   onOpenMpep,
-  helperLine = "The same requirement at three levels. The guidance explains the law and the rule.",
+  helperLine = "The same requirement at three levels, down to the guidebook for how to abide by the rule and the law.",
   dense,
   hideSource,
   className,

@@ -147,6 +147,10 @@ export function WorkflowVisual({ step }: { step: number }) {
           <p className="mt-3 font-sans text-xs leading-relaxed text-muted-foreground">
             US 6,983,542 B2, granted
           </p>
+          <p className="mt-2 font-sans text-[13px] leading-relaxed text-foreground/80">
+            The same wording already appears in a granted patent, so this part may
+            not be new
+          </p>
         </div>
       );
     case 3:
@@ -172,6 +176,9 @@ export function WorkflowVisual({ step }: { step: number }) {
           </div>
           <p className="mt-3 font-sans text-xs leading-relaxed text-muted-foreground">
             One suggested fix, reviewed and applied
+          </p>
+          <p className="mt-2 font-sans text-[13px] leading-relaxed text-foreground/80">
+            The first time a part is named it needs a, not the
           </p>
         </div>
       );
