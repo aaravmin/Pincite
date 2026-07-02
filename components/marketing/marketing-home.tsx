@@ -6,6 +6,7 @@ import { SectionStake } from "@/components/marketing/section-stake";
 import { SectionWorkflow } from "@/components/marketing/section-workflow";
 import { SectionOnePlace } from "@/components/marketing/section-one-place";
 import { SectionTrust } from "@/components/marketing/section-trust";
+import { SectionCta } from "@/components/marketing/section-cta";
 
 // The public landing page body. Rendered at `/` for signed-out visitors and at
 // `/home` for signed-in users who click the wordmark to revisit the homepage.
@@ -20,6 +21,7 @@ export function MarketingHome() {
           <SectionWorkflow />
           <SectionOnePlace />
           <SectionTrust />
+          <SectionCta />
         </main>
       </MarketingMotion>
       <MarketingFooter />

@@ -1,98 +1,157 @@
 "use client";
 
-// How it works - a numbered vertical timeline of the workflow (draft, check,
-// compare, fix, export). The rail draws itself in on scroll and each step staggers
-// up, so it reads as one continuous thread. Calm and minimal, few words.
+// How it works - a numbered timeline of the workflow (draft, check, compare, fix,
+// export) with a sticky visual panel on the left that crossfades to whichever step
+// is centered in the viewport. Each step block watches itself into view and claims
+// the panel, so scrolling the steps steps the visual. On mobile the panel is gone
+// and each step carries its own visual inline. Calm, neutral, few words.
 
-import { motion, type Variants } from "motion/react";
-import { BlurFade } from "@/components/ui/blur-fade";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useInView } from "motion/react";
+import { SectionEyebrow } from "@/components/marketing/section-eyebrow";
 import { AnimatedHeading } from "@/components/marketing/animated-heading";
+import { BlurFade } from "@/components/ui/blur-fade";
+import { WORKFLOW_STEPS, WorkflowVisual } from "@/components/marketing/workflow-showcase";
 
-const STEPS = [
-  { n: "01", title: "Draft", body: "Write your patent one section at a time." },
-  { n: "02", title: "Check", body: "Every rule violation caught and cited." },
-  { n: "03", title: "Compare", body: "Measured against prior patents for novelty and obviousness." },
-  { n: "04", title: "Fix", body: "Review each fix, then apply it." },
-  { n: "05", title: "Export", body: "Filing ready documents in the right format." },
-];
+// One step in the right-hand timeline. It watches a band around the middle of the
+// screen; when it crosses that band it reports itself active so the sticky panel
+// swaps to its visual. The active step reads emphasized, the rest calm.
+function Step({
+  index,
+  active,
+  onActive,
+  isLast,
+}: {
+  index: number;
+  active: boolean;
+  onActive: (i: number) => void;
+  isLast: boolean;
+}) {
+  const ref = useRef<HTMLLIElement>(null);
+  const inView = useInView(ref, { margin: "-45% 0px -45% 0px" });
+  const s = WORKFLOW_STEPS[index];
 
-const rail: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.13, delayChildren: 0.05 } },
-};
-const stepIn: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
-const dotIn: Variants = {
-  hidden: { scale: 0, opacity: 0 },
-  show: { scale: 1, opacity: 1, transition: { type: "spring", stiffness: 320, damping: 20 } },
-};
-const lineIn: Variants = {
-  hidden: { scaleY: 0 },
-  show: { scaleY: 1, transition: { duration: 0.5, ease: "easeOut" } },
-};
+  // When this step crosses the middle band it claims the sticky panel. The parent
+  // owns the active index; we only report on the rising edge.
+  useEffect(() => {
+    if (inView) onActive(index);
+  }, [inView, index, onActive]);
+
+  return (
+    <motion.li
+      ref={ref}
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="relative flex gap-6 pb-14 last:pb-0"
+    >
+      {/* rail: dot + connector */}
+      <div className="flex flex-col items-center">
+        <span className="mt-1.5" aria-hidden>
+          <span
+            className={
+              "block size-4 rounded-full ring-4 transition-all duration-300 " +
+              (active
+                ? "scale-110 bg-foreground ring-foreground/15"
+                : "bg-muted-foreground/40 ring-transparent")
+            }
+          />
+        </span>
+        {!isLast && <span className="mt-2 w-px flex-1 bg-border" aria-hidden />}
+      </div>
+
+      {/* content */}
+      <div className="min-w-0 flex-1">
+        <div
+          className={
+            "font-rounded text-xl font-semibold transition-colors duration-300 " +
+            (active ? "text-foreground/60" : "text-muted-foreground/40")
+          }
+        >
+          {s.n}
+        </div>
+        <h3
+          className={
+            "mt-1 font-rounded text-2xl font-semibold tracking-tight transition-colors duration-300 " +
+            (active ? "text-foreground" : "text-muted-foreground")
+          }
+        >
+          {s.title}
+        </h3>
+        <p
+          className={
+            "mt-1.5 max-w-md text-pretty text-lg leading-relaxed transition-colors duration-300 " +
+            (active ? "text-foreground/80" : "text-muted-foreground")
+          }
+        >
+          {s.body}
+        </p>
+
+        {/* mobile only: the visual inline under its step */}
+        <div className="mt-5 lg:hidden">
+          <WorkflowVisual step={index} />
+        </div>
+      </div>
+    </motion.li>
+  );
+}
 
 export function SectionWorkflow() {
-  return (
-    <section className="border-t">
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-14 px-6 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:py-32">
-        <div>
-          <BlurFade inView>
-            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              How it works
-            </p>
-          </BlurFade>
-          <AnimatedHeading className="mt-3 max-w-md text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            Draft to filing in five steps
-          </AnimatedHeading>
-          <BlurFade inView delay={0.1} className="mt-5">
-            <p className="max-w-sm text-pretty text-lg leading-relaxed text-muted-foreground">
-              No new information to learn.
-              <br />
-              Write, and Pincite handles the rest.
-            </p>
-          </BlurFade>
-        </div>
+  const [active, setActive] = useState(0);
+  const step = WORKFLOW_STEPS[active];
 
-        <motion.ol
-          className="relative"
-          variants={rail}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-        >
-          {STEPS.map((s, i) => (
-            <motion.li key={s.n} variants={stepIn} className="group relative flex gap-6 pb-12 last:pb-0">
-              {/* rail: dot + connector */}
-              <div className="flex flex-col items-center">
-                <motion.span variants={dotIn} className="mt-1.5" aria-hidden>
-                  <span className="block size-4 rounded-full bg-foreground ring-4 ring-foreground/10 transition-transform duration-200 group-hover:scale-125" />
-                </motion.span>
-                {i < STEPS.length - 1 && (
-                  <motion.span
-                    variants={lineIn}
-                    style={{ originY: 0 }}
-                    className="mt-2 w-px flex-1 bg-border"
-                    aria-hidden
-                  />
-                )}
+  return (
+    <section className="bg-background">
+      <div className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32">
+        <BlurFade inView>
+          <SectionEyebrow n="0003">How it works</SectionEyebrow>
+        </BlurFade>
+        <AnimatedHeading className="mt-3 max-w-2xl text-balance font-rounded text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Draft to filing in five steps
+        </AnimatedHeading>
+        <BlurFade inView delay={0.1} className="mt-5">
+          <p className="max-w-sm text-pretty text-lg leading-relaxed text-muted-foreground">
+            Write, and Pincite handles the rest.
+          </p>
+        </BlurFade>
+
+        <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.05fr]">
+          {/* left: the sticky visual panel (lg only). Crossfades to the active step. */}
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <div className="flex min-h-[26rem] flex-col justify-center rounded-2xl border bg-card p-6 shadow-sm">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={active}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                  >
+                    <WorkflowVisual step={active} />
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              {/* content */}
-              <div className="pb-2 transition-transform duration-200 group-hover:translate-x-1">
-                <div className="font-rounded text-2xl font-semibold text-muted-foreground/45 transition-colors group-hover:text-foreground/70">
-                  {s.n}
-                </div>
-                <h3 className="mt-1 font-rounded text-2xl font-semibold tracking-tight text-foreground">
-                  {s.title}
-                </h3>
-                <p className="mt-1.5 max-w-md text-pretty text-lg leading-relaxed text-muted-foreground transition-colors group-hover:text-foreground/80">
-                  {s.body}
-                </p>
-              </div>
-            </motion.li>
-          ))}
-        </motion.ol>
+              <p className="mt-3 text-right font-mono text-xs text-muted-foreground">
+                {step.n} {step.title}
+              </p>
+            </div>
+          </div>
+
+          {/* right: the five steps */}
+          <ol className="relative">
+            {WORKFLOW_STEPS.map((s, i) => (
+              <Step
+                key={s.n}
+                index={i}
+                active={active === i}
+                onActive={setActive}
+                isLast={i === WORKFLOW_STEPS.length - 1}
+              />
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );
