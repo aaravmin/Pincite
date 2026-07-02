@@ -36,14 +36,15 @@ export function Trace() {
   const frame = useCurrentFrame();
   const f = MULTI_DEPENDENT_FINDING;
 
-  const slide = interpolate(frame, [14, 56], [0, 1], {
+  // Reveals compressed to roughly half so this beat matches the film's tempo.
+  const slide = interpolate(frame, [10, 34], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
   });
-  const hl = interpolate(frame, [58, 84], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const subIn = interpolate(frame, [18, 40], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const stackProgress = interpolate(frame, [80, 158], [0, 1], {
+  const hl = interpolate(frame, [34, 52], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const subIn = interpolate(frame, [12, 30], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const stackProgress = interpolate(frame, [44, 96], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -52,18 +53,18 @@ export function Trace() {
     <Scene
       // headline, then across the three columns as each takes its turn - the
       // flag as the columns slide in, the MPEP text while the highlight lands
-      // (58-84), the citation stack while it fills (80-158), then down to the
+      // (34-52), the citation stack while it fills (44-96), then down to the
       // closing line
       hue={[
         { f: 0, x: 50, y: 16 },
-        { f: 14, x: 50, y: 16 },
-        { f: 34, x: 22, y: 50 },
-        { f: 54, x: 22, y: 50 },
-        { f: 66, x: 50, y: 52 },
-        { f: 86, x: 50, y: 52 },
-        { f: 104, x: 78, y: 52 },
-        { f: 158, x: 78, y: 52 },
-        { f: 178, x: 52, y: 74 },
+        { f: 10, x: 50, y: 16 },
+        { f: 26, x: 22, y: 50 },
+        { f: 40, x: 22, y: 50 },
+        { f: 50, x: 50, y: 52 },
+        { f: 64, x: 50, y: 52 },
+        { f: 78, x: 78, y: 52 },
+        { f: 100, x: 78, y: 52 },
+        { f: 120, x: 52, y: 74 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 90px" }}>
@@ -126,8 +127,12 @@ export function Trace() {
               law={f.citation.law}
               cfr={f.citation.cfr}
               mpep={f.citation.mpep}
-              guidance={f.citation.guidance}
-              excerpt={f.citation.excerpt}
+              // Guidance reads a plain line here (the verbatim MPEP text still
+              // shows in the middle column), and the standalone helper line under
+              // the stack is hidden.
+              guidance="The guidebook explaining the rule and law"
+              excerpt={undefined}
+              helperLine=""
               progress={stackProgress}
             />
           </div>
@@ -136,7 +141,7 @@ export function Trace() {
         <div style={{ marginTop: 34 }}>
           <KineticText
             text="Nothing is guessed"
-            startFrame={172}
+            startFrame={104}
             className="font-serif"
             style={{ fontSize: 40, fontWeight: 600, color: COLORS.mutedForeground }}
           />

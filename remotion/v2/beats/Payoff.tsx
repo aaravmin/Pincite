@@ -56,7 +56,8 @@ function FieldCallback({ width = 1920, height = 1080, zoom = 1 }: { width?: numb
                   top: r * cell + (cell - size) / 2,
                   width: size,
                   height: size,
-                  borderRadius: 8,
+                  // circles, like the Hook's opening dots
+                  borderRadius: 999,
                   background: isGreen ? COLORS.pass : COLORS.violation,
                   border: isSurv ? `2px solid ${COLORS.foreground}` : "none",
                   boxShadow: isSurv ? "0 6px 20px rgba(0,0,0,0.18)" : "none",
@@ -83,15 +84,19 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
   const aIn = interpolate(frame, [8, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const aOut = interpolate(frame, [128, 148], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const bIn = interpolate(frame, [140, 162], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  // zoom the camera into the one green survivor (successfully filed), until it fills the frame.
+  // zoom the camera into the one green survivor (successfully filed) until it fills
+  // the frame, then hold the green disc still (clamped) while the line sits on it.
   const zoom = interpolate(frame, [182, 226], [1, 20], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  const bOut = interpolate(frame, [224, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cIn = interpolate(frame, [232, 252], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const logoT = spring({ frame: frame - 234, fps, config: { damping: 200 } });
+  // the disc + line hold fully still 240-260, fade out 260-274, then the logo
+  // fades in over clean white (274-290) so it never sits over the disc text, and
+  // lingers at full opacity through the end of the beat.
+  const bOut = interpolate(frame, [260, 274], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cIn = interpolate(frame, [274, 290], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoT = spring({ frame: frame - 276, fps, config: { damping: 200 } });
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
 
   return (
@@ -106,8 +111,10 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         { f: 90, x: 28, y: 52 },
         { f: 122, x: 68, y: 50 },
         { f: 152, x: 68, y: 52 },
-        { f: 200, x: 50, y: 24 },
-        { f: 255, x: 50, y: 24 },
+        { f: 200, x: 50, y: 30 },
+        { f: 260, x: 50, y: 30 },
+        { f: 296, x: 50, y: 22 },
+        { f: 340, x: 50, y: 22 },
       ]}
     >
       {/* A: recolor + the real filing-ready document */}
@@ -184,14 +191,21 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
         <FieldCallback width={width} height={height} zoom={zoom} />
       </AbsoluteFill>
 
-      {/* the line on the green fill */}
+      {/* the closing line, sitting fully inside the green disc. It only appears
+          once the zoom is essentially complete (disc large), wraps to two lines,
+          and is width- and size-capped so no letter reaches the white gutters. */}
       <AbsoluteFill
         className="items-center justify-center"
-        style={{ opacity: interpolate(frame, [208, 220, 236, 246], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
+        style={{ opacity: interpolate(frame, [228, 240, 260, 274], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}
       >
-        <span className="font-serif" style={{ fontSize: 78, fontWeight: 700, color: "#ffffff" }}>
-          Be the one that gets accepted
-        </span>
+        <div
+          className="font-serif text-center"
+          style={{ maxWidth: 720, fontSize: 68, fontWeight: 700, lineHeight: 1.12, color: "#ffffff" }}
+        >
+          Be the one that
+          <br />
+          gets accepted
+        </div>
       </AbsoluteFill>
 
       {/* C: logo only */}

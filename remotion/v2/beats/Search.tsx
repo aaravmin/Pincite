@@ -93,8 +93,10 @@ function DocWall() {
 export function Search() {
   const frame = useCurrentFrame();
 
+  // US utility patent No. 12,000,000 issued June 4, 2024; the USPTO grants about
+  // 325,800 utility patents a year, so by mid-2026 roughly 12.68M are in force.
   const count = Math.round(
-    interpolate(frame, [60, 150], [0, 12_000_000], {
+    interpolate(frame, [60, 150], [0, 12_680_000], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
       easing: Easing.out(Easing.cubic),

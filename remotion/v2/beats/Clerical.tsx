@@ -58,12 +58,17 @@ function Card({
   );
 }
 
-// A mono snippet box with an offending token marked red.
+// Shared height for every card's middle box, so the three snippet/middle boxes
+// (and the glosses beneath them) line up on one baseline across the row.
+const MIDDLE_MIN_H = 96;
+
+// A mono snippet box with an offending token marked red. Content is top-aligned
+// and the box carries the shared min-height so all three middles match.
 function Snippet({ before, token, after }: { before: string; token: string; after: string }) {
   return (
     <div
       className="rounded-lg bg-muted/40 p-4 leading-relaxed text-foreground"
-      style={{ fontFamily: "var(--font-geist-mono)", fontSize: 20 }}
+      style={{ fontFamily: "var(--font-geist-mono)", fontSize: 20, minHeight: MIDDLE_MIN_H }}
     >
       {before}
       <span style={redMark}>{token}</span>
@@ -130,7 +135,12 @@ export function Clerical() {
             delay={70}
             label="A drawing mismatch"
             middle={
-              <div className="flex items-center gap-4">
+              // same box + min-height as the snippet middles, content top-aligned,
+              // so the 203 chip drops to where the claim text begins in cards 1 and 2
+              <div
+                className="flex items-start gap-4 rounded-lg bg-muted/40 p-4"
+                style={{ minHeight: MIDDLE_MIN_H }}
+              >
                 <span
                   className="rounded-lg border border-violation bg-violation-bg px-4 py-2 font-mono font-bold text-violation"
                   style={{ fontFamily: "var(--font-geist-mono)", fontSize: 26 }}

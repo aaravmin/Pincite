@@ -62,8 +62,11 @@ export function Hook({ width = 1920 }: { width?: number }) {
 
   // the survivor dot transforms into the draft: grows, rounds, whitens
   const EDW = 1480;
-  const EDH = 210;
-  const EDCY = 412;
+  // Taller card so the enlarged 18px claim text (four lines) reads without
+  // clipping; EDH matches the AnnotatedEditor's rendered height at this font so
+  // the survivor-dot morph lands exactly on the editor (no empty gutter).
+  const EDH = 206;
+  const EDCY = 430;
   const morph = interpolate(frame, [116, 196], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
   const cardW = interpolate(morph, [0, 1], [DOT, EDW]);
   const cardH = interpolate(morph, [0, 1], [DOT, EDH]);
@@ -153,15 +156,18 @@ export function Hook({ width = 1920 }: { width?: number }) {
           activeFlagId="md"
           progress={editorProgress}
           caption={APPLE_META.claimsCaption}
-          className="shadow-[0_44px_110px_-24px_rgba(0,0,0,0.28)] ring-1 ring-black/5"
+          // enlarge the claim text for THIS instance only - a parent descendant
+          // selector beats the shared <pre>'s own text-[13px] without !important
+          className="shadow-[0_44px_110px_-24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 [&_pre]:text-[18px] [&_pre]:leading-loose"
         />
       </div>
 
-      {/* the sublines, below the patent */}
-      <div style={{ position: "absolute", left: 0, right: 0, top: EDCY + EDH / 2 + 56, textAlign: "center" }}>
-        <div style={{ maxWidth: 1180, marginLeft: "auto", marginRight: "auto" }}>
+      {/* the sublines, below the patent. The second line is kept to a single row
+          (no word orphaned) with a wide container plus nowrap. */}
+      <div style={{ position: "absolute", left: 0, right: 0, top: EDCY + EDH / 2 + 54, textAlign: "center" }}>
+        <div style={{ maxWidth: 1620, marginLeft: "auto", marginRight: "auto" }}>
           <KineticText text={LINES.themeSub} startFrame={210} className="font-serif" style={{ fontSize: 56, fontWeight: 700, color: COLORS.foreground }} />
-          <div className="mt-3">
+          <div className="mt-3" style={{ whiteSpace: "nowrap" }}>
             <KineticText text={LINES.themeSub2} startFrame={238} className="font-serif" style={{ fontSize: 40, fontWeight: 500, color: COLORS.mutedForeground }} />
           </div>
         </div>

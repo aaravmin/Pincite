@@ -46,6 +46,21 @@ const FLAGGED = [
 
 const G = COLORS.mutedForeground;
 
+// A small red X (two crossed strokes, rounded caps) in the same style as the
+// failing mark in Review, for the "never mentioned" tally.
+function RedX({ size = 15 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 20 20" width={size} height={size} className="shrink-0" fill="none" aria-hidden>
+      <path
+        d="M6 6l8 8M14 6l-8 8"
+        stroke={COLORS.violation}
+        strokeWidth={2.4}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 // The other half of the rule, the written description itself. The scan sweeps
 // the real paragraph text, each described numeral lights green as it is matched,
 // and the four drawing-only numerals come back never mentioned.
@@ -162,7 +177,7 @@ function SpecCrossCheck() {
           <span className="text-[15px] font-medium text-foreground">{litValues.size} of 5 matched in the description</span>
         </div>
         <div className="flex items-center gap-2" style={{ opacity: missT }}>
-          <SignalMark signal="red" />
+          <RedX />
           <span className="text-[15px] font-medium text-violation">4 never mentioned</span>
         </div>
       </div>

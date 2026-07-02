@@ -9,17 +9,20 @@
 export { FPS, SIZE } from "../theme";
 
 // Beat lengths in frames (sequence durations; TransitionSeries overlaps XFADE each).
+// Each length holds the fully composed beat still for at least 15 frames after its
+// last element lands, before the crossfade to the next (the payoff, being last,
+// instead lingers on the logo ~50 frames). See the pacing note in the revision.
 export const BEAT = {
-  hook: 300,
-  clerical: 225,
-  search: 225,
-  positioning: 185,
+  hook: 315,
+  clerical: 250,
+  search: 244,
+  positioning: 198,
   review: 165,
-  trace: 214,
-  autofix: 205,
-  drawings: 215,
-  priorart: 215,
-  payoff: 255,
+  trace: 178,
+  autofix: 206,
+  drawings: 218,
+  priorart: 226,
+  payoff: 340,
 } as const;
 
 // Crossfade between beats.
@@ -32,7 +35,7 @@ export const LINES = {
   theme: "Nine out of ten patents are rejected",
   themeFirst: "on the first application",
   themeSub: "Not because the ideas are bad",
-  themeSub2: "Because of simple paperwork mistakes that were completely avoidable",
+  themeSub2: "Many over avoidable formatting and wording mistakes",
   // Beat 2 - clerical mistakes made concrete.
   clerical: "Mistakes like these",
   clericalFoot1: "Any one of these can sink the whole application",
@@ -40,8 +43,8 @@ export const LINES = {
   // Beat 3 - the tedious prior-art search.
   searchLead: "Then comes one more question",
   searchQuestion: "Has anyone already patented this?",
-  searchCaption: "existing US patents to check against",
-  searchClose: "Checking by hand takes hours, every single time",
+  searchCaption: "existing US utility patents to check against",
+  searchClose: "By hand, that search takes days of reading",
   // Beat 4 - the pivot.
   positioning: "Pincite automates the tedious parts",
   positioningEmph1: "It never invents for you",
