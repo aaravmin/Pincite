@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "How Pincite collects, uses, and protects your information.",
 };
 
-const CONTACT_EMAIL = "aaravmin@pincite.net";
+const CONTACT_EMAIL = "hello@pincite.net";
 const UPDATED = "June 29, 2026";
 
 export default function PrivacyPage() {

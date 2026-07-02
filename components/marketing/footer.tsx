@@ -23,10 +23,10 @@ export function MarketingFooter() {
                 Contact
               </span>
               <a
-                href="mailto:aaravmin@pincite.net"
+                href="mailto:hello@pincite.net"
                 className="text-muted-foreground transition-colors hover:text-foreground"
               >
-                aaravmin@pincite.net
+                hello@pincite.net
               </a>
             </nav>
             <nav className="flex flex-col gap-3 text-sm">
