@@ -9,19 +9,22 @@
 export { FPS, SIZE } from "../theme";
 
 // Beat lengths in frames (sequence durations; TransitionSeries overlaps XFADE each).
-// Each length holds the fully composed beat still for at least 15 frames after its
-// last element lands, before the crossfade to the next (the payoff, being last,
-// instead lingers on the logo ~49 frames). See the pacing note in the revision.
+// Each length holds the fully composed beat still for ~15 frames after its last
+// element lands, before the crossfade to the next - no idle waiting, nothing
+// rushed (the payoff, being last, instead lingers on the logo ~47 frames at full
+// opacity). Retimed in the pacing pass: every beat's footer / closing line now
+// follows promptly after its content lands, so there is no dead air, and the
+// static holds were trimmed to the ~15f standard. See the per-beat notes.
 export const BEAT = {
-  hook: 315,
-  clerical: 250,
-  search: 244,
-  positioning: 198,
-  review: 148,
-  trace: 170,
-  autofix: 190,
-  drawings: 218,
-  priorart: 196,
+  hook: 288,
+  clerical: 184,
+  search: 208,
+  positioning: 164,
+  review: 128,
+  trace: 156,
+  autofix: 176,
+  drawings: 204,
+  priorart: 182,
   payoff: 305,
 } as const;
 

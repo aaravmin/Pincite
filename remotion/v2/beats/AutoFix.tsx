@@ -61,7 +61,7 @@ export function AutoFix() {
         { f: 88, x: 50, y: 46 },
         { f: 118, x: 70, y: 58 },
         { f: 148, x: 70, y: 58 },
-        { f: 180, x: 50, y: 48 },
+        { f: 176, x: 50, y: 48 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>

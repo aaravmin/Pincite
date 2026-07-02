@@ -75,8 +75,7 @@ export function Review() {
         { f: 68, x: 68, y: 42 },
         { f: 92, x: 50, y: 60 },
         { f: 110, x: 50, y: 60 },
-        { f: 132, x: 50, y: 76 },
-        { f: 165, x: 50, y: 76 },
+        { f: 128, x: 50, y: 76 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>

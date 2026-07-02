@@ -203,7 +203,7 @@ export function Drawings() {
         { f: 118, x: 72, y: 30 },
         { f: 140, x: 72, y: 32 },
         { f: 170, x: 74, y: 66 },
-        { f: 215, x: 74, y: 66 },
+        { f: 204, x: 74, y: 66 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "50px 100px" }}>

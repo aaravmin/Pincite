@@ -91,9 +91,9 @@ export function Clerical() {
         { f: 24, x: 50, y: 14 },
         { f: 48, x: 24, y: 48 },
         { f: 70, x: 50, y: 48 },
-        { f: 96, x: 76, y: 48 },
-        { f: 150, x: 50, y: 76 },
-        { f: 225, x: 50, y: 76 },
+        { f: 92, x: 76, y: 48 },
+        { f: 112, x: 50, y: 76 },
+        { f: 184, x: 50, y: 76 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "56px 100px" }}>
@@ -161,14 +161,14 @@ export function Clerical() {
         <div className="mt-12 text-center">
           <KineticText
             text={LINES.clericalFoot1}
-            startFrame={150}
+            startFrame={106}
             className="font-serif"
             style={{ fontSize: 44, fontWeight: 600, color: COLORS.foreground }}
           />
           <div className="mt-3">
             <KineticText
               text={LINES.clericalFoot2}
-              startFrame={174}
+              startFrame={128}
               className="font-serif"
               style={{ fontSize: 28, fontWeight: 500, color: COLORS.mutedForeground }}
             />

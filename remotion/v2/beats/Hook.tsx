@@ -92,7 +92,7 @@ export function Hook({ width = 1920 }: { width?: number }) {
         { f: 156, x: 50, y: 40 },
         { f: 196, x: 50, y: 38 },
         { f: 228, x: 50, y: 60 },
-        { f: 300, x: 50, y: 62 },
+        { f: 288, x: 50, y: 62 },
       ]}
     >
       {/* the field of applications - dots flip in on a diagonal wave */}

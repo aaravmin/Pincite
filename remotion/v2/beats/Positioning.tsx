@@ -48,8 +48,8 @@ export function Positioning() {
         { f: 0, x: 50, y: 30 },
         { f: 40, x: 50, y: 30 },
         { f: 64, x: 50, y: 50 },
-        { f: 110, x: 50, y: 68 },
-        { f: 195, x: 50, y: 68 },
+        { f: 100, x: 50, y: 68 },
+        { f: 164, x: 50, y: 68 },
       ]}
     >
       <AbsoluteFill className="flex-col items-center justify-center" style={{ padding: "0 120px", paddingBottom: 96 }}>
@@ -135,14 +135,14 @@ export function Positioning() {
         <div className="mt-16 text-center">
           <KineticText
             text={LINES.positioningEmph1}
-            startFrame={110}
+            startFrame={100}
             className="font-serif"
             style={{ fontSize: 46, fontWeight: 600, color: COLORS.foreground }}
           />
           <div className="mt-3">
             <KineticText
               text={LINES.positioningEmph2}
-              startFrame={136}
+              startFrame={124}
               className="font-serif"
               style={{ fontSize: 34, fontWeight: 500, color: COLORS.mutedForeground }}
             />

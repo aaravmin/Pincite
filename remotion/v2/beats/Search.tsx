@@ -114,8 +114,8 @@ export function Search() {
         { f: 40, x: 50, y: 34 },
         { f: 58, x: 50, y: 58 },
         { f: 150, x: 50, y: 58 },
-        { f: 172, x: 50, y: 74 },
-        { f: 225, x: 50, y: 74 },
+        { f: 160, x: 50, y: 74 },
+        { f: 208, x: 50, y: 74 },
       ]}
     >
       <DocWall />
@@ -153,7 +153,7 @@ export function Search() {
         <div className="mt-14 text-center">
           <KineticText
             text={LINES.searchClose}
-            startFrame={170}
+            startFrame={156}
             className="font-serif"
             style={{ fontSize: 36, fontWeight: 500, color: COLORS.mutedForeground }}
           />

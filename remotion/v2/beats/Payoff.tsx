@@ -84,25 +84,31 @@ export function Payoff({ width = 1920, height = 1080 }: { width?: number; height
   const aIn = interpolate(frame, [8, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const aOut = interpolate(frame, [116, 136], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const bIn = interpolate(frame, [128, 150], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  // Mirror the opening Hook move in reverse: zoom the camera into the one green
-  // survivor (successfully filed) until it fills the frame, then hold the green
-  // fill still (>=15f), then whiten it out - the green fill dissolves into clean
-  // white and the logo fades up on that white, the same seamless feel as the
-  // Hook's dot-to-draft morph.
-  const zoom = interpolate(frame, [170, 214], [1, 20], {
+  // Mirror the opening Hook move in reverse: zoom the camera ALL THE WAY into the
+  // one green survivor (successfully filed) until its green disc completely covers
+  // the 1920x1080 frame - no white side gutters, no visible border ring - then hold
+  // that solid-green frame still, then whiten it out (the green dissolves into clean
+  // white) and the logo fades up on that white, the same seamless feel as the Hook's
+  // dot-to-draft morph. The 62px disc must exceed the ~2203px frame diagonal, so the
+  // zoom runs to 44x (62 * 44 = 2728px diameter, radius 1364 > the 1102px half
+  // diagonal): the whole frame sits inside the disc with margin, and its scaled
+  // border is far off-screen.
+  const zoom = interpolate(frame, [170, 210], [1, 44], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  // the green fill fully fills the frame by 214 and holds still 214-232 (>=15f),
-  // then whitens out 232-252 (the green dissolves into white). The logo fades up
-  // on that clean white 240-256 and lingers at full opacity through the end of
-  // the beat (~49 frames).
-  const bOut = interpolate(frame, [232, 252], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // the disc covers the entire frame by ~208 and the frame holds solid green still
+  // 210-228 (>=15f), then whitens out 228-250 (the green dissolves into white). The
+  // whiten/logo begin only after the frame is fully green (never while gutters could
+  // still show). The logo fades up on that clean white 240-258 and lingers at full
+  // opacity through the end of the beat (~47 frames).
+  const bOut = interpolate(frame, [230, 250], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   // a white veil rises over the green fill as it whitens, so the transition reads
-  // as green dissolving into white rather than simply vanishing.
-  const whiten = interpolate(frame, [230, 252], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cIn = interpolate(frame, [240, 256], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // as green dissolving into white rather than simply vanishing. It begins only
+  // after the hold, once the frame is already fully green.
+  const whiten = interpolate(frame, [228, 250], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cIn = interpolate(frame, [240, 258], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const logoT = spring({ frame: frame - 242, fps, config: { damping: 200 } });
   const docT = spring({ frame: frame - 44, fps, config: { damping: 200 } });
 
