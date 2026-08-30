@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { Workspace } from "@/components/projects/workspace";
+import { getProjectPage } from "@/features/projects/application/get-project-page";
+import { Workspace } from "@/features/projects/ui/workspace";
 
 export default async function ProjectPage({
   params,
@@ -10,11 +9,8 @@ export default async function ProjectPage({
 }) {
   const { id } = await params;
 
-  await requireViewer();
+  const model = await getProjectPage(id);
+  if (!model) notFound();
 
-  const project = await getProject(id);
-  if (!project) notFound();
-  const sections = await getSectionContent(id);
-
-  return <Workspace project={project} initialSections={sections} />;
+  return <Workspace project={model.project} initialSections={model.sections} />;
 }

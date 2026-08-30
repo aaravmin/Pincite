@@ -1,11 +1,8 @@
-import { HeaderActions } from "@/components/projects/header-actions";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { notFound } from "next/navigation";
-import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { detectStage } from "@/lib/stage/detect";
-import { lifecycleActions, resolveActionPins } from "@/lib/lifecycle/actions";
-import { StageClient } from "@/components/stage/stage-client";
-import { NextActions } from "@/components/lifecycle/next-actions";
+import { getStagePage } from "@/features/projects/application/get-stage-page";
+import { StageClient } from "@/features/projects/ui/stage/stage-client";
+import { NextActions } from "@/features/projects/ui/stage/next-actions";
 import { LifecycleTimeline } from "@visual/lifecycle-timeline";
 
 const STAGE_INDEX: Record<string, number> = {
@@ -24,24 +21,9 @@ export default async function StagePage({
 }) {
   const { id } = await params;
 
-  await requireViewer();
-
-  const project = await getProject(id);
-  if (!project) notFound();
-  const sections = await getSectionContent(id);
-  const filled = Object.entries(sections)
-    .filter(([, v]) => v.trim().length > 0)
-    .map(([k]) => k);
-  const stage = detectStage({
-    filled,
-    declared_status: project.declared_status,
-    application_number: project.application_number,
-    filing_date: project.filing_date,
-    patent_type: project.patent_type,
-  });
-  const actions = await resolveActionPins(
-    lifecycleActions(project.declared_status, project.patent_type),
-  );
+  const model = await getStagePage(id);
+  if (!model) notFound();
+  const { project, stage, actions } = model;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

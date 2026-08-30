@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { HeaderActions } from "@/components/projects/header-actions";
-import { OverviewClient } from "@/components/overview/overview-client";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
+import { OverviewClient } from "@/features/projects/ui/overview/overview-client";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { getReadiness } from "@/lib/readiness";
+import { getReadiness } from "@/features/projects/application/get-readiness";
 
 export default async function OverviewPage({
   params,
@@ -11,6 +11,8 @@ export default async function OverviewPage({
 }) {
   const { id } = await params;
 
+  // The role tailors the filing-readiness checks (an attorney is not asked to certify that
+  // they are the inventor), so the readiness model needs it.
   const { profile } = await requireViewer();
 
   const r = await getReadiness(id, profile.role);

@@ -1,14 +1,6 @@
-import Link from "next/link";
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
-import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getAttachments } from "@/lib/filing/queries";
-import { getDisclosure } from "@/lib/disclosure/queries";
-import { runFilingChecks, resolveFilingPins } from "@/lib/validators/filing";
-import { runCrossRefChecks } from "@/lib/validators/crossref";
-import { getReview } from "@/lib/validators/results";
-import { ReviewClient } from "@/components/validators/review-client";
+import { getReviewPage } from "@/features/review/application/get-review-page";
+import { ReviewScreen } from "@/features/review/ui/review-screen";
 
 export default async function ReviewPage({
   params,
@@ -16,76 +8,8 @@ export default async function ReviewPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const model = await getReviewPage(id);
+  if (!model) notFound();
 
-  const { profile } = await requireViewer();
-
-  const project = await getProject(id);
-  if (!project) notFound();
-  const { sections, findings } = await getReview(id);
-
-  const [inventors, attachments, sectionContent] = await Promise.all([
-    getInventors(id),
-    getAttachments(id),
-    getSectionContent(id),
-  ]);
-  const filing = await resolveFilingPins(
-    runFilingChecks({
-      project,
-      inventors,
-      hasSignedDeclaration: attachments.some((a) => a.kind === "declaration"),
-      role: profile.role ?? null,
-      title: sectionContent["title"] ?? "",
-    }),
-  );
-  const filingFix = filing.filter((f) => f.severity === "violation").length;
-  const filingCheck = filing.filter((f) => f.severity === "attention").length;
-
-  const disclosure = await getDisclosure(id);
-  const consistency = runCrossRefChecks(disclosure, sectionContent);
-
-  return (
-    <div className="flex h-screen flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-border px-6 py-3">
-        <div className="flex items-center gap-3">
-          <span className="text-lg font-semibold tracking-tight text-foreground">
-            Review
-          </span>
-        </div>
-        <HeaderActions projectId={id} />
-      </header>
-      {filing.length > 0 && (
-        <Link
-          href={`/projects/${id}/sign`}
-          className="block border-b border-border bg-secondary/40 px-6 py-2 text-sm hover:bg-secondary/60"
-        >
-          <span className="font-medium text-foreground">Filing readiness:</span>{" "}
-          <span
-            className={
-              filingFix > 0 ? "text-violation" : "text-muted-foreground"
-            }
-          >
-            {filingFix} to fix
-          </span>
-          , {filingCheck} to check →{" "}
-          <span className="underline">Sign documents</span>
-        </Link>
-      )}
-      {consistency.length > 0 && (
-        <Link
-          href={`/projects/${id}/disclosure`}
-          className="block border-b border-border bg-secondary/40 px-6 py-2 text-sm hover:bg-secondary/60"
-        >
-          <span className="font-medium text-foreground">Consistency:</span>{" "}
-          <span className="text-attention-foreground">
-            {consistency.length} to reconcile
-          </span>{" "}
-          →{" "}
-          <span className="underline">Invention intake</span>
-        </Link>
-      )}
-      <div className="min-h-0 flex-1">
-        <ReviewClient projectId={id} sections={sections} findings={findings} />
-      </div>
-    </div>
-  );
+  return <ReviewScreen projectId={id} model={model} />;
 }

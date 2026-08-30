@@ -2,7 +2,7 @@
 
 import { type ReactNode, useState, useTransition } from "react";
 import { EvidencePane } from "@/features/mpep/ui/evidence-pane";
-import { getRuleSection } from "@/lib/validators/run";
+import { getRuleSection } from "@/features/review/actions";
 import type { MpepSection } from "@/features/mpep/domain/types";
 import type { SurfacedRule, ConditionalRule } from "@/features/rules/domain/surface";
 

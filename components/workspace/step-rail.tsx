@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { CommandMenu } from "@/components/command/command-menu";
+import type { StepProgress } from "@/features/projects/domain/step-progress";
 
 type Step = { key: string; label: string; path: string; tick?: boolean };
 
@@ -26,7 +27,8 @@ export function StepRail({
   done,
 }: {
   projectId: string;
-  done: Record<string, boolean>;
+  /** Per-step completion, computed once by features/projects/domain/step-progress. */
+  done: StepProgress;
 }) {
   const pathname = usePathname();
   const reduce = useReducedMotion();
@@ -35,7 +37,7 @@ export function StepRail({
     key: s.key,
     label: s.label,
     path: s.sub ? `${base}/${s.sub}` : base,
-    tick: s.tickable ? !!done[s.key] : undefined,
+    tick: s.tickable ? !!done[s.key as keyof StepProgress] : undefined,
   }));
 
   return (

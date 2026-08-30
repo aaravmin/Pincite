@@ -1,8 +1,8 @@
-import { HeaderActions } from "@/components/projects/header-actions";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { notFound } from "next/navigation";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, listVersions } from "@/lib/projects/queries";
-import { VersionActions } from "@/components/projects/version-actions";
+import { getVersionsPage } from "@/features/projects/application/get-versions-page";
+import { VersionActions } from "@/features/projects/ui/version-actions";
 import { fmtDateTime } from "@/shared/format";
 
 export default async function VersionsPage({
@@ -15,9 +15,9 @@ export default async function VersionsPage({
   const { profile } = await requireViewer();
   const unit = profile.role === "attorney" ? "matter" : "application";
 
-  const project = await getProject(id);
-  if (!project) notFound();
-  const versions = await listVersions(id);
+  const model = await getVersionsPage(id);
+  if (!model) notFound();
+  const versions = model.versions;
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-background">

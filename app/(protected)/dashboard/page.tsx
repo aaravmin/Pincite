@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { NewProjectDialog } from "@/components/projects/new-project-dialog";
+import { NewProjectDialog } from "@/features/projects/ui/new-project-dialog";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { DashboardProjects } from "@/components/dashboard/dashboard-projects";
-import { getDashboardProjects } from "@/lib/projects/queries";
+import { DashboardProjects } from "@/features/projects/ui/dashboard/dashboard-projects";
+import { getDashboard } from "@/features/projects/application/get-dashboard";
 import { isAdminEmail } from "@/shared/auth/admin-allowlist";
 
 // Always render per request for the signed-in user; never serve another account's cache.
@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const isAttorney = profile.role === "attorney";
   const isAdmin = isAdminEmail(user.email);
 
-  const projects = await getDashboardProjects();
+  const projects = await getDashboard();
 
   return (
     <div className="flex min-h-screen bg-background">

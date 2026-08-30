@@ -29,7 +29,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { cn } from "@/shared/utils";
-import { listMatters } from "@/lib/palette/actions";
+import { listMatters } from "@/features/projects/actions";
 
 type Matter = { id: string; name: string };
 

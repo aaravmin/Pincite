@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { requireViewer } from "@/shared/auth/require-viewer";
 import { StepRail } from "@/components/workspace/step-rail";
-import { getSectionContent } from "@/lib/projects/queries";
-import { getInventors, getAttachments } from "@/lib/filing/queries";
-import { getDisclosure } from "@/lib/disclosure/queries";
-import { SECTION_KEYS, ADVANCED_SECTION_KEYS } from "@/lib/projects/sections";
+import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
+import {
+  NO_STEPS_DONE,
+  stepProgress,
+} from "@/features/projects/domain/step-progress";
 
 export default async function ProjectLayout({
   children,
@@ -14,42 +14,19 @@ export default async function ProjectLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  // The (protected) group layout already gated this request; this call is deduped by the
-  // React cache and is here for the request-scoped client the step queries need.
-  const { supabase } = await requireViewer();
-
-  const [sections, inventors, attachments, disclosure, exportsRes] =
-    await Promise.all([
-      getSectionContent(id),
-      getInventors(id),
-      getAttachments(id),
-      getDisclosure(id),
-      supabase.from("exports").select("id").eq("project_id", id).limit(1),
-    ]);
-  const required = SECTION_KEYS.filter((k) => !ADVANCED_SECTION_KEYS.has(k));
-  const filled = required.filter(
-    (k) => (sections[k] ?? "").trim().length > 0,
-  ).length;
-  const hasSignedDeclaration = attachments.some((a) => a.kind === "declaration");
-  const done: Record<string, boolean> = {
-    draft: required.length > 0 && filled === required.length,
-    disclosure: !!(
-      disclosure.problem_solved.trim() &&
-      disclosure.how_it_works.trim() &&
-      disclosure.components.trim()
-    ),
-    inventors:
-      inventors.length > 0 &&
-      inventors.every(
-        (i) =>
-          i.legal_name.trim() &&
-          i.residence.trim() &&
-          i.mailing_address.trim(),
-      ),
-    drawings: attachments.some((a) => a.kind === "drawing"),
-    sign: inventors.length > 0 && hasSignedDeclaration,
-    submission: (exportsRes.data ?? []).length > 0,
-  };
+  // One request-cached read for the whole matter; the pages inside this layout share it.
+  // A matter the viewer cannot see renders the rail with nothing ticked - the page below
+  // is what turns that into notFound().
+  const snapshot = await getProjectSnapshot(id);
+  const done = snapshot
+    ? stepProgress({
+        sections: snapshot.sections,
+        inventors: snapshot.inventors,
+        attachments: snapshot.attachments,
+        disclosure: snapshot.disclosure,
+        hasExport: snapshot.exports.length > 0,
+      })
+    : NO_STEPS_DONE;
 
   return (
     <div className="flex min-h-screen bg-background">
