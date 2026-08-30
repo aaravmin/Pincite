@@ -1,5 +1,5 @@
 /** Read-side loaders for the filing domain. RLS scopes every query to the owner. */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import type { Inventor, Attachment } from "@/lib/filing/types";
 
 export async function getInventors(projectId: string): Promise<Inventor[]> {

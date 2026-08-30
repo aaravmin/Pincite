@@ -1,6 +1,6 @@
 import type { DashboardProject } from "@/lib/projects/queries";
 import { PATENT_TYPE_LABELS } from "@/lib/projects/sections";
-import { fmtDate } from "@/lib/format";
+import { fmtDate } from "@/shared/format";
 import { DeleteProjectButton } from "@/components/dashboard/delete-project-button";
 import { OpenableRow } from "@/components/dashboard/openable-row";
 

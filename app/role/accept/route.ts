@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit, clientIp } from "@/lib/audit";
-import { USER_ROLES, type UserRole } from "@/lib/profile";
+import { createClient } from "@/shared/db/server";
+import { logAudit, clientIp } from "@/shared/audit/log";
+import { USER_ROLES } from "@/shared/auth/types";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -12,8 +12,9 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.redirect(`${origin}/login`, { status: 303 });
 
   const form = await request.formData();
-  const role = String(form.get("role") ?? "");
-  if (!USER_ROLES.includes(role as UserRole)) {
+  const submitted = String(form.get("role") ?? "");
+  const role = USER_ROLES.find((r) => r === submitted);
+  if (!role) {
     return NextResponse.redirect(`${origin}/role`, { status: 303 });
   }
 

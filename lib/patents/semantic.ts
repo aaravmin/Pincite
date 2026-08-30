@@ -4,7 +4,7 @@
  * the user's claims so candidates can be ranked beyond literal term overlap. One batched
  * Voyage call per search. Returns [] on any failure so the caller stays on the lexical score.
  */
-import { embed } from "@/lib/embeddings/voyage";
+import { embed } from "@/shared/llm/embeddings";
 
 function cosine(a: number[], b: number[]): number {
   let dot = 0;

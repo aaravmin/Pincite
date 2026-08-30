@@ -8,8 +8,8 @@
  */
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit } from "@/lib/audit";
+import { createClient } from "@/shared/db/server";
+import { logAudit } from "@/shared/audit/log";
 import { getSectionContent, getProject } from "@/lib/projects/queries";
 import { runTier1 } from "@/lib/validators/tier1";
 import { runTier2 } from "@/lib/validators/tier2";
@@ -17,8 +17,8 @@ import { runTier3 } from "@/lib/validators/tier3";
 import { validateCitations } from "@/lib/mpep/citation";
 import { loadSection, type MpepSection } from "@/lib/mpep/load";
 import { parseClaims } from "@/lib/patent/claims";
-import { generateText } from "@/lib/llm/generate";
-import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
+import { generateText } from "@/shared/llm/generate";
+import { checkRateLimit, checkGlobalLimit } from "@/shared/rate-limit/check";
 import {
   SECTION_LABELS,
   wordCount,
@@ -225,7 +225,8 @@ export async function applyFix(input: {
 }): Promise<{ ok: true } | { error: string }> {
   const { supabase, user } = await requireUser();
   const sections = await getSectionContent(input.projectId);
-  const content = sections[input.sectionKey as SectionKey] ?? "";
+  const sectionKey = input.sectionKey as SectionKey;
+  const content = sections[sectionKey] ?? "";
   const idx = nearestIndex(content, input.before, input.spanStart);
   if (idx < 0) return { error: "Text changed since the fix - re-run it." };
 
@@ -235,7 +236,7 @@ export async function applyFix(input: {
   const { error } = await supabase.from("project_sections").upsert(
     {
       project_id: input.projectId,
-      section_key: input.sectionKey,
+      section_key: sectionKey,
       content: next,
       word_count: wordCount(next),
       updated_at: now,

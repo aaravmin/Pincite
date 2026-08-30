@@ -7,7 +7,7 @@ import { ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { SectionEyebrow } from "@/components/marketing/section-eyebrow";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { AnnotatedEditor } from "@visual/annotated-editor";
 import { CitationStack } from "@visual/citation-stack";
 import { SignalBadge } from "@visual/signal";

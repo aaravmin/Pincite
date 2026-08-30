@@ -9,7 +9,7 @@ import {
   type MotionProps,
 } from "motion/react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/utils"
 
 type AnimationType = "text" | "word" | "character" | "line"
 type AnimationVariant =

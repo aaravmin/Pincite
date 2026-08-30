@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import JSZip from "jszip";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { buildReportData, toText } from "@/lib/export/report";
 import { buildSpecDocx } from "@/lib/export/docx";
 import { buildPatentPdf } from "@/lib/export/patent-pdf";
@@ -12,20 +12,20 @@ import {
 } from "@/lib/export/filing-package";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getAttachments } from "@/lib/filing/queries";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/shared/db/admin";
 import {
   buildPatentLatex,
   buildLatexReadme,
   figureDescription,
 } from "@/lib/export/latex";
 import { buildFigurePdf } from "@/lib/export/figure-pdf";
-import { logAudit } from "@/lib/audit";
+import { logAudit } from "@/shared/audit/log";
 import {
   sanitizeOutputFilename,
   sanitizeOutputRecord,
   sanitizeOutputText,
-} from "@/lib/text/sanitize";
-import type { SupabaseClient } from "@supabase/supabase-js";
+} from "@/shared/text/sanitize";
+import type { TypedSupabaseClient } from "@/shared/db/types";
 
 /**
  * Safe, collision-free names for the signed declaration documents placed under `declarations/`
@@ -99,7 +99,7 @@ async function renderPatentPdf(id: string): Promise<Uint8Array | null> {
 }
 
 async function record(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   userId: string,
   projectId: string,
   format: string,

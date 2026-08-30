@@ -1,6 +1,6 @@
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getDisclosure } from "@/lib/disclosure/queries";
 import { runCrossRefChecks, resolveCrossRefPins } from "@/lib/validators/crossref";

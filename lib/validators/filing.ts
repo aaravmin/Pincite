@@ -8,7 +8,7 @@
 import type { Severity } from "@/lib/validators/types";
 import type { Project } from "@/lib/projects/types";
 import { type Inventor } from "@/lib/filing/types";
-import type { UserRole } from "@/lib/profile";
+import type { UserRole } from "@/shared/auth/types";
 import { validateCitations } from "@/lib/mpep/citation";
 
 export type FilingFinding = {

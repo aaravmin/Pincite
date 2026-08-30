@@ -1,9 +1,9 @@
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, listVersions } from "@/lib/projects/queries";
 import { VersionActions } from "@/components/projects/version-actions";
-import { fmtDateTime } from "@/lib/format";
+import { fmtDateTime } from "@/shared/format";
 
 export default async function VersionsPage({
   params,

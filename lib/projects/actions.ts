@@ -8,9 +8,9 @@
  */
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit } from "@/lib/audit";
-import { isAdminEmail } from "@/lib/admin";
+import { createClient } from "@/shared/db/server";
+import { logAudit } from "@/shared/audit/log";
+import { isAdminEmail } from "@/shared/auth/admin-allowlist";
 import {
   SECTION_KEYS,
   PATENT_TYPES,
@@ -21,6 +21,7 @@ import {
   type ProjectStatus,
 } from "@/lib/projects/sections";
 import type { VersionSnapshot } from "@/lib/projects/types";
+import type { TablesUpdate, TypedSupabaseClient } from "@/shared/db/types";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -30,8 +31,6 @@ async function requireUser() {
   if (!user) redirect("/login");
   return { supabase, user };
 }
-
-type SupabaseFromRequireUser = Awaited<ReturnType<typeof requireUser>>["supabase"];
 
 export async function createProject(input: {
   name: string;
@@ -116,7 +115,7 @@ export async function updateProjectStatus(input: {
     return { error: "Unknown status." };
   }
   const { supabase, user } = await requireUser();
-  const patch: Record<string, unknown> = {
+  const patch: TablesUpdate<"projects"> = {
     declared_status: input.declared_status,
   };
   if (input.application_number !== undefined) {
@@ -194,7 +193,7 @@ export async function saveSection(input: {
 }
 
 async function buildSnapshot(
-  supabase: SupabaseFromRequireUser,
+  supabase: TypedSupabaseClient,
   projectId: string,
 ): Promise<VersionSnapshot> {
   const [{ data: project }, { data: sections }] = await Promise.all([

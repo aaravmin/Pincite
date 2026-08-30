@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit, clientIp } from "@/lib/audit";
+import { createClient } from "@/shared/db/server";
+import { logAudit, clientIp } from "@/shared/audit/log";
 
 /**
  * OAuth PKCE callback. Exchanges the code for a session, records the login in

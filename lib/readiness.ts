@@ -4,7 +4,7 @@
  * deterministic validators, the filing and cross-reference checks, the completeness score) so
  * the overview never disagrees with the detail screens. Read-only; RLS scopes every query.
  */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getAttachments } from "@/lib/filing/queries";
 import { getDisclosure } from "@/lib/disclosure/queries";
@@ -23,7 +23,7 @@ import {
   type SectionKey,
 } from "@/lib/projects/sections";
 import type { Project } from "@/lib/projects/types";
-import type { UserRole } from "@/lib/profile";
+import type { UserRole } from "@/shared/auth/types";
 
 export type GateStatus = "done" | "violation" | "attention" | "todo";
 export type Gate = {

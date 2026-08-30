@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 
 // A realistic patent figure (cross-section, numbered leader lines) for the drawing
 // check feature. The red-circled numerals appear in the drawing but not in the

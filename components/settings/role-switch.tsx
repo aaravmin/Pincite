@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateRole } from "@/lib/profile-actions";
-import type { UserRole } from "@/lib/profile";
+import type { UserRole } from "@/shared/auth/types";
 
 export function RoleSwitch({ current }: { current: UserRole | null }) {
   const router = useRouter();

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/shared/db/server";
+import { createAdminClient } from "@/shared/db/admin";
 
 // Serve a private attachment. By default redirect to a short-lived signed URL (good for
 // <img> previews and downloads). With ?raw=1 stream the bytes from this same-origin route

@@ -4,7 +4,7 @@
 // Remotion demo. Stage colors stay neutral (this is progress, not pass/fail);
 // only the deadline marker uses attention (yellow), never red for decoration.
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { clamp01, stagger } from "./types";
 
 export type LifecycleStage = {

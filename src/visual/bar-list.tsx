@@ -3,7 +3,7 @@
 // tints stay on-palette; default bars are neutral so red is never spent on
 // decoration - pass an explicit signal only where a bar marks a real defect.
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { SIGNAL, clamp01, stagger, type Signal } from "./types";
 import { SignalMark } from "./signal";
 

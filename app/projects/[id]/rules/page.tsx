@@ -1,6 +1,6 @@
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { surfaceRules, type SurfacedRule } from "@/lib/rules/surface";
 import { validateCitations } from "@/lib/mpep/citation";

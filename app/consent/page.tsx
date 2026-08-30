@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { Button } from "@/components/ui/button";
 
 // Read the consent state fresh every time so a returning user is not re-prompted.

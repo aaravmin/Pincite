@@ -15,7 +15,7 @@ import {
 } from "@/lib/rules/surface";
 import { SECTION_KEYS, SECTION_LABELS } from "@/lib/projects/sections";
 import type { Project } from "@/lib/projects/types";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 export type Report = {
   project: Project;

@@ -6,8 +6,8 @@
  * actual patent and its drawing in place. SERVER ONLY. Only the public patent number is
  * sent out, never the user's invention text. Rate limited per user.
  */
-import { createClient } from "@/lib/supabase/server";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { createClient } from "@/shared/db/server";
+import { checkRateLimit } from "@/shared/rate-limit/check";
 
 export type PatentDetails = {
   number: string;

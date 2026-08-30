@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors } from "@/lib/filing/queries";
 import { buildDeclarationPdf, buildPoaPdf } from "@/lib/export/declaration-pdf";
-import { sanitizeOutputFilename, sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputFilename, sanitizeOutputText } from "@/shared/text/sanitize";
 
 // Serve a filing document as a PDF to print, sign, and upload back. ?doc=poa returns the
 // power of attorney (for attorneys); otherwise the inventor's declaration (one page per

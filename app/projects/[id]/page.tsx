@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { Workspace } from "@/components/projects/workspace";
 

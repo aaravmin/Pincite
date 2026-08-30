@@ -3,7 +3,7 @@
  * evidence pane renders full_text and highlights offsets into it. No live USPTO
  * fetching at request time - the corpus is the versioned local copy.
  */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 
 export type MpepSection = {
   section_number: string;

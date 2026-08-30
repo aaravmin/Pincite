@@ -6,7 +6,7 @@
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DECLARATION_STATEMENTS } from "@/lib/export/filing-package";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);
 

@@ -11,15 +11,15 @@
  */
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit } from "@/lib/audit";
+import { createClient } from "@/shared/db/server";
+import { logAudit } from "@/shared/audit/log";
 import { getSectionContent } from "@/lib/projects/queries";
 import { extractLimitations, claimKeywords } from "@/lib/patents/extract";
 import { matchCandidate } from "@/lib/patents/match";
 import { semanticScores } from "@/lib/patents/semantic";
 import { searchCandidates, bigQueryConfigured } from "@/lib/patents/bigquery";
 import { searchCandidatesKeyless } from "@/lib/patents/keyless";
-import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
+import { checkRateLimit, checkGlobalLimit } from "@/shared/rate-limit/check";
 import type { SpanMatch } from "@/lib/patents/match";
 import type { Candidate } from "@/lib/patents/bigquery";
 

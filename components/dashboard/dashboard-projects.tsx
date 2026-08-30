@@ -15,7 +15,7 @@ import {
   PROJECT_STATUSES,
   PROJECT_STATUS_LABELS,
 } from "@/lib/projects/sections";
-import { fmtDate } from "@/lib/format";
+import { fmtDate } from "@/shared/format";
 import { PortfolioTable } from "@/components/projects/portfolio-table";
 import { DeleteProjectButton } from "@/components/dashboard/delete-project-button";
 import type { DashboardProject } from "@/lib/projects/queries";

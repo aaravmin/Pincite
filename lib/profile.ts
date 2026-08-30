@@ -1,25 +1,15 @@
 /**
- * Profile helpers. A profile carries the confidentiality consent timestamp and the
- * user's chosen role. Role tailors the whole workflow:
- *  - inventor  = pro se filer; gets plain-English guidance and personally signs the
- *                inventor's declaration (37 CFR 1.63 / PTO-AIA-01).
- *  - attorney  = practitioner; gets a denser portfolio across clients/matters, manages
- *                the power of attorney (PTO-AIA-82), and signs the prosecution papers.
- * Read-only helpers for Server Components; the role is set via app/role/accept.
+ * Profile loader for Server Components. The role/consent TYPES now live in
+ * `@/shared/auth/types` (pure); this file keeps only the Supabase read while the
+ * request-cached viewer loader (`shared/auth/require-viewer.ts`) is introduced.
  */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
+import type { ViewerProfile } from "@/shared/auth/types";
 
-export const USER_ROLES = ["attorney", "inventor"] as const;
-export type UserRole = (typeof USER_ROLES)[number];
+export { USER_ROLES } from "@/shared/auth/types";
+export type { UserRole, ViewerProfile, Profile } from "@/shared/auth/types";
 
-export type Profile = {
-  id: string;
-  email: string | null;
-  role: UserRole | null;
-  consented_at: string | null;
-};
-
-export async function getProfile(): Promise<Profile | null> {
+export async function getProfile(): Promise<ViewerProfile | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,5 +20,5 @@ export async function getProfile(): Promise<Profile | null> {
     .select("id, email, role, consented_at")
     .eq("id", user.id)
     .maybeSingle();
-  return (data as Profile) ?? null;
+  return data ?? null;
 }

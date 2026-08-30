@@ -1,5 +1,5 @@
 /** Read-side loader for the review page. RLS scopes to the owner. */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 
 export type FindingRow = {
   id: string;

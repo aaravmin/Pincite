@@ -4,8 +4,8 @@
  * over the embedded chunks (Voyage + pgvector); then keyword full-text search as a
  * resilient fallback when embeddings are unavailable or throttled.
  */
-import { createClient } from "@/lib/supabase/server";
-import { embedOne } from "@/lib/embeddings/voyage";
+import { createClient } from "@/shared/db/server";
+import { embedOne } from "@/shared/llm/embeddings";
 
 export type LocatedSection = {
   section_number: string;
@@ -56,7 +56,9 @@ export async function locateSemantic(
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("match_mpep_chunks", {
-    query_embedding: embedding,
+    // Generated types model a pgvector argument as text; PostgREST accepts the raw
+    // number array and casts it, which is what this call has always sent.
+    query_embedding: embedding as unknown as string,
     match_count: limit,
   });
   if (error || !data) return [];

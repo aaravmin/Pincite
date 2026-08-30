@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import {
   DISCLOSURE_FIELDS,
   emptyDisclosure,

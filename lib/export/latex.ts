@@ -11,7 +11,7 @@
  * Pure string builder; the route bundles this .tex with the figure files into a ZIP.
  */
 import type { SectionKey } from "@/lib/projects/sections";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const SEC_TITLE: Partial<Record<SectionKey, string>> = {
   cross_reference: "Cross-Reference to Related Applications",

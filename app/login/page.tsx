@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { LoginForm } from "@/components/auth/login-form";
 import { Logo } from "@/components/brand/logo";
 

@@ -1,9 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { OverviewClient } from "@/components/overview/overview-client";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getReadiness } from "@/lib/readiness";
-import type { UserRole } from "@/lib/profile";
+import type { UserRole } from "@/shared/auth/types";
 
 export default async function OverviewPage({
   params,

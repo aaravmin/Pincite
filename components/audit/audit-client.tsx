@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ACTION_LABELS, type AuditEntry } from "@/lib/audit-log";
-import { fmtDateTime } from "@/lib/format";
+import { fmtDateTime } from "@/shared/format";
 
 function summarize(detail: Record<string, unknown>): string {
   return Object.entries(detail)

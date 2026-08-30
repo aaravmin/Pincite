@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { ThemeToggle } from "@/components/settings/theme-toggle";
 import { RoleSwitch } from "@/components/settings/role-switch";
 import { Button } from "@/components/ui/button";
-import type { UserRole } from "@/lib/profile";
+import type { UserRole } from "@/shared/auth/types";
 
 export const dynamic = "force-dynamic";
 

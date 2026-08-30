@@ -8,7 +8,7 @@
 // via `onActivateFlag`; the parent owns the active state (web: mouse, Remotion:
 // frame). That keeps it identical on the site, in the app, and in the video.
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { SIGNAL, clamp01, type VisualSpan } from "./types";
 
 type Segment =

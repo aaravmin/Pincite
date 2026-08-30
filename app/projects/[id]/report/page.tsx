@@ -1,6 +1,6 @@
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { buildReportData } from "@/lib/export/report";
 import { ReportView } from "@/components/export/report-view";
 import { ReportWorkspace } from "@/components/export/report-workspace";

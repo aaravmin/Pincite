@@ -7,15 +7,15 @@
  */
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/shared/db/server";
+import { createAdminClient } from "@/shared/db/admin";
 import {
   analyzeDrawingVision,
   classifyDrawingView,
   type DrawingVision,
-} from "@/lib/llm/vision";
-import { checkRateLimit, checkGlobalLimit } from "@/lib/ratelimit";
-import { logAudit } from "@/lib/audit";
+} from "@/shared/llm/vision";
+import { checkRateLimit, checkGlobalLimit } from "@/shared/rate-limit/check";
+import { logAudit } from "@/shared/audit/log";
 import { validateCitations } from "@/lib/mpep/citation";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";

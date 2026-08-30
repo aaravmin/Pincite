@@ -6,12 +6,12 @@
  * section numbers resolve to real corpus text vs are dropped (anti-hallucination spine).
  * Deterministic and corpus-only; a Grok-generated plain-English answer layers on next.
  */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { locate, extractSectionNumbers } from "@/lib/mpep/locate";
 import { loadSection } from "@/lib/mpep/load";
 import { partitionCitations } from "@/lib/mpep/citation";
 import { selectResponsivePassage, isPointerStub } from "@/lib/mpep/highlight";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { checkRateLimit } from "@/shared/rate-limit/check";
 import type { AskResult } from "@/lib/mpep/types";
 
 export async function askMpep(

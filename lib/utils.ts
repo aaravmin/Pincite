@@ -1,6 +1,2 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+// Moved to shared/utils.ts. Re-export shim; delete once every importer is remapped.
+export * from "@/shared/utils";

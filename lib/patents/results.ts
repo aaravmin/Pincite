@@ -1,5 +1,5 @@
 /** Read-side loader for the prior-art results view. RLS scopes to the owner. */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 
 export type ResultSpan = {
   user_span_start: number;

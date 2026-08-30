@@ -7,7 +7,7 @@
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { DrawingAnnotations } from "@/lib/filing/types";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);
 const WHITE = rgb(1, 1, 1);

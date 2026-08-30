@@ -1,6 +1,6 @@
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject } from "@/lib/projects/queries";
 import { getPriorArtResults } from "@/lib/patents/results";
 import { PriorArtClient } from "@/components/patents/prior-art-client";

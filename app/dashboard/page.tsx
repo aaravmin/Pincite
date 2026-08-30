@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardProjects } from "@/components/dashboard/dashboard-projects";
 import { getDashboardProjects } from "@/lib/projects/queries";
-import { isAdminEmail } from "@/lib/admin";
+import { isAdminEmail } from "@/shared/auth/admin-allowlist";
 
 // Always render per request for the signed-in user; never serve another account's cache.
 export const dynamic = "force-dynamic";

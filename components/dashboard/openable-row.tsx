@@ -8,7 +8,7 @@ import {
   restoreVersion,
   saveVersion,
 } from "@/lib/projects/actions";
-import { fmtDateTime } from "@/lib/format";
+import { fmtDateTime } from "@/shared/format";
 
 type V = { id: string; label: string | null; created_at: string };
 

@@ -2,7 +2,7 @@ import { type Page, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs";
 import path from "node:path";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 /**
  * Reusable verification harness for the §7 gate.

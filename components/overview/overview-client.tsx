@@ -5,7 +5,7 @@
 // getReadiness (server, RLS-scoped); no finding is changed here.
 
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { SignalMark } from "@visual/signal";
 import { FindingsTable } from "@/components/overview/findings-table";
 import type { Signal } from "@visual/types";

@@ -7,7 +7,7 @@ import type { Project } from "@/lib/projects/types";
 import type { Inventor } from "@/lib/filing/types";
 import { ENTITY_STATUS_LABELS } from "@/lib/projects/sections";
 import { applicantName } from "@/lib/filing/ads";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 export function buildAdsText(
   project: Project,

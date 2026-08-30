@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit, clientIp } from "@/lib/audit";
+import { createClient } from "@/shared/db/server";
+import { logAudit, clientIp } from "@/shared/audit/log";
 
 /**
  * DEVELOPMENT-ONLY sign-in endpoint for the Playwright verification gate, so

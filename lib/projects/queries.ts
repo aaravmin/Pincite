@@ -2,7 +2,7 @@
  * Read-side loaders for projects/sections/versions. Plain async functions called from
  * Server Components (not "use server" actions). RLS scopes every query to the owner.
  */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import {
   ADVANCED_SECTION_KEYS,
   SECTION_KEYS,

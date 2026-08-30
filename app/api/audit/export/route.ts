@@ -2,8 +2,8 @@
  * Export the signed-in user's full audit log as CSV. RLS scopes the rows to this user, so
  * one account can never export another's history.
  */
-import { createClient } from "@/lib/supabase/server";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { createClient } from "@/shared/db/server";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 function csvCell(v: unknown): string {
   const s =

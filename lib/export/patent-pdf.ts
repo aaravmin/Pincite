@@ -9,7 +9,7 @@
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
 import type { SectionKey } from "@/lib/projects/sections";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);
 const PAGE_W = 612; // US Letter, points

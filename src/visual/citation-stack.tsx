@@ -6,7 +6,7 @@
 // section, and in the Remotion video (reveal driven by `progress`).
 
 import { Scale, FileText, BookOpen, ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { clamp01, stagger, type Citation } from "./types";
 
 const USPTO_MPEP_BASE = "https://www.uspto.gov/web/offices/pac/mpep/";

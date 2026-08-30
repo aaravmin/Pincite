@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { MarketingHome } from "@/components/marketing/marketing-home";
 
 // A signed-in visitor skips the landing and goes straight to their dashboard.

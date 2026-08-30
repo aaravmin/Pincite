@@ -4,7 +4,7 @@
  * unresolved cites are dropped and the output flagged for review. Reused by findings,
  * rule surfacing, and the Ask flow.
  */
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 
 /** Returns the subset of the given section numbers that resolve to real corpus text. */
 export async function validateCitations(

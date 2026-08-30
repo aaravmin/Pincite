@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit } from "@/lib/audit";
-import { USER_ROLES, type UserRole } from "@/lib/profile";
+import { createClient } from "@/shared/db/server";
+import { logAudit } from "@/shared/audit/log";
+import { USER_ROLES, type UserRole } from "@/shared/auth/types";
 
 /** Switch the signed-in user's role (patent agent/attorney <-> pro se inventor). */
 export async function updateRole(

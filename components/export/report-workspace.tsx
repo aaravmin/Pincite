@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Eye, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 
 type ExportFormat = {
   format: "pdf" | "latex" | "package";

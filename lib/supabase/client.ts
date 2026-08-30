@@ -1,11 +1,2 @@
-import { createBrowserClient } from "@supabase/ssr";
-
-/**
- * Supabase client for browser/client components.
- */
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-}
+// Moved to shared/db/client.ts. Re-export shim; delete once every importer is remapped.
+export * from "@/shared/db/client";

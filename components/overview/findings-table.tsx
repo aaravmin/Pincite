@@ -17,7 +17,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import {
   HoverCard,
   HoverCardTrigger,

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { StepRail } from "@/components/workspace/step-rail";
 import { getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getAttachments } from "@/lib/filing/queries";

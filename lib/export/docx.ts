@@ -12,7 +12,7 @@ import {
   AlignmentType,
 } from "docx";
 import type { SectionKey } from "@/lib/projects/sections";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 type SpecEntry = {
   key: SectionKey;

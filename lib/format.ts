@@ -1,8 +1,2 @@
-/** Deterministic UTC formatting, so server-rendered dates don't cause hydration drift. */
-export function fmtDateTime(iso: string): string {
-  return new Date(iso).toISOString().slice(0, 16).replace("T", " ") + " UTC";
-}
-
-export function fmtDate(iso: string): string {
-  return new Date(iso).toISOString().slice(0, 10);
-}
+// Moved to shared/format.ts. Re-export shim; delete once every importer is remapped.
+export * from "@/shared/format";

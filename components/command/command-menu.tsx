@@ -28,7 +28,7 @@ import {
   CommandItem,
   CommandShortcut,
 } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { listMatters } from "@/lib/palette/actions";
 
 type Matter = { id: string; name: string };

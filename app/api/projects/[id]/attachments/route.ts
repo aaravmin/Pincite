@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { logAudit, clientIp } from "@/lib/audit";
+import { createClient } from "@/shared/db/server";
+import { createAdminClient } from "@/shared/db/admin";
+import { logAudit, clientIp } from "@/shared/audit/log";
 import { ATTACHMENT_VIEWS } from "@/lib/filing/types";
+import type { TablesInsert } from "@/shared/db/types";
 
 const ALLOWED = [
   "image/png",
@@ -70,7 +71,7 @@ export async function POST(
     .upload(path, bytes, { contentType: mime, upsert: false });
   if (upErr) return NextResponse.json({ error: upErr.message }, { status: 400 });
 
-  const rows = [
+  const rows: TablesInsert<"project_attachments">[] = [
     {
       project_id: projectId,
       kind,

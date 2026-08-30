@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { logAudit } from "@/lib/audit";
+import { createClient } from "@/shared/db/server";
+import { logAudit } from "@/shared/audit/log";
 import { DISCLOSURE_FIELDS, type Disclosure } from "@/lib/disclosure/types";
+import type { TablesInsert } from "@/shared/db/types";
 
 export async function saveDisclosure(input: {
   projectId: string;
@@ -16,7 +17,7 @@ export async function saveDisclosure(input: {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const row: Record<string, unknown> = {
+  const row: TablesInsert<"project_disclosure"> = {
     project_id: input.projectId,
     updated_at: new Date().toISOString(),
   };

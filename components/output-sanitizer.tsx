@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { sanitizeOutputText } from "@/lib/text/sanitize";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const TEXT_ATTRIBUTES = [
   "aria-label",

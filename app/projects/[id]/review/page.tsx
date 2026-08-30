@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/shared/db/server";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors, getAttachments } from "@/lib/filing/queries";
 import { getDisclosure } from "@/lib/disclosure/queries";
