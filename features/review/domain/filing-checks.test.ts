@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { runFilingChecks, type FilingFinding } from "@/features/review/domain/filing-checks";
 import type { Project } from "@/features/projects/domain/types";
-import type { Inventor } from "@/lib/filing/types";
+import type { Inventor } from "@/features/filing/domain/types";
 
 const project = (over: Partial<Project> = {}): Project => ({
   id: "p1",

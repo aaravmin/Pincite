@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { HeaderActions } from "@/components/projects/header-actions";
+import { requireViewer } from "@/shared/auth/require-viewer";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { getSignPage } from "@/features/filing/application/get-sign-page";
 import { DeclarationSign } from "@/features/filing/ui/declaration-sign";
 import { DeclarationStatementsCard } from "@/features/filing/ui/declaration-statements";
@@ -10,6 +11,8 @@ export default async function SignPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
+
   const model = await getSignPage(id);
   if (!model) notFound();
   const { inventors, declarationDocs, isAttorney, hrefs } = model;

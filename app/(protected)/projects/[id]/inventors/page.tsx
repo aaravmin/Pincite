@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { notFound } from "next/navigation";
-import { HeaderActions } from "@/components/projects/header-actions";
+import { requireViewer } from "@/shared/auth/require-viewer";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { getInventorsPage } from "@/features/filing/application/get-inventors-page";
 import { InventorsForm } from "@/features/filing/ui/inventors-form";
 
@@ -10,6 +11,8 @@ export default async function InventorsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
+
   const model = await getInventorsPage(id);
   if (!model) notFound();
   const { project, inventors, ads } = model;

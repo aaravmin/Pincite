@@ -34,7 +34,7 @@ import {
 } from "@/features/exports/types";
 import { getViewer } from "@/shared/auth/require-viewer";
 import { sanitizeOutputFilename } from "@/shared/text/sanitize";
-import type { Attachment } from "@/lib/filing/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 const ZIP = "application/zip";
 const PDF = "application/pdf";

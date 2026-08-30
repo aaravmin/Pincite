@@ -13,7 +13,7 @@ import type {
   ConditionalRule,
   SurfacedRule,
 } from "@/features/rules/domain/surface";
-import type { Project } from "@/lib/projects/types";
+import type { Project } from "@/features/projects/domain/types";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 export type Report = {

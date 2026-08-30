@@ -15,7 +15,7 @@ import {
   declarationZipNames,
 } from "@/features/exports/formats/filing-package";
 import type { DrawingFile, ExportContext } from "@/features/exports/types";
-import type { Attachment } from "@/lib/filing/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 /** The extension a packaged drawing keeps, falling back to whatever the upload was named. */
 function drawingExtension(a: Attachment): string {

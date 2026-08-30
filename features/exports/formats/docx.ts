@@ -11,7 +11,7 @@ import {
   TextRun,
   AlignmentType,
 } from "docx";
-import type { SectionKey } from "@/lib/projects/sections";
+import type { SectionKey } from "@/features/projects/domain/sections";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 type SpecEntry = {

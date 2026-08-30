@@ -81,7 +81,7 @@ function clamp01(n: unknown): number | null {
   return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : null;
 }
 
-/** The standard patent projections, matching ATTACHMENT_VIEWS in lib/filing/types.ts. */
+/** The standard patent projections, matching ATTACHMENT_VIEWS in features/drawings/domain/types.ts. */
 export const DRAWING_VIEWS = [
   "perspective",
   "top",

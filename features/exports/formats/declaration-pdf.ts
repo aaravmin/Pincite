@@ -5,7 +5,7 @@
  * operative signature; Pincite never asks for one in-app. Pure pdf-lib, no native dependency.
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { DECLARATION_STATEMENTS } from "@/features/exports/formats/filing-package";
+import { DECLARATION_STATEMENTS } from "@/features/filing/domain/declaration";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);

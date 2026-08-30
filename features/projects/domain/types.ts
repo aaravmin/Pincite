@@ -25,15 +25,6 @@ export type Project = {
   updated_at: string;
 };
 
-export type ProjectSectionRow = {
-  id: string;
-  project_id: string;
-  section_key: SectionKey;
-  content: string;
-  word_count: number;
-  updated_at: string;
-};
-
 /** The immutable snapshot stored on each save (roadmap §8). */
 export type VersionSnapshot = {
   project: {

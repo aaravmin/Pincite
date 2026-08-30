@@ -3,9 +3,9 @@ import { buildReportData } from "@/features/exports/application/get-report";
 import type { ProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
 import type { FindingRow } from "@/features/review/domain/finding";
 import type { ResultMatch } from "@/features/prior-art/domain/types";
-import { SECTION_KEYS, type SectionKey } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import { emptyDisclosure } from "@/lib/disclosure/types";
+import { SECTION_KEYS, type SectionKey } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import { emptyDisclosure } from "@/features/disclosure/domain/types";
 
 const project: Project = {
   id: "p1",
@@ -69,10 +69,7 @@ function deps(over: { snapshot?: ProjectSnapshot | null } = {}) {
   const loadSnapshot = vi.fn(async () =>
     over.snapshot === undefined ? snapshot : over.snapshot,
   );
-  const loadFindings = vi.fn(async () => ({
-    sections: {} as Record<string, string>,
-    findings: [finding],
-  }));
+  const loadFindings = vi.fn(async () => [finding]);
   const loadPriorArt = vi.fn(async () => ({ claims: "", matches: [match] }));
   return { loadSnapshot, loadFindings, loadPriorArt };
 }

@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { loadExportContext } from "@/features/exports/application/load-export-context";
 import type { ProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
-import { SECTION_KEYS, type SectionKey } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import type { Attachment, Inventor } from "@/lib/filing/types";
-import { emptyDisclosure } from "@/lib/disclosure/types";
+import { SECTION_KEYS, type SectionKey } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment } from "@/features/drawings/domain/types";
+import { emptyDisclosure } from "@/features/disclosure/domain/types";
 
 const project: Project = {
   id: "p1",

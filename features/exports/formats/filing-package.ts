@@ -3,10 +3,11 @@
  * These mirror what the user enters into Patent Center (ADS data), the inventor's
  * declaration text (PTO/AIA/01), and a transmittal + fee checklist. No internal analysis.
  */
-import type { Project } from "@/lib/projects/types";
-import type { Inventor } from "@/lib/filing/types";
-import { ENTITY_STATUS_LABELS } from "@/lib/projects/sections";
-import { applicantName } from "@/lib/filing/ads";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import { ENTITY_STATUS_LABELS } from "@/features/projects/domain/sections";
+import { applicantName } from "@/features/filing/domain/ads";
+import { DECLARATION_STATEMENTS } from "@/features/filing/domain/declaration";
 import {
   sanitizeOutputFilename,
   sanitizeOutputText,
@@ -67,14 +68,6 @@ export function buildAdsText(
   );
   return sanitizeOutputText(lines.join("\n"));
 }
-
-export const DECLARATION_STATEMENTS = [
-  "This application was made or authorized to be made by me.",
-  "I believe I am the original inventor or an original joint inventor of a claimed invention in the application.",
-  "I have reviewed and understand the contents of the application, including the claims.",
-  "I am aware of the duty to disclose to the USPTO all information known to be material to patentability (37 CFR 1.56).",
-  "I acknowledge that willful false statements are punishable under 18 U.S.C. 1001 by fine or imprisonment of up to 5 years, or both.",
-];
 
 /**
  * The declaration cover sheet (a reference copy of the 1.63 contents). The operative document

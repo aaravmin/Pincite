@@ -8,7 +8,7 @@
  * step can show a real visual preview and offer a downloadable PDF.
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
-import type { SectionKey } from "@/lib/projects/sections";
+import type { SectionKey } from "@/features/projects/domain/sections";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);

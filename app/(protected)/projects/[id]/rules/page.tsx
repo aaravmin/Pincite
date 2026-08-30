@@ -1,10 +1,8 @@
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { surfaceRules, type SurfacedRule } from "@/lib/rules/surface";
-import { validateCitations } from "@/lib/mpep/citation";
-import { RulesClient } from "@/components/rules/rules-client";
+import { getRulesPage } from "@/features/rules/application/get-rules-page";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
+import { RulesClient } from "@/features/rules/ui/rules-client";
 
 export default async function RulesPage({
   params,
@@ -12,32 +10,10 @@ export default async function RulesPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
   await requireViewer();
 
-  const project = await getProject(id);
-  if (!project) notFound();
-  const sections = await getSectionContent(id);
-  const filled = Object.entries(sections)
-    .filter(([, v]) => v.trim().length > 0)
-    .map(([k]) => k);
-
-  const { appliesNow, conditional } = surfaceRules({
-    patentType: project.patent_type,
-    filled,
-    sections,
-    declared_status: project.declared_status,
-  });
-
-  // Drop MPEP pins that don't resolve to corpus text (anti-hallucination spine).
-  const pins = [...appliesNow, ...conditional]
-    .map((r) => r.mpep_section)
-    .filter((p): p is string => !!p);
-  const ok = await validateCitations(pins);
-  const clean = <T extends SurfacedRule>(arr: T[]): T[] =>
-    arr.map((r) =>
-      r.mpep_section && !ok.has(r.mpep_section) ? { ...r, mpep_section: null } : r,
-    );
+  const model = await getRulesPage(id);
+  if (!model) notFound();
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -50,7 +26,10 @@ export default async function RulesPage({
         <HeaderActions projectId={id} />
       </header>
       <div className="min-h-0 flex-1">
-        <RulesClient appliesNow={clean(appliesNow)} conditional={clean(conditional)} />
+        <RulesClient
+          appliesNow={model.appliesNow}
+          conditional={model.conditional}
+        />
       </div>
     </div>
   );

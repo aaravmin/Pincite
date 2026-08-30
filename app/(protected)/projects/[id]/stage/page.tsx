@@ -1,5 +1,6 @@
 import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { notFound } from "next/navigation";
+import { requireViewer } from "@/shared/auth/require-viewer";
 import { getStagePage } from "@/features/projects/application/get-stage-page";
 import { StageClient } from "@/features/projects/ui/stage/stage-client";
 import { NextActions } from "@/features/projects/ui/stage/next-actions";
@@ -20,6 +21,7 @@ export default async function StagePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
 
   const model = await getStagePage(id);
   if (!model) notFound();

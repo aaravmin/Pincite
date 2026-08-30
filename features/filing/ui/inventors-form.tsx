@@ -17,7 +17,7 @@ import {
   ENTITY_STATUSES,
   ENTITY_STATUS_LABELS,
   type EntityStatus,
-} from "@/lib/projects/sections";
+} from "@/features/projects/domain/sections";
 import type { Inventor } from "@/features/filing/domain/types";
 
 type Row = {

@@ -1,5 +1,6 @@
-import { HeaderActions } from "@/components/projects/header-actions";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { notFound } from "next/navigation";
+import { requireViewer } from "@/shared/auth/require-viewer";
 import { buildReportData } from "@/features/exports/application/get-report";
 import { ReportView } from "@/features/exports/ui/report-view";
 import { ReportWorkspace } from "@/features/exports/ui/report-workspace";
@@ -10,6 +11,7 @@ export default async function ReportPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
 
   const report = await buildReportData(id);
   if (!report) notFound();

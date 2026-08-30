@@ -1,9 +1,8 @@
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject } from "@/lib/projects/queries";
-import { getPriorArtResults } from "@/lib/patents/results";
-import { PriorArtClient } from "@/components/patents/prior-art-client";
+import { getPriorArtPage } from "@/features/prior-art/application/get-prior-art-page";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
+import { PriorArtClient } from "@/features/prior-art/ui/prior-art-client";
 
 export default async function PriorArtPage({
   params,
@@ -11,12 +10,10 @@ export default async function PriorArtPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
   await requireViewer();
 
-  const project = await getProject(id);
-  if (!project) notFound();
-  const { claims, matches } = await getPriorArtResults(id);
+  const model = await getPriorArtPage(id);
+  if (!model) notFound();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -28,7 +25,11 @@ export default async function PriorArtPage({
         </div>
         <HeaderActions projectId={id} />
       </header>
-      <PriorArtClient projectId={id} claims={claims} matches={matches} />
+      <PriorArtClient
+        projectId={id}
+        claims={model.claims}
+        matches={model.matches}
+      />
     </div>
   );
 }

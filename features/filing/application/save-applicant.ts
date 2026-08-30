@@ -6,7 +6,7 @@ import "server-only";
  */
 import { logAudit } from "@/shared/audit/log";
 import type { TypedSupabaseClient } from "@/shared/db/types";
-import { ENTITY_STATUSES, type EntityStatus } from "@/lib/projects/sections";
+import { ENTITY_STATUSES, type EntityStatus } from "@/features/projects/domain/sections";
 import { updateApplicant } from "@/features/filing/infrastructure/inventors-repository";
 
 export type SaveApplicantInput = {

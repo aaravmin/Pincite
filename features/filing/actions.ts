@@ -9,7 +9,7 @@ import { requireViewer } from "@/shared/auth/require-viewer";
 import { saveApplicant as saveApplicantOp } from "@/features/filing/application/save-applicant";
 import { saveInventors as saveInventorsOp } from "@/features/filing/application/save-inventors";
 import type { InventorInput } from "@/features/filing/domain/types";
-import type { EntityStatus } from "@/lib/projects/sections";
+import type { EntityStatus } from "@/features/projects/domain/sections";
 
 export async function saveInventors(input: {
   projectId: string;

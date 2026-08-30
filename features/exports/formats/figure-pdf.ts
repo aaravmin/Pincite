@@ -6,7 +6,7 @@
  * black-and-white line art (the review red is screen-only).
  */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import type { DrawingAnnotations } from "@/lib/filing/types";
+import type { DrawingAnnotations } from "@/features/drawings/domain/types";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const BLACK = rgb(0, 0, 0);

@@ -16,8 +16,8 @@ import {
   SECTION_KEYS,
   type SectionKey,
 } from "@/features/projects/domain/sections";
-import type { AttachmentKind } from "@/lib/filing/types";
-import type { Disclosure } from "@/lib/disclosure/types";
+import type { AttachmentKind } from "@/features/drawings/domain/types";
+import type { Disclosure } from "@/features/disclosure/domain/types";
 
 /** The steps that can be ticked. Review, rules, and prior art are not completion steps. */
 export type StepProgress = {

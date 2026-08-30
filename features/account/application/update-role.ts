@@ -10,24 +10,25 @@ import "server-only";
 import { logAudit } from "@/shared/audit/log";
 import type { Viewer } from "@/shared/auth/require-viewer";
 import { USER_ROLES, type UserRole } from "@/shared/auth/types";
+import { updateProfileRole } from "@/features/account/infrastructure/profile-repository";
 
 export async function changeRole(
   viewer: Viewer,
   role: UserRole,
+  /** Audit context: where the change came from, and the request IP when there is one. */
+  options: { via?: string; ip?: string | null } = {},
 ): Promise<{ ok: true } | { error: string }> {
   if (!USER_ROLES.includes(role)) return { error: "Invalid role." };
 
   const { supabase, user } = viewer;
-  const { error } = await supabase
-    .from("profiles")
-    .update({ role })
-    .eq("id", user.id);
-  if (error) return { error: error.message };
+  const { error } = await updateProfileRole(supabase, user.id, role);
+  if (error) return { error };
 
   await logAudit(supabase, {
     userId: user.id,
     action: "role_selected",
-    detail: { role, via: "settings" },
+    detail: options.via ? { role, via: options.via } : { role },
+    ip: options.ip,
   });
   return { ok: true };
 }

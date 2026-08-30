@@ -26,8 +26,8 @@ import {
 } from "@/features/projects/domain/step-progress";
 import type { Finding } from "@/features/review/domain/finding";
 import type { FilingFinding } from "@/features/review/domain/filing-checks";
-import type { AttachmentKind } from "@/lib/filing/types";
-import type { Disclosure } from "@/lib/disclosure/types";
+import type { AttachmentKind } from "@/features/drawings/domain/types";
+import type { Disclosure } from "@/features/disclosure/domain/types";
 
 export type GateStatus = "done" | "violation" | "attention" | "todo";
 export type Gate = {

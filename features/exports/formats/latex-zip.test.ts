@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { buildLatexBundle } from "@/features/exports/formats/latex-zip";
 import type { DrawingFile, ExportContext } from "@/features/exports/types";
-import { SECTION_KEYS, type SectionKey } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import type { Attachment, Inventor } from "@/lib/filing/types";
+import { SECTION_KEYS, type SectionKey } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 /** A real 1x1 PNG, so pdf-lib can genuinely embed it into the figure PDF. */
 const PNG = Uint8Array.from(

@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { buildFilingPackageZip } from "@/features/exports/formats/package-zip";
 import type { DrawingFile, ExportContext } from "@/features/exports/types";
-import type { SectionKey } from "@/lib/projects/sections";
-import { SECTION_KEYS } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import type { Attachment, Inventor } from "@/lib/filing/types";
+import type { SectionKey } from "@/features/projects/domain/sections";
+import { SECTION_KEYS } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 const project: Project = {
   id: "p1",

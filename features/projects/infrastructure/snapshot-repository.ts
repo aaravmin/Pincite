@@ -16,17 +16,13 @@ import {
   type SectionKey,
 } from "@/features/projects/domain/sections";
 import type { Project } from "@/features/projects/domain/types";
-import type {
-  Attachment,
-  DrawingAnnotations,
-  DrawingReview,
-  Inventor,
-} from "@/lib/filing/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment, DrawingAnnotations, DrawingReview } from "@/features/drawings/domain/types";
 import {
   DISCLOSURE_FIELDS,
   emptyDisclosure,
   type Disclosure,
-} from "@/lib/disclosure/types";
+} from "@/features/disclosure/domain/types";
 
 /** One row of `exports`, as the readiness gates and the submission step need it. */
 export type ExportRecord = { id: string; format: string; created_at: string };

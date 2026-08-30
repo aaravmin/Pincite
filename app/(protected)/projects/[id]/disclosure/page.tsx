@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { HeaderActions } from "@/components/projects/header-actions";
+import { requireViewer } from "@/shared/auth/require-viewer";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { getDisclosurePage } from "@/features/disclosure/application/get-disclosure-page";
 import { DisclosureWorkspace } from "@/features/disclosure/ui/disclosure-workspace";
 
@@ -9,6 +10,8 @@ export default async function DisclosurePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
+
   const model = await getDisclosurePage(id);
   if (!model) notFound();
 

@@ -1,4 +1,4 @@
-import type { FilingFinding } from "@/lib/validators/filing";
+import type { FilingFinding } from "@/features/review/domain/filing-checks";
 
 // Color discipline: violation = solid red dot, attention = outline yellow dot, each with a
 // text label ("Issue"/"Check") so color is never the only signal.

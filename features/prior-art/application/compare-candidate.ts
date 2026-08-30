@@ -8,10 +8,12 @@ import type { User } from "@supabase/supabase-js";
 import type { TypedSupabaseClient } from "@/shared/db/types";
 import { logAudit } from "@/shared/audit/log";
 import { checkRateLimit } from "@/shared/rate-limit/check";
-import { getSectionContent } from "@/lib/projects/queries";
 import { extractLimitations } from "@/features/prior-art/domain/extract";
 import { matchCandidate } from "@/features/prior-art/domain/match";
-import { replaceMatches } from "@/features/prior-art/infrastructure/matches-repository";
+import {
+  loadClaimsText,
+  replaceMatches,
+} from "@/features/prior-art/infrastructure/matches-repository";
 
 export type CompareInput = {
   projectId: string;
@@ -26,8 +28,7 @@ export async function compareCandidate(
   user: User,
   input: CompareInput,
 ): Promise<{ ok: true; count: number } | { error: string }> {
-  const sections = await getSectionContent(input.projectId);
-  const claims = sections["claims"] ?? "";
+  const claims = await loadClaimsText(supabase, input.projectId);
   if (!claims.trim()) return { error: "Add claims to the project first." };
 
   const rl = await checkRateLimit(supabase, "prior_art_compare", 60, 3600);

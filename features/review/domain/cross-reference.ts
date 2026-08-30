@@ -6,7 +6,7 @@
  * pins are validated against the corpus one layer up (application/resolve-pins.ts).
  */
 import type { FilingFinding } from "@/features/review/domain/filing-checks";
-import type { Disclosure } from "@/lib/disclosure/types";
+import type { Disclosure } from "@/features/disclosure/domain/types";
 
 const STOPWORDS = new Set([
   "the", "a", "an", "and", "or", "of", "for", "with", "to", "in", "on", "at",

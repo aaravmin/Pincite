@@ -30,7 +30,7 @@ export async function updateRole(
   role: UserRole,
 ): Promise<{ ok: true } | { error: string }> {
   const viewer = await requireViewer();
-  const result = await changeRole(viewer, role);
+  const result = await changeRole(viewer, role, { via: "settings" });
   if ("error" in result) return result;
 
   revalidatePath("/settings");

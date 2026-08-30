@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { parseClaims } from "@/lib/patent/claims";
+import { parseClaims } from "@/features/review/domain/claims";
 
 /**
  * A read-only tree of the claims parsed from the plain-text editor: independent claims as

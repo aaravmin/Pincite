@@ -1,9 +1,8 @@
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject } from "@/lib/projects/queries";
-import { type AuditEntry } from "@/lib/audit-log";
-import { AuditClient } from "@/components/audit/audit-client";
+import { getProjectAudit } from "@/features/audit/application/get-project-audit";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
+import { AuditClient } from "@/features/audit/ui/audit-client";
 
 export default async function AuditPage({
   params,
@@ -11,18 +10,10 @@ export default async function AuditPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
 
-  const { supabase } = await requireViewer();
-
-  const project = await getProject(id);
-  if (!project) notFound();
-  const { data: rows } = await supabase
-    .from("audit_log")
-    .select("id, action, detail, created_at")
-    .eq("project_id", id)
-    .order("created_at", { ascending: false })
-    .limit(500);
-  const entries = (rows as AuditEntry[]) ?? [];
+  const entries = await getProjectAudit(id);
+  if (!entries) notFound();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

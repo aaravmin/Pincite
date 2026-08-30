@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { requireViewer } from "@/shared/auth/require-viewer";
 import { StepRail } from "@/components/workspace/step-rail";
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
 import {
@@ -14,6 +15,11 @@ export default async function ProjectLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  // Layouts are defense in depth, not the only gate: Next does not re-render a layout on a
+  // soft navigation between routes that share it, so every page below calls requireViewer()
+  // too. Within one render the call is deduped by the React cache.
+  await requireViewer();
+
   // One request-cached read for the whole matter; the pages inside this layout share it.
   // A matter the viewer cannot see renders the rail with nothing ticked - the page below
   // is what turns that into notFound().

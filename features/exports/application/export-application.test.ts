@@ -10,9 +10,10 @@ import {
   type ExportContext,
   type ExportFormat,
 } from "@/features/exports/types";
-import { SECTION_KEYS, type SectionKey } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import type { Attachment, Inventor } from "@/lib/filing/types";
+import { SECTION_KEYS, type SectionKey } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 /** A real 1x1 PNG, so the figure pipeline runs for real rather than being stubbed. */
 const PNG = Uint8Array.from(

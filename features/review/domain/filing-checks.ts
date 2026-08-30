@@ -8,7 +8,7 @@
  */
 import type { Severity } from "@/features/review/domain/finding";
 import type { Project } from "@/features/projects/domain/types";
-import { type Inventor } from "@/lib/filing/types";
+import { type Inventor } from "@/features/filing/domain/types";
 import type { UserRole } from "@/shared/auth/types";
 
 export type FilingFinding = {

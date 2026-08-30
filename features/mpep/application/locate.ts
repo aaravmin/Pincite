@@ -16,7 +16,7 @@ import {
   matchByKeyword,
 } from "@/features/mpep/infrastructure/corpus-repository";
 
-export async function locateByKeyword(
+async function locateByKeyword(
   supabase: TypedSupabaseClient,
   query: string,
   limit = 5,
@@ -25,7 +25,7 @@ export async function locateByKeyword(
 }
 
 /** Semantic locate: embed the query and rank sections by chunk cosine similarity. */
-export async function locateSemantic(
+async function locateSemantic(
   supabase: TypedSupabaseClient,
   query: string,
   limit = 5,

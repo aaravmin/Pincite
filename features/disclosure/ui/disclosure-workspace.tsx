@@ -11,7 +11,7 @@ import {
   type Disclosure,
   type DisclosureKey,
 } from "@/features/disclosure/domain/types";
-import type { FilingFinding } from "@/lib/validators/filing";
+import type { FilingFinding } from "@/features/review/domain/filing-checks";
 
 type SaveState = "saved" | "unsaved" | "saving" | "error";
 const ALL = "__all__" as const;

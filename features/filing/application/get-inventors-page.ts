@@ -2,7 +2,7 @@ import "server-only";
 
 /** The page model for the Inventors & applicant step: the ADS data card and its gaps. */
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
-import type { Project } from "@/lib/projects/types";
+import type { Project } from "@/features/projects/domain/types";
 import { buildAds, type AdsCard } from "@/features/filing/domain/ads";
 import type { Inventor } from "@/features/filing/domain/types";
 

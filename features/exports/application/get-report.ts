@@ -11,30 +11,25 @@ import "server-only";
  */
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
 import { getPriorArtResults } from "@/features/prior-art/application/get-results";
-import { getReview } from "@/lib/validators/results";
+import { loadProjectFindings } from "@/features/review/application/get-findings";
 import type { FindingRow } from "@/features/review/domain/finding";
 import { detectStage } from "@/features/projects/domain/stage";
 import { surfaceRules } from "@/features/rules/domain/surface";
 import {
   SECTION_KEYS,
   SECTION_LABELS,
-} from "@/lib/projects/sections";
+} from "@/features/projects/domain/sections";
 import type { Report } from "@/features/exports/formats/txt";
 
 export type GetReportDeps = {
   loadSnapshot: typeof getProjectSnapshot;
-  /**
-   * Only the findings are used. Typed structurally rather than as `typeof getReview` so the
-   * compatibility loader in lib/validators (which also re-reads the sections this module now
-   * takes from the snapshot) can be swapped for a findings-only reader without a type change.
-   */
-  loadFindings: (projectId: string) => Promise<{ findings: FindingRow[] }>;
+  loadFindings: (projectId: string) => Promise<FindingRow[]>;
   loadPriorArt: typeof getPriorArtResults;
 };
 
 const defaultDeps: GetReportDeps = {
   loadSnapshot: getProjectSnapshot,
-  loadFindings: getReview,
+  loadFindings: loadProjectFindings,
   loadPriorArt: getPriorArtResults,
 };
 
@@ -42,7 +37,7 @@ export async function buildReportData(
   projectId: string,
   deps: GetReportDeps = defaultDeps,
 ): Promise<Report | null> {
-  const [snapshot, review, priorArt] = await Promise.all([
+  const [snapshot, findings, priorArt] = await Promise.all([
     deps.loadSnapshot(projectId),
     deps.loadFindings(projectId),
     deps.loadPriorArt(projectId),
@@ -78,7 +73,7 @@ export async function buildReportData(
     stage,
     generatedAt: new Date().toISOString(),
     sections,
-    findings: review.findings,
+    findings,
     appliesNow,
     conditional,
     priorArt: priorArt.matches,

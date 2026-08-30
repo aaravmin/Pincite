@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  DECLARATION_STATEMENTS,
   buildAdsText,
   buildDeclarationText,
   buildReadme,
   buildTransmittalAndFeesText,
 } from "@/features/exports/formats/filing-package";
-import type { Project } from "@/lib/projects/types";
-import type { Inventor } from "@/lib/filing/types";
+import { DECLARATION_STATEMENTS } from "@/features/filing/domain/declaration";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
 
 const project = (over: Partial<Project> = {}): Project => ({
   id: "p1",

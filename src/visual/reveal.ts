@@ -54,29 +54,3 @@ export function useReveal(options?: {
 
   return { ref, progress, inView, reduced };
 }
-
-/**
- * Reveal on mount rather than on scroll. For above-the-fold dashboard content
- * (KPI count-ups, the tracker) that is already in view. Honors reduced motion.
- */
-export function useMountProgress(duration = 900): number {
-  const reduced = useReducedMotion();
-  const [progress, setProgress] = useState(0);
-  useEffect(() => {
-    if (reduced) {
-      setProgress(1);
-      return;
-    }
-    let raf = 0;
-    let start = 0;
-    const tick = (now: number) => {
-      if (!start) start = now;
-      const t = Math.min(1, Math.max(0, (now - start) / duration));
-      setProgress(easeOutCubic(t));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [reduced, duration]);
-  return progress;
-}

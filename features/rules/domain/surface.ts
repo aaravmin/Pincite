@@ -8,8 +8,8 @@
  * next" while claiming to already apply. Honors actionable vs informational (fees/deadlines
  * are informational). Pure; MPEP pins are corpus-validated by the caller before display.
  */
-import { parseClaims } from "@/lib/patent/claims";
-import type { PatentType } from "@/lib/projects/sections";
+import { parseClaims } from "@/features/review/domain/claims";
+import type { PatentType } from "@/features/projects/domain/sections";
 
 export type SurfacedRule = {
   mpep_section: string | null;

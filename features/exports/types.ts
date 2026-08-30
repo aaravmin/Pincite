@@ -3,9 +3,10 @@
  * Supabase, no HTTP, no Next. Everything an export needs about a matter is carried in one
  * `ExportContext`, loaded once per request, so a formatter never reaches for the database.
  */
-import type { SectionKey } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import type { Attachment, Inventor } from "@/lib/filing/types";
+import type { SectionKey } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 /** Every downloadable format the export route serves, in menu order. */
 export const EXPORT_FORMATS = ["txt", "pdf", "docx", "latex", "package"] as const;

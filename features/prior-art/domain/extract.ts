@@ -4,7 +4,7 @@
  * evidence pane can underline the exact element) and pull significant technical terms
  * for query building and overlap scoring.
  */
-import { parseClaims } from "@/lib/patent/claims";
+import { parseClaims } from "@/features/review/domain/claims";
 
 export type Limitation = {
   claimNumber: number;

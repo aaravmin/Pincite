@@ -9,7 +9,6 @@ import type { User } from "@supabase/supabase-js";
 import type { TypedSupabaseClient } from "@/shared/db/types";
 import { logAudit } from "@/shared/audit/log";
 import { checkGlobalLimit, checkRateLimit } from "@/shared/rate-limit/check";
-import { getSectionContent } from "@/lib/projects/queries";
 import {
   claimKeywords,
   extractLimitations,
@@ -25,7 +24,10 @@ import {
 } from "@/features/prior-art/infrastructure/bigquery";
 import { searchCandidatesKeyless } from "@/features/prior-art/infrastructure/keyless";
 import { semanticScores } from "@/features/prior-art/infrastructure/semantic";
-import { replaceMatches } from "@/features/prior-art/infrastructure/matches-repository";
+import {
+  loadClaimsText,
+  replaceMatches,
+} from "@/features/prior-art/infrastructure/matches-repository";
 
 export type RunSearchResult =
   | { ok: true; count: number; scanGB: number; source: "bigquery" | "google_patents" }
@@ -36,8 +38,7 @@ export async function runSearch(
   user: User,
   projectId: string,
 ): Promise<RunSearchResult> {
-  const sections = await getSectionContent(projectId);
-  const claims = sections["claims"] ?? "";
+  const claims = await loadClaimsText(supabase, projectId);
   if (!claims.trim()) return { error: "Add claims to the project first." };
 
   // A live search is a network call on either path; cap per user by hour and day.

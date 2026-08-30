@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { HeaderActions } from "@/components/projects/header-actions";
+import { requireViewer } from "@/shared/auth/require-viewer";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
 import { UploadsPanel } from "@/features/drawings/ui/uploads-panel";
 
@@ -9,6 +10,8 @@ export default async function UploadsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireViewer();
+
   const snapshot = await getProjectSnapshot(id);
   if (!snapshot) notFound();
 

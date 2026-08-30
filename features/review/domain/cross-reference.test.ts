@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { runCrossRefChecks } from "@/features/review/domain/cross-reference";
-import { emptyDisclosure, type Disclosure } from "@/lib/disclosure/types";
+import { emptyDisclosure, type Disclosure } from "@/features/disclosure/domain/types";
 
 const disclosure = (over: Partial<Disclosure> = {}): Disclosure => ({
   ...emptyDisclosure(),

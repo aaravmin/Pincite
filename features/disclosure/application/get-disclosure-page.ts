@@ -8,8 +8,8 @@ import "server-only";
  */
 import { resolvePins } from "@/features/mpep/application/validate-citations";
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
-import { runCrossRefChecks } from "@/lib/validators/crossref";
-import type { FilingFinding } from "@/lib/validators/filing";
+import { runCrossRefChecks } from "@/features/review/domain/cross-reference";
+import type { FilingFinding } from "@/features/review/domain/filing-checks";
 import type { Disclosure } from "@/features/disclosure/domain/types";
 
 export type DisclosurePageModel = {

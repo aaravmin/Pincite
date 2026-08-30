@@ -1,5 +1,4 @@
 import { defineConfig, type Plugin } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 /**
  * `server-only` / `client-only` are build-time markers for the Next.js bundler: importing
@@ -30,14 +29,12 @@ function stubBoundaryMarkers(): Plugin {
  * which is excluded here.
  */
 export default defineConfig({
-  plugins: [stubBoundaryMarkers(), tsconfigPaths()],
+  plugins: [stubBoundaryMarkers()],
+  // Vite resolves the tsconfig `@/*` and `@visual/*` aliases natively; no plugin needed.
+  resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
-    include: [
-      "features/**/*.test.ts",
-      "shared/**/*.test.ts",
-      "lib/**/*.test.ts",
-    ],
+    include: ["features/**/*.test.ts", "shared/**/*.test.ts"],
     exclude: ["**/node_modules/**", "**/.next/**", "e2e/**"],
   },
 });

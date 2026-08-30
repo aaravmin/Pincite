@@ -4,9 +4,9 @@ import {
   parseFilingDocument,
 } from "@/features/exports/application/build-declaration";
 import type { ExportContext } from "@/features/exports/types";
-import { SECTION_KEYS, type SectionKey } from "@/lib/projects/sections";
-import type { Project } from "@/lib/projects/types";
-import type { Inventor } from "@/lib/filing/types";
+import { SECTION_KEYS, type SectionKey } from "@/features/projects/domain/sections";
+import type { Project } from "@/features/projects/domain/types";
+import type { Inventor } from "@/features/filing/domain/types";
 
 const project: Project = {
   id: "p1",

@@ -7,7 +7,13 @@ import "server-only";
  *
  * Both lists are validated in ONE corpus round trip - the same two steps `resolvePins`
  * performs, split so a pin shared by the two lists is not looked up twice.
+ *
+ * The draft it reasons over comes from the request-cached project snapshot, so opening
+ * Rules from another project screen costs no extra queries; `null` means the matter is not
+ * visible to the viewer and the caller answers notFound().
  */
+import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
+import { SECTION_KEYS } from "@/features/projects/domain/sections";
 import { validateCitations } from "@/features/mpep/application/validate-citations";
 import {
   applyResolvedPins,
@@ -16,7 +22,6 @@ import {
 import {
   surfaceRules,
   type ConditionalRule,
-  type RuleInput,
   type SurfacedRule,
 } from "@/features/rules/domain/surface";
 
@@ -25,8 +30,20 @@ export type RulesPageModel = {
   conditional: ConditionalRule[];
 };
 
-export async function getRulesPage(input: RuleInput): Promise<RulesPageModel> {
-  const { appliesNow, conditional } = surfaceRules(input);
+export async function getRulesPage(
+  projectId: string,
+): Promise<RulesPageModel | null> {
+  const snapshot = await getProjectSnapshot(projectId);
+  if (!snapshot) return null;
+  const { project, sections } = snapshot;
+
+  const { appliesNow, conditional } = surfaceRules({
+    patentType: project.patent_type,
+    filled: SECTION_KEYS.filter((k) => sections[k].trim().length > 0),
+    sections,
+    declared_status: project.declared_status,
+  });
+
   const resolved = await validateCitations(
     collectPins([...appliesNow, ...conditional]),
   );

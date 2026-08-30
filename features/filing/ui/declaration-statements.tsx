@@ -1,4 +1,4 @@
-import { DECLARATION_STATEMENTS } from "@/lib/export/filing-package";
+import { DECLARATION_STATEMENTS } from "@/features/filing/domain/declaration";
 import type { Inventor } from "@/features/filing/domain/types";
 
 /**

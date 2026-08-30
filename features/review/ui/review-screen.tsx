@@ -8,7 +8,7 @@
  * fix; everything else is neutral or the attention token.
  */
 import Link from "next/link";
-import { HeaderActions } from "@/components/projects/header-actions";
+import { HeaderActions } from "@/features/projects/ui/header-actions";
 import type { ReviewPageModel } from "@/features/review/application/get-review-page";
 import { ReviewClient } from "@/features/review/ui/review-client";
 

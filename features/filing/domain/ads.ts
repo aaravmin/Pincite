@@ -3,9 +3,9 @@
  * data the user types into Patent Center's Web ADS (the USPTO's preferred path), and what
  * the export's data card mirrors. We surface what is captured and what is still missing.
  */
-import type { Project } from "@/lib/projects/types";
+import type { Project } from "@/features/projects/domain/types";
 import type { Inventor } from "@/features/filing/domain/types";
-import { ENTITY_STATUS_LABELS } from "@/lib/projects/sections";
+import { ENTITY_STATUS_LABELS } from "@/features/projects/domain/sections";
 
 export type AdsCard = {
   rows: { label: string; value: string }[];

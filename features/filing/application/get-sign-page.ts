@@ -10,7 +10,7 @@ import "server-only";
  */
 import { requireViewer } from "@/shared/auth/require-viewer";
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
-import type { Project } from "@/lib/projects/types";
+import type { Project } from "@/features/projects/domain/types";
 import type { Inventor } from "@/features/filing/domain/types";
 import {
   isDeclaration,

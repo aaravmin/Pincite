@@ -10,7 +10,7 @@
  * class, so the .tex compiles with plain pdflatex or on Overleaf without the uspatent package.
  * Pure string builder; latex-zip.ts bundles this .tex with the figure files into a ZIP.
  */
-import type { SectionKey } from "@/lib/projects/sections";
+import type { SectionKey } from "@/features/projects/domain/sections";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const SEC_TITLE: Partial<Record<SectionKey, string>> = {

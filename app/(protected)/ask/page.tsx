@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { AskClient } from "@/components/ask/ask-client";
+import { AskClient } from "@/features/mpep/ui/ask-client";
 
 export default async function AskPage() {
   await requireViewer();
