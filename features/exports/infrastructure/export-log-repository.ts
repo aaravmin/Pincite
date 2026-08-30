@@ -6,7 +6,7 @@ import "server-only";
  * `export_generated` audit event.
  *
  * `exports.format` is constrained by a CHECK in the schema - a new format needs a migration,
- * or the insert is silently rejected (see CLAUDE.md).
+ * or the insert is silently rejected (see the README).
  */
 import { logAudit } from "@/shared/audit/log";
 import type { TypedSupabaseClient } from "@/shared/db/types";

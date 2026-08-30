@@ -1,7 +1,7 @@
 /**
  * Vision for patent drawings. SERVER ONLY. Uses Grok vision (the active vendor).
  * CONFIDENTIALITY: a figure sent here is seen by the vendor and ZDR is not confirmed on,
- * so use only public or synthetic figures until ZDR is on (CLAUDE.md "How we work").
+ * so use only public or synthetic figures until ZDR is on (see the README).
  */
 import "server-only";
 import { sanitizeOutputText } from "@/shared/text/sanitize";

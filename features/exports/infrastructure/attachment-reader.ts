@@ -4,8 +4,8 @@ import "server-only";
  * Read uploaded attachment bytes out of the private `project-files` bucket.
  *
  * Uses the service-role client on purpose: the cookie-based SSR server client does not carry
- * the user JWT to Supabase Storage, so Storage RLS rejects reads made with it (see CLAUDE.md,
- * "Storage needs the admin client"). Because that client bypasses RLS, the CALLER must have
+ * the user JWT to Supabase Storage, so Storage RLS rejects reads made with it (the "Storage
+ * needs the admin client" rule in the README). Because that client bypasses RLS, the CALLER must have
  * already established that the viewer may see this matter - the export application only ever
  * passes paths that came out of a project snapshot loaded through the user-scoped client.
  *

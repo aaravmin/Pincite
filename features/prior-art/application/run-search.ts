@@ -3,7 +3,7 @@ import "server-only";
 /**
  * Live prior-art search: discover candidates from claim keywords, then
  * pinpoint-match each against the user's limitations and persist ranked results. Synthetic
- * data only until vendor zero-retention is confirmed (CLAUDE.md "How we work").
+ * data only until vendor zero-retention is confirmed (see the README).
  */
 import type { User } from "@supabase/supabase-js";
 import type { TypedSupabaseClient } from "@/shared/db/types";

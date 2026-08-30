@@ -6,7 +6,7 @@ import "server-only";
  * transport detail.
  *
  * CONFIDENTIALITY: a figure sent here is seen by the vendor and ZDR is not confirmed on, so
- * only public or synthetic figures may go through it (CLAUDE.md "How we work").
+ * only public or synthetic figures may go through it (see the README).
  */
 import {
   analyzeDrawingVision,

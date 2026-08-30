@@ -6,7 +6,7 @@ import "server-only";
  * ALL OF IT GOES THROUGH THE ADMIN CLIENT. The cookie-based SSR client does not carry the
  * user JWT to Supabase Storage, so Storage RLS rejects its writes outright ("new row
  * violates RLS"). Every caller in the application layer verifies ownership with the USER
- * client first and only then reaches for these functions (see CLAUDE.md).
+ * client first and only then reaches for these functions (see the README).
  *
  * The bucket also enforces an `allowed_mime_types` allowlist (scripts/setup-storage.mjs);
  * a type accepted by features/drawings/domain/upload-policy but missing there is rejected

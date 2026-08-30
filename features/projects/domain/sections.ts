@@ -1,7 +1,7 @@
 /**
  * The structured-intake section model. Section content is stored as a
  * raw plain-text string so character offsets stay stable for later finding/highlight
- * spans - see CLAUDE.md "Conventions".
+ * spans - see the README Architecture section.
  */
 
 export const SECTION_KEYS = [

@@ -10,7 +10,7 @@ import "server-only";
  * policy, so the SSR user client cannot patch a row. Ownership is verified first with the
  * user client (the application layer does this before calling either function), and only
  * then is the update issued with the service-role client - the same "verify with the user
- * client, act with the admin client" pattern Storage requires (see CLAUDE.md).
+ * client, act with the admin client" pattern Storage requires (see the README).
  */
 import { createAdminClient } from "@/shared/db/admin";
 import type { TablesInsert, TypedSupabaseClient } from "@/shared/db/types";
