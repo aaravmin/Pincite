@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { surfaceRules, type RuleInput } from "@/lib/rules/surface";
+import { surfaceRules, type RuleInput } from "@/features/rules/domain/surface";
 
 const input = (over: Partial<RuleInput> = {}): RuleInput => ({
   patentType: "utility",

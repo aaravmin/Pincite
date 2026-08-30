@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isPointerStub, selectResponsivePassage } from "@/lib/mpep/highlight";
+import { isPointerStub, selectResponsivePassage } from "@/features/mpep/domain/highlight";
 
 describe("isPointerStub", () => {
   it("treats empty and [Reserved]-style text as a stub", () => {
