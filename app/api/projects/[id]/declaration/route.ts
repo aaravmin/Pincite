@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/shared/db/server";
+import { getViewer } from "@/shared/auth/require-viewer";
 import { getProject, getSectionContent } from "@/lib/projects/queries";
 import { getInventors } from "@/lib/filing/queries";
 import { buildDeclarationPdf, buildPoaPdf } from "@/lib/export/declaration-pdf";
@@ -13,11 +13,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new NextResponse("Unauthorized", { status: 401 });
+  // Auth only, no viewer fields needed: the loaders below are RLS-scoped to the owner.
+  const viewer = await getViewer();
+  if (!viewer) return new NextResponse("Unauthorized", { status: 401 });
 
   const project = await getProject(id);
   if (!project) return new NextResponse("Not found", { status: 404 });

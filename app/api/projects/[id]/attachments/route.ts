@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/shared/db/server";
+import { getViewer } from "@/shared/auth/require-viewer";
 import { createAdminClient } from "@/shared/db/admin";
 import { logAudit, clientIp } from "@/shared/audit/log";
 import { ATTACHMENT_VIEWS } from "@/lib/filing/types";
@@ -21,11 +21,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: projectId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const viewer = await getViewer();
+  if (!viewer) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { supabase, user } = viewer;
 
   const form = await request.formData();
   const file = form.get("file") as File | null;

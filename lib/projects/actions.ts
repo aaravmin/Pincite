@@ -7,8 +7,7 @@
  * version that links back to its source - history is never overwritten.
  */
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { createClient } from "@/shared/db/server";
+import { requireViewer } from "@/shared/auth/require-viewer";
 import { logAudit } from "@/shared/audit/log";
 import { isAdminEmail } from "@/shared/auth/admin-allowlist";
 import {
@@ -22,15 +21,6 @@ import {
 } from "@/lib/projects/sections";
 import type { VersionSnapshot } from "@/lib/projects/types";
 import type { TablesUpdate, TypedSupabaseClient } from "@/shared/db/types";
-
-async function requireUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  return { supabase, user };
-}
 
 export async function createProject(input: {
   name: string;
@@ -46,7 +36,7 @@ export async function createProject(input: {
   const clientName = input.clientName?.trim() || null;
   const matterNo = input.matterNo?.trim() || null;
 
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const { data, error } = await supabase
     .from("projects")
     .insert({
@@ -80,7 +70,7 @@ export async function createProject(input: {
 export async function deleteProject(input: {
   projectId: string;
 }): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   if (!isAdminEmail(user.email)) {
     return { error: "Only the admin can remove patents." };
   }
@@ -114,7 +104,7 @@ export async function updateProjectStatus(input: {
   if (!PROJECT_STATUSES.includes(input.declared_status)) {
     return { error: "Unknown status." };
   }
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const patch: TablesUpdate<"projects"> = {
     declared_status: input.declared_status,
   };
@@ -152,7 +142,7 @@ export async function saveSection(input: {
   if (!SECTION_KEYS.includes(input.sectionKey)) {
     return { error: "Unknown section." };
   }
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
 
   const { data: prev } = await supabase
     .from("project_sections")
@@ -227,7 +217,7 @@ export async function saveVersion(input: {
   projectId: string;
   label?: string;
 }): Promise<{ id: string } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const snapshot = await buildSnapshot(supabase, input.projectId);
   const { data, error } = await supabase
     .from("project_versions")
@@ -263,7 +253,7 @@ async function reopenVersion(
   sourceVersionId: string,
   mode: "restore" | "branch",
 ): Promise<{ id: string } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
 
   const { data: source, error: loadErr } = await supabase
     .from("project_versions")
@@ -344,7 +334,7 @@ export async function branchVersion(input: {
 export async function listProjectVersions(
   projectId: string,
 ): Promise<{ id: string; label: string | null; created_at: string }[]> {
-  const { supabase } = await requireUser();
+  const { supabase } = await requireViewer();
   const { data } = await supabase
     .from("project_versions")
     .select("id, label, created_at")

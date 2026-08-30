@@ -6,8 +6,7 @@
  * UPLOADS go through the route handler app/api/projects/[id]/attachments (multipart).
  */
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { createClient } from "@/shared/db/server";
+import { requireViewer } from "@/shared/auth/require-viewer";
 import { createAdminClient } from "@/shared/db/admin";
 import {
   analyzeDrawingVision,
@@ -26,20 +25,11 @@ import {
   type DrawingReview,
 } from "@/lib/filing/types";
 
-async function requireUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  return { supabase, user };
-}
-
 export async function saveInventors(input: {
   projectId: string;
   inventors: InventorInput[];
 }): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const clean = input.inventors
     .map((i) => ({
       legal_name: i.legal_name?.trim() ?? "",
@@ -88,7 +78,7 @@ export async function saveApplicant(input: {
   applicantIsJuristic: boolean;
   entityStatus: EntityStatus;
 }): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const entity = ENTITY_STATUSES.includes(input.entityStatus)
     ? input.entityStatus
     : "large";
@@ -117,7 +107,7 @@ export async function deleteAttachment(input: {
   projectId: string;
   attachmentId: string;
 }): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const { data: row } = await supabase
     .from("project_attachments")
     .select("storage_path")
@@ -167,7 +157,7 @@ export async function analyzeDrawing(input: {
   projectId: string;
   attachmentId: string;
 }): Promise<({ ok: true } & DrawingReview) | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
 
   const { data: att } = await supabase
     .from("project_attachments")
@@ -329,7 +319,7 @@ export async function classifyOrientation(input: {
   projectId: string;
   attachmentId: string;
 }): Promise<{ ok: true; view: string } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
 
   const { data: att } = await supabase
     .from("project_attachments")
@@ -395,7 +385,7 @@ export async function setAttachmentView(input: {
   attachmentId: string;
   view: string;
 }): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const view = (ATTACHMENT_VIEWS as readonly string[]).includes(input.view)
     ? input.view
     : "";

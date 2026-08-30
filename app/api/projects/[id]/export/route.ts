@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import JSZip from "jszip";
-import { createClient } from "@/shared/db/server";
+import { getViewer } from "@/shared/auth/require-viewer";
 import { buildReportData, toText } from "@/lib/export/report";
 import { buildSpecDocx } from "@/lib/export/docx";
 import { buildPatentPdf } from "@/lib/export/patent-pdf";
@@ -125,11 +125,9 @@ export async function GET(
   const isPreview = url.searchParams.get("preview") === "1";
   const safeId = sanitizeOutputFilename(id);
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new NextResponse("Unauthorized", { status: 401 });
+  const viewer = await getViewer();
+  if (!viewer) return new NextResponse("Unauthorized", { status: 401 });
+  const { supabase, user } = viewer;
 
   // A half-screen preview shows what the application looks like typeset: the rendered patent PDF,
   // streamed inline so the browser displays the actual pages. Every previewable format (PDF,

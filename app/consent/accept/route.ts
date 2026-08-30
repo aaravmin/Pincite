@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/shared/db/server";
+import { getViewer } from "@/shared/auth/require-viewer";
 import { logAudit, clientIp } from "@/shared/audit/log";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const viewer = await getViewer();
 
   const { origin } = new URL(request.url);
-  if (!user) return NextResponse.redirect(`${origin}/login`, { status: 303 });
+  if (!viewer) return NextResponse.redirect(`${origin}/login`, { status: 303 });
+  const { supabase, user } = viewer;
 
   const { error } = await supabase
     .from("profiles")

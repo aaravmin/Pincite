@@ -2,7 +2,7 @@
  * Export the signed-in user's full audit log as CSV. RLS scopes the rows to this user, so
  * one account can never export another's history.
  */
-import { createClient } from "@/shared/db/server";
+import { getViewer } from "@/shared/auth/require-viewer";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 function csvCell(v: unknown): string {
@@ -12,11 +12,9 @@ function csvCell(v: unknown): string {
 }
 
 export async function GET() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new Response("Unauthorized", { status: 401 });
+  const viewer = await getViewer();
+  if (!viewer) return new Response("Unauthorized", { status: 401 });
+  const { supabase, user } = viewer;
 
   const { data: rows, error } = await supabase
     .from("audit_log")

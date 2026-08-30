@@ -1,23 +1,14 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/shared/db/server";
+import { requireUser } from "@/shared/auth/require-viewer";
 import { Button } from "@/components/ui/button";
 
 // Read the consent state fresh every time so a returning user is not re-prompted.
 export const dynamic = "force-dynamic";
 
 export default async function ConsentPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("consented_at")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (profile?.consented_at) redirect("/dashboard");
+  // Auth only, never requireViewer: demanding consent to reach the consent screen loops.
+  const { profile } = await requireUser();
+  if (profile.consented_at) redirect("/dashboard");
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background px-6 py-12">

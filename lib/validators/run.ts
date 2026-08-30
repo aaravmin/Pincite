@@ -6,9 +6,8 @@
  * dropped (set null) rather than shown. analyzeEligibility is the model-assisted §101
  * Alice/Mayo walkthrough (MPEP 2106), returned for display and labeled as the model's read.
  */
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/shared/db/server";
+import { requireViewer } from "@/shared/auth/require-viewer";
 import { logAudit } from "@/shared/audit/log";
 import { getSectionContent, getProject } from "@/lib/projects/queries";
 import { runTier1 } from "@/lib/validators/tier1";
@@ -25,15 +24,7 @@ import {
   type SectionKey,
 } from "@/lib/projects/sections";
 import type { EligibilityAnalysis, Finding } from "@/lib/validators/types";
-
-async function requireUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  return { supabase, user };
-}
+import type { TypedSupabaseClient } from "@/shared/db/types";
 
 /**
  * Re-run the deterministic validators (tiers 1-3) over the project's current saved text,
@@ -42,7 +33,7 @@ async function requireUser() {
  * Deterministic and cheap (no model call), so it is safe to run on every recheck.
  */
 async function computeAndPersistFindings(
-  supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
+  supabase: TypedSupabaseClient,
   projectId: string,
 ): Promise<{ findings: Finding[]; dropped: number }> {
   const [sections, project] = await Promise.all([
@@ -80,7 +71,7 @@ async function computeAndPersistFindings(
 export async function runValidators(
   projectId: string,
 ): Promise<{ ok: true; count: number; dropped: number } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const { findings, dropped } = await computeAndPersistFindings(supabase, projectId);
 
   await logAudit(supabase, {
@@ -103,7 +94,7 @@ export async function recheckFinding(
   sectionKey: string,
   title: string,
 ): Promise<{ ok: true; fixed: boolean; total: number } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const { findings } = await computeAndPersistFindings(supabase, projectId);
   const stillPresent = findings.some(
     (f) => f.section_key === sectionKey && f.title === title,
@@ -152,7 +143,7 @@ export async function proposeFix(input: {
 }): Promise<
   { ok: true; before: string; after: string; note: string } | { error: string }
 > {
-  const { supabase } = await requireUser();
+  const { supabase } = await requireViewer();
   const rl = await checkRateLimit(supabase, "grok_autofix", 30, 3600);
   if (!rl.allowed) return { error: rl.retryMessage };
   const budget = await checkGlobalLimit(supabase, "grok_global_day", 300, 86400);
@@ -223,7 +214,7 @@ export async function applyFix(input: {
   after: string;
   spanStart: number;
 }): Promise<{ ok: true } | { error: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const sections = await getSectionContent(input.projectId);
   const sectionKey = input.sectionKey as SectionKey;
   const content = sections[sectionKey] ?? "";
@@ -260,7 +251,7 @@ export async function applyFix(input: {
 export async function getRuleSection(
   sectionNumber: string,
 ): Promise<MpepSection | null> {
-  await requireUser();
+  await requireViewer();
   return loadSection(sectionNumber);
 }
 
@@ -274,7 +265,7 @@ export async function analyzeEligibility(projectId: string): Promise<
     }
   | { error: string }
 > {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireViewer();
   const claims = (await getSectionContent(projectId))["claims"] ?? "";
   if (!claims.trim()) return { error: "Add claims first." };
 

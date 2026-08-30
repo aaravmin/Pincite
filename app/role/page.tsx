@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { getProfile } from "@/lib/profile";
+import { requireUser } from "@/shared/auth/require-viewer";
 
 export const dynamic = "force-dynamic";
 
 export default async function RolePage() {
-  const profile = await getProfile();
-  if (!profile) redirect("/login");
+  // Auth only: the role is chosen right after consent, before any protected screen.
+  const { profile } = await requireUser();
   if (!profile.consented_at) redirect("/consent");
   if (profile.role) redirect("/dashboard");
 

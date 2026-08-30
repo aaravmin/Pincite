@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/shared/db/server";
+import { getViewer } from "@/shared/auth/require-viewer";
 import { createAdminClient } from "@/shared/db/admin";
 
 // Serve a private attachment. By default redirect to a short-lived signed URL (good for
@@ -10,11 +10,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string; attachmentId: string }> },
 ) {
   const { id: projectId, attachmentId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const viewer = await getViewer();
+  if (!viewer) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { supabase } = viewer;
 
   const { data: row } = await supabase
     .from("project_attachments")
