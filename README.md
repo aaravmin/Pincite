@@ -12,7 +12,8 @@
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Supabase-Postgres_%2B_pgvector-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
   <img src="https://img.shields.io/badge/Grok-grok--4.3-1D9BF0" alt="Grok" />
-  <img src="https://img.shields.io/badge/Playwright-21_green-2EAD33?logo=playwright&logoColor=white" alt="Playwright" />
+  <img src="https://img.shields.io/badge/Vitest-617_tests-6E9F18?logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/Playwright-e2e_gate-2EAD33?logo=playwright&logoColor=white" alt="Playwright" />
 </p>
 
 ---
@@ -85,7 +86,10 @@ Compare against a patent you paste, or pull candidates from Google BigQuery publ
 
 ### 11. Signing the inventor's declaration
 
-Each inventor reviews the application and confirms the five statements the USPTO requires, then types their legal name to record it. The filing readiness checks run here too and flag any defect, like a declaration that does not match the ADS, before you rely on it.
+The Sign step shows what the declaration says (the five 37 CFR 1.63 statements) and who has to sign it, then hands each inventor the real PTO/AIA/01 declaration as a PDF (attorneys also get the power of attorney).
+The inventor signs it by hand and uploads the signed copy, which is the operative signature and is bundled verbatim into the filing package.
+Pincite never verifies a signature and never records a click as one.
+The filing readiness checks (a missing inventor, address, applicant, or signed declaration) run on the Review step.
 
 ![Signing the declaration](screenshots/case-sign.png)
 
@@ -105,9 +109,13 @@ Every meaningful action is written to an append only audit log you can filter, s
 
 ## How it works
 
-For a complete walkthrough of every screen, field, and check, see [docs/product-functionality.md](docs/product-functionality.md).
-
-The spine of the app is `validateCitations` in `lib/mpep/citation.ts`. Every MPEP number a check or the model produces gets looked up in the ingested corpus before display. Numbers that resolve are shown and openable. Numbers that do not resolve get dropped. This is the same reason there is no single novelty score for prior art. Pincite leads with the spans instead.
+The spine of the app is `validateCitations` in [features/mpep/application/validate-citations.ts](features/mpep/application/validate-citations.ts).
+Every MPEP number a check or the model produces gets looked up in the ingested corpus before display.
+Numbers that resolve are shown and openable.
+Numbers that do not resolve get dropped (`resolvePins` nulls the pin and keeps the finding, so the CFR reference still shows).
+This is the same reason there is no single novelty score for prior art.
+Pincite leads with the spans instead.
+How the code is organized to keep that discipline is in [Architecture](#architecture) below.
 
 Similar patents
 
@@ -216,8 +224,8 @@ The export is a real document set rather than a generic PDF. The specification c
 | Embeddings | Voyage `voyage-law-2`, a legal tuned 1024 dimension model, over the MPEP corpus |
 | Prior art | Google BigQuery `patents-public-data` through a service account, with PatentsView as a key free fallback |
 | Export | `docx` for the specification and `jszip` for the filing package |
-| Testing | Playwright end to end gate and `@axe-core/playwright` for accessibility |
-| Tooling | pnpm and ESLint |
+| Testing | Vitest unit and application tests that need no credentials, a Playwright end to end gate, and `@axe-core/playwright` for accessibility |
+| Tooling | pnpm, ESLint with architectural boundary rules, GitHub Actions CI (lint, typecheck, unit tests, build) |
 
 ---
 
@@ -272,33 +280,110 @@ node --env-file=.env.local scripts/embed-mpep.mjs
 pnpm dev    # http://localhost:3100
 ```
 
-Other commands are `pnpm build`, `pnpm lint`, `pnpm exec playwright test` for the full gate, and `pnpm exec playwright test e2e/<feature>.spec.ts` for one. Port 3100 is intentional because 3000 is reserved for another local app.
+Other commands are `pnpm test` (unit and application tests, no credentials needed), `pnpm typecheck`, `pnpm lint` (includes the architecture boundary rules), `pnpm build`, `pnpm exec playwright test` for the full end to end gate, and `pnpm exec playwright test e2e/<feature>.spec.ts` for one.
+Port 3100 is intentional because 3000 is reserved for another local app.
 
 ---
 
-## Project structure
+## Architecture
+
+Pincite is a feature oriented modular monolith on the Next.js App Router.
+`app/` is a thin routing layer, every product capability lives in one folder under `features/`, and the framework free plumbing lives in `shared/`.
 
 ```
-app/                     Next routes (dashboard, /projects/[id]/* step pages, /api)
-lib/
-  mpep/                  locate, load, citation validation, highlight (the evidence pane)
-  patents/               extract limitations, BigQuery search, pinpoint match and score
-  validators/            tier1 to tier3 plus filing and crossref checks that produce findings
-  filing/                inventors, applicant and ADS, attachments, declarations
-  disclosure/            the plain language invention intake
-  lifecycle/             what to do now by application status
-  export/                report (TXT), docx (specification), filing package (zip)
-  stage/  rules/         stage detection and rule surfacing
-  projects/              projects, sections, append only versions
-  supabase/              server, client, middleware, and admin clients
-supabase/migrations/     0001 onward, each with row level security
-e2e/                     Playwright specs (one per feature) plus the case study generator
-scripts/                 db-apply, ingest-mpep, embed-mpep, verify-rls, setup-storage
-docs/                    product functionality, architecture, style guide, business context, api reference
+app/
+  (public)/            /, /home, /login, /privacy, /terms
+  (protected)/         layout enforces auth + consent; dashboard, settings, ask, projects/[id]/*
+  consent/  role/      signed in but not yet consented or role picked
+  auth/  api/          OAuth callback, sign out, dev login, attachments, declaration, export, audit CSV
+features/
+  <feature>/
+    domain/            pure TypeScript: no Next, React, Supabase, network, clock, or auth
+    application/       one file per use case; composes domain with infrastructure, marked server-only
+    infrastructure/    Supabase, Storage, BigQuery, LLM adapters, marked server-only
+    actions.ts         "use server" entry points, each under ~40 lines
+    ui/                React components for this feature
+shared/
+  auth/                requireViewer, getViewer, the pure access rule, role types, the admin allowlist
+  db/                  typed server, browser, admin, and middleware clients plus database.types.ts
+  audit/  rate-limit/  llm/  text/  format.ts  utils.ts
+components/            app shell (sidebar, step rail, command palette), marketing site, shadcn primitives
+src/visual/            animation agnostic visuals shared by the site and the Remotion demo
 ```
+
+### Dependency direction
+
+```
+app/ and ui/  ->  application/  ->  domain/
+                               ->  infrastructure/
+```
+
+Domain never imports up.
+A feature may import another feature's `domain`, `application`, `actions`, or `ui`, but never its `infrastructure`.
+Routes, UI, and components never touch infrastructure, the server or admin database clients, providers, or the rate limiter.
+These rules are enforced by `no-restricted-imports` groups in [eslint.config.mjs](eslint.config.mjs), so a violation fails `pnpm lint` instead of waiting for review.
+Every application and infrastructure module starts with `import "server-only"`, so the bundler refuses to ship a server SDK or a document generator to the browser.
+
+### Features
+
+| Feature | Owns |
+| --- | --- |
+| `projects` | matters, sections, append only versions, stage detection, lifecycle actions, readiness, the dashboard summary, and the request scoped `ProjectSnapshot` |
+| `review` | the claim parser, tier 1 to 3 validators, cross reference and filing checks, citation partitioning, guided auto fix, the §101 walkthrough, and the review screen (the reference slice) |
+| `mpep` | the corpus: load, locate, keyword and semantic search, Ask, citation validation and `resolvePins` |
+| `prior-art` | limitation extraction, BigQuery and keyless search, Voyage ranking, pinpoint matching, results |
+| `rules` | applies now and conditional rule surfacing |
+| `filing` | inventors, applicant, the ADS card, the declaration statements, the sign page |
+| `drawings` | uploads, upload policy, signed URL and raw streaming, vision review assembly, orientation, delete |
+| `disclosure` | the plain language intake and its consistency check against the draft |
+| `exports` | the export context, every format builder, the filing package, and the export log |
+| `audit` | the per matter audit viewer and the CSV export |
+| `account` | login, consent, role selection, settings |
+
+### Authentication and authorization
+
+`shared/auth/require-viewer.ts` wraps one request cached lookup (`React.cache`) of the Supabase user and profile.
+`getViewer()` never redirects and returns `null` when signed out, so route handlers can answer 401.
+`requireViewer()` redirects to `/login` or `/consent`, and `requireUser()` checks the session only, for the consent and role screens.
+The `(protected)` layout calls `requireViewer()`, and every protected page calls it once more, because Next layouts do not re-render on soft navigation; the second call is served from the request cache.
+Server actions authenticate themselves with `requireViewer()` before doing anything.
+Row level security on every user table is defense in depth, not the only gate: application code checks ownership through the user scoped client before any service role or Storage work, and the service role client is used only for Storage and for the two attachment columns that have no user update policy.
+
+### The project snapshot
+
+`getProjectSnapshot(projectId)` in `features/projects/application` is the one canonical loader for a matter: project, every section (missing rows default to `""`), inventors, attachments, disclosure, and export records, started together with `Promise.all` and deduplicated per request with `React.cache`.
+It returns `null` when the project is not visible to the viewer.
+Nothing user scoped is ever placed in a persistent Next cache.
+Loaders that run after a write in the same request read fresh through their own repository instead of the snapshot, so a recompute never sees stale text.
+The dashboard does not go through the snapshot: it loads every matter's rows in one batched query per table and derives stage, completeness, open issues, and next step with a pure `summarizeDashboardProject`.
+
+### One read flow: opening Review
+
+1. `app/(protected)/projects/[id]/review/page.tsx` awaits `params`, calls `requireViewer()`, then `getReviewPage(id)`, and renders `ReviewScreen` or `notFound()`.
+2. `features/review/application/get-review-page.ts` loads the snapshot and the stored findings in parallel, runs the pure `runFilingChecks` and `runCrossRefChecks`, and drops unresolved MPEP pins with `resolvePins`.
+3. `features/review/ui/review-screen.tsx` renders the banners and the client, which is split into toolbar, finding groups, finding item, fix proposal, and eligibility panel.
+
+### One write flow: accepting a proposed fix
+
+1. `FixProposal` calls the `applyFix` server action in `features/review/actions.ts`.
+2. The action calls `requireViewer()`, hands the input to `applyFix` in `features/review/application/apply-fix.ts`, and revalidates the review and draft paths.
+3. The use case reads the section fresh, uses the pure `applyReplacement` from `domain/fix.ts` to replace the occurrence nearest the flagged span, writes through `infrastructure/section-writer.ts`, logs `section_edited` to the audit trail, then reruns `runDeterministicValidators`, validates every MPEP pin against the corpus, and replaces the stored findings.
+
+### Testing layers
+
+- Unit tests (`pnpm test`, Vitest, colocated `*.test.ts`) cover the pure domain: validators, claim parsing, citation partitioning, stage detection, readiness, completeness, dashboard summaries, drawing review assembly, upload policy, and every export serializer, all without credentials.
+- Application tests use small in memory fakes for repositories and providers to check orchestration: rate limits short circuit before any paid call, audit rows carry the right detail, findings are persisted with unresolved pins nulled, exports are recorded once per download and never for a preview.
+- Playwright (`pnpm exec playwright test`) keeps the end to end journeys: login and consent, matters and saves, review and auto fix, prior art, uploads and drawings, filing and exports, account isolation, and accessibility.
+- CI runs lint, typecheck, unit tests, and the production build on every push.
+
+### Data types
+
+`shared/db/database.types.ts` is the `Database` type every client is parameterized with.
+It is derived from `supabase/migrations/*.sql` and should be regenerated with `supabase gen types typescript` whenever the schema changes; a mismatch there is a bug in that file.
+Rows are mapped into domain objects explicitly where the shapes differ (jsonb columns such as a drawing's persisted analysis or a version snapshot).
 
 ---
 
 ## Disclaimer
 
-Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors. Voyage retention is opted out, and xAI zero data retention is the last piece to enable, so it stays the blocker until then. The full gate is 21 specs green with the accessibility scan clean on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Drawings get a vision check too. A model reads a figure and Pincite flags drawing issues under 37 CFR 1.84 and 1.83, a reference numeral on the drawing that is not in the specification, a missing figure label, and a disclosed component that is not shown, marking each located issue with a numbered red circle on the figure pinned to the rule, restricted to public or synthetic figures until vendor zero data retention is on.
+Pincite is not legal advice and not a filing service. A human stays in the loop. A similarity hit is a candidate to verify, not a conclusion about validity or patentability. Use synthetic or non confidential text for now, because real unfiled invention text should only go to zero data retention vendors. Voyage retention is opted out, and xAI zero data retention is the last piece to enable, so it stays the blocker until then. The unit layer is 617 credential free tests, and the Playwright gate is 32 specs with the accessibility scan on every screen. Semantic MPEP locate and Voyage semantic candidate ranking for prior art are now wired. Drawings get a vision check too. A model reads a figure and Pincite flags drawing issues under 37 CFR 1.84 and 1.83, a reference numeral on the drawing that is not in the specification, a missing figure label, and a disclosed component that is not shown, marking each located issue with a numbered red circle on the figure pinned to the rule, restricted to public or synthetic figures until vendor zero data retention is on.
