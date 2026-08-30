@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * The Ask flow (roadmap §5): locate the responsive MPEP section for a question, load
+ * The Ask flow: locate the responsive MPEP section for a question, load
  * its full text, pick the responsive passage to highlight, and report which requested
  * section numbers resolve to real corpus text vs are dropped (anti-hallucination spine).
  * Deterministic and corpus-only; a Grok-generated plain-English answer layers on next.

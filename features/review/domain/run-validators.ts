@@ -1,5 +1,5 @@
 /**
- * The single entry point for the deterministic validator tiers (roadmap §4.3).
+ * The single entry point for the deterministic validator tiers.
  *
  * Findings used to be assembled by spreading runTier1/2/3 into an array at every call site -
  * the persisting run, the readiness overview, and the dashboard issue count - which is how

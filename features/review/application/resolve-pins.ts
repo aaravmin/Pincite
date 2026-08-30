@@ -6,8 +6,8 @@ import "server-only";
  * The finding still shows - its CFR reference and explanation stand on their own - but a
  * citation never reaches the screen without real text behind it.
  *
- * Both check families use the same FilingFinding shape, so they share one resolver; the
- * generic pin logic itself lives in the MPEP feature.
+ * The generic pin logic itself lives in the MPEP feature; this is the review feature's
+ * FilingFinding-shaped entry point into it.
  */
 import { resolvePins } from "@/features/mpep/application/validate-citations";
 import type { FilingFinding } from "@/features/review/domain/filing-checks";
@@ -17,6 +17,3 @@ export async function resolveFilingPins(
 ): Promise<FilingFinding[]> {
   return resolvePins(findings);
 }
-
-/** Same resolver, kept under the cross-reference name its callers use. */
-export { resolveFilingPins as resolveCrossRefPins };

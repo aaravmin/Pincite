@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Citation validation - the anti-hallucination spine (roadmap §10, §11). Every
+ * Citation validation - the anti-hallucination spine. Every
  * model-produced MPEP section number is checked against the corpus before display;
  * unresolved cites are dropped and the output flagged for review. Reused by findings,
  * rule surfacing, the lifecycle actions, and the Ask flow.

@@ -1,5 +1,5 @@
 /**
- * Tier 1 validator: deterministic structural/format checks (roadmap §4.3). No model -
+ * Tier 1 validator: deterministic structural/format checks. No model -
  * each result is true or not and carries a hard MPEP/CFR pin. Honors the actionable vs
  * informational split: fee items are informational (actionable: false), never a field to
  * "do". span_* are character offsets into the relevant section's content. Patent-type

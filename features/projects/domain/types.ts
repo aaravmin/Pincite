@@ -25,7 +25,7 @@ export type Project = {
   updated_at: string;
 };
 
-/** The immutable snapshot stored on each save (roadmap §8). */
+/** The immutable snapshot stored on each save. */
 export type VersionSnapshot = {
   project: {
     name: string;

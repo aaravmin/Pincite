@@ -71,6 +71,9 @@ importers:
       remotion:
         specifier: ^4.0.484
         version: 4.0.484(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -4106,6 +4109,9 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -7000,12 +7006,12 @@ snapshots:
 
   css-loader@7.1.4(@rspack/core@1.7.11(@swc/helpers@0.5.15))(webpack@5.105.0(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.15)):
     dependencies:
-      icss-utils: 5.1.0(postcss@8.5.15)
-      postcss: 8.5.15
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.15)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.15)
-      postcss-modules-scope: 3.2.1(postcss@8.5.15)
-      postcss-modules-values: 4.0.0(postcss@8.5.15)
+      icss-utils: 5.1.0(postcss@8.5.26)
+      postcss: 8.5.26
+      postcss-modules-extract-imports: 3.1.0(postcss@8.5.26)
+      postcss-modules-local-by-default: 4.2.0(postcss@8.5.26)
+      postcss-modules-scope: 3.2.1(postcss@8.5.26)
+      postcss-modules-values: 4.0.0(postcss@8.5.26)
       postcss-value-parser: 4.2.0
       semver: 7.8.5
     optionalDependencies:
@@ -7545,9 +7551,9 @@ snapshots:
     dependencies:
       reusify: 1.1.0
 
-  fdir@6.5.0(picomatch@4.0.4):
+  fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
-      picomatch: 4.0.4
+      picomatch: 4.0.7
 
   fetch-blob@3.2.0:
     dependencies:
@@ -7746,9 +7752,9 @@ snapshots:
 
   iceberg-js@0.8.1: {}
 
-  icss-utils@5.1.0(postcss@8.5.15):
+  icss-utils@5.1.0(postcss@8.5.26):
     dependencies:
-      postcss: 8.5.15
+      postcss: 8.5.26
 
   ignore@5.3.2: {}
 
@@ -8440,26 +8446,26 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-modules-extract-imports@3.1.0(postcss@8.5.15):
+  postcss-modules-extract-imports@3.1.0(postcss@8.5.26):
     dependencies:
-      postcss: 8.5.15
+      postcss: 8.5.26
 
-  postcss-modules-local-by-default@4.2.0(postcss@8.5.15):
+  postcss-modules-local-by-default@4.2.0(postcss@8.5.26):
     dependencies:
-      icss-utils: 5.1.0(postcss@8.5.15)
-      postcss: 8.5.15
+      icss-utils: 5.1.0(postcss@8.5.26)
+      postcss: 8.5.26
       postcss-selector-parser: 7.1.4
       postcss-value-parser: 4.2.0
 
-  postcss-modules-scope@3.2.1(postcss@8.5.15):
+  postcss-modules-scope@3.2.1(postcss@8.5.26):
     dependencies:
-      postcss: 8.5.15
+      postcss: 8.5.26
       postcss-selector-parser: 7.1.4
 
-  postcss-modules-values@4.0.0(postcss@8.5.15):
+  postcss-modules-values@4.0.0(postcss@8.5.26):
     dependencies:
-      icss-utils: 5.1.0(postcss@8.5.15)
-      postcss: 8.5.15
+      icss-utils: 5.1.0(postcss@8.5.26)
+      postcss: 8.5.26
 
   postcss-selector-parser@7.1.4:
     dependencies:
@@ -8758,6 +8764,8 @@ snapshots:
 
   semver@7.8.5: {}
 
+  server-only@0.0.1: {}
+
   set-function-length@1.2.2:
     dependencies:
       define-data-property: 1.1.4
@@ -9023,8 +9031,8 @@ snapshots:
 
   tinyglobby@0.2.17:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
+      fdir: 6.5.0(picomatch@4.0.7)
+      picomatch: 4.0.7
 
   tinyrainbow@3.1.1: {}
 

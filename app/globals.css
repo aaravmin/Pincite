@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Pincite color system (roadmap §2.1). Color is DATA, never decoration.
+  Pincite color system. Color is DATA, never decoration.
   - Neutral tokens (white / black / grays) carry canvas, text, structure, borders.
   - Signal tokens are the only colors allowed to mean something:
       violation = red   -> a rule break / likely violation

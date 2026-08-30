@@ -18,7 +18,10 @@ import "server-only";
 import { buildSpecDocx } from "@/features/exports/formats/docx";
 import { declarationZipNames } from "@/features/exports/formats/filing-package";
 import { buildLatexBundle } from "@/features/exports/formats/latex-zip";
-import { buildFilingPackageZip } from "@/features/exports/formats/package-zip";
+import {
+  buildFilingPackageZip,
+  type DeclarationFile,
+} from "@/features/exports/formats/package-zip";
 import { renderPatentPdf } from "@/features/exports/formats/pdf";
 import { toText, type Report } from "@/features/exports/formats/txt";
 import { buildReportData } from "@/features/exports/application/get-report";
@@ -34,7 +37,11 @@ import {
 } from "@/features/exports/types";
 import { getViewer } from "@/shared/auth/require-viewer";
 import { sanitizeOutputFilename } from "@/shared/text/sanitize";
-import type { Attachment } from "@/features/drawings/domain/types";
+import {
+  isDeclaration,
+  isDrawing,
+  type Attachment,
+} from "@/features/drawings/domain/types";
 
 const ZIP = "application/zip";
 const PDF = "application/pdf";
@@ -70,7 +77,7 @@ const defaultDeps: ExportApplicationDeps = {
 
 /** Only PNG and JPEG drawings can be typeset; the others are not worth downloading. */
 const isTypesettableDrawing = (a: Attachment) =>
-  a.kind === "drawing" && (a.mime === "image/png" || a.mime === "image/jpeg");
+  isDrawing(a) && (a.mime === "image/png" || a.mime === "image/jpeg");
 
 /** Pair the attachments with their bytes, dropping any file Storage could not return. */
 function pair(
@@ -161,21 +168,22 @@ export async function exportApplication(
     case "package": {
       const ctx = await deps.loadContext(projectId);
       if (!ctx) return null;
-      const drawingAttachments = ctx.attachments.filter((a) => a.kind === "drawing");
-      const declarationAttachments = ctx.attachments.filter(
-        (a) => a.kind === "declaration",
-      );
+      const drawingAttachments = ctx.attachments.filter(isDrawing);
+      const declarationAttachments = ctx.attachments.filter(isDeclaration);
       // Drawings and declarations are independent files: one concurrent read for all of them.
       const bytes = await deps.readAttachments(
         [...drawingAttachments, ...declarationAttachments].map((a) => a.storage_path),
       );
+      // The packaged names are assigned HERE, once, and carried into the zip so the files and
+      // the cover sheet cannot disagree. A document Storage could not return keeps its name
+      // and travels with null bytes, which lists it on the sheet without writing a file.
       const names = declarationZipNames(
         declarationAttachments.map((a) => a.filename),
       );
-      const declarations = declarationAttachments.flatMap((a, i) => {
-        const found = bytes.get(a.storage_path);
-        return found ? [{ name: names[i], bytes: found }] : [];
-      });
+      const declarations: DeclarationFile[] = declarationAttachments.map((a, i) => ({
+        name: names[i],
+        bytes: bytes.get(a.storage_path) ?? null,
+      }));
       const body = await buildFilingPackageZip(
         ctx,
         pair(drawingAttachments, bytes),

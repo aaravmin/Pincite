@@ -16,7 +16,11 @@ import {
   SECTION_KEYS,
   type SectionKey,
 } from "@/features/projects/domain/sections";
-import type { AttachmentKind } from "@/features/drawings/domain/types";
+import {
+  drawingCount,
+  hasSignedDeclaration,
+  type AttachmentKind,
+} from "@/features/drawings/domain/types";
 import type { Disclosure } from "@/features/disclosure/domain/types";
 
 /** The steps that can be ticked. Review, rules, and prior art are not completion steps. */
@@ -38,6 +42,12 @@ type InventorFields = {
 
 /** Only the attachment field the kind predicates need. */
 type KindOnly = { kind: AttachmentKind };
+
+/**
+ * `hasSignedDeclaration` and `drawingCount` are the drawings domain's predicates, imported
+ * rather than restated: what counts as a signed declaration or a figure is one rule, and the
+ * rail, the readiness gates, the filing checks, and the export all ask the same question.
+ */
 
 export type StepProgressInput = {
   sections: Partial<Record<SectionKey, string>>;
@@ -62,23 +72,6 @@ export const NO_STEPS_DONE: StepProgress = {
 export const REQUIRED_SECTION_KEYS: SectionKey[] = SECTION_KEYS.filter(
   (k) => !ADVANCED_SECTION_KEYS.has(k),
 );
-
-/**
- * "Signed" means the inventor's hand-signed declaration document has been uploaded - the
- * operative signature lives on that document, not on any in-app click, and Pincite never
- * verifies the signature itself. One named home for the predicate the rail, the readiness
- * gates, the filing checks, and the export all ask.
- */
-export function hasSignedDeclaration(
-  attachments: readonly KindOnly[],
-): boolean {
-  return attachments.some((a) => a.kind === "declaration");
-}
-
-/** How many uploaded figures this matter has. */
-export function drawingCount(attachments: readonly KindOnly[]): number {
-  return attachments.filter((a) => a.kind === "drawing").length;
-}
 
 export function stepProgress(input: StepProgressInput): StepProgress {
   const { sections, inventors, attachments, disclosure } = input;

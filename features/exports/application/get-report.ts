@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Assemble the review report (roadmap §9): project metadata + detected stage, the draft
+ * Assemble the review report: project metadata + detected stage, the draft
  * sections, findings grouped by severity with pins, the applies-now/conditional rules, and
  * the prior-art matches with overlaps. `toText` serializes it for the TXT export and the
  * /report screen renders the same object for print-to-PDF, so both always agree.

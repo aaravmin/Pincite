@@ -8,7 +8,7 @@
  * Two gates, in order:
  *  1. Signed in at all -> otherwise "login".
  *  2. Confidentiality consent recorded -> otherwise "consent". Consent is a legal
- *     precondition for putting matter into Pincite (see docs/business-context.md), so
+ *     precondition for putting matter into Pincite (see CLAUDE.md "How we work"), so
  *     every screen that can hold invention text requires it. The consent and role
  *     screens themselves pass `requireConsent: false`, since demanding consent to reach
  *     the consent screen would loop.

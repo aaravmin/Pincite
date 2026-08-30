@@ -2,7 +2,7 @@ import "server-only";
 
 /**
  * The version-history model: the matter plus every immutable save, newest first. Saves are
- * append-only (roadmap §8) - reopening an earlier save appends a new version linked to its
+ * append-only - reopening an earlier save appends a new version linked to its
  * source and never deletes later history.
  */
 import { requireViewer } from "@/shared/auth/require-viewer";

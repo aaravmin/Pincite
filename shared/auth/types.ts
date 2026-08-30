@@ -25,6 +25,3 @@ export type ViewerProfile = {
   role: UserRole | null;
   consented_at: string | null;
 };
-
-/** @deprecated Use `ViewerProfile`. Kept while importers are migrated. */
-export type Profile = ViewerProfile;

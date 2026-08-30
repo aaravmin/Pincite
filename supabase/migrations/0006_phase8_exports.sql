@@ -1,4 +1,4 @@
--- Pincite Phase 8: exports audit record (roadmap §3, §9).
+-- Pincite Phase 8: exports audit record.
 -- Apply: node --env-file=.env.local scripts/db-apply.mjs supabase/migrations/0006_phase8_exports.sql
 -- then: notify pgrst, 'reload schema'
 

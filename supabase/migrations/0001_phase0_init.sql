@@ -47,7 +47,7 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ----------------------------------------------------------------------------
--- audit_log: append-only record of meaningful actions (roadmap §3, §8).
+-- audit_log: append-only record of meaningful actions.
 -- Users may insert and read their OWN rows. No update/delete policy => immutable
 -- from the client. The service role bypasses RLS for server-side maintenance.
 -- ----------------------------------------------------------------------------

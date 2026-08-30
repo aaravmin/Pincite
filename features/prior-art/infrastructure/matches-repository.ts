@@ -14,17 +14,22 @@ import type {
 /**
  * The claims text a search compares against. Read as a single targeted row (rather than
  * through the projects loader) so the prior-art screen does exactly one section query.
+ *
+ * A read FAILURE throws rather than reading as empty: the callers turn "" into "Add claims to
+ * the project first", and a transient database error must never be reported to the user as an
+ * empty claims section.
  */
 export async function loadClaimsText(
   supabase: TypedSupabaseClient,
   projectId: string,
 ): Promise<string> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("project_sections")
     .select("content")
     .eq("project_id", projectId)
     .eq("section_key", "claims")
     .maybeSingle();
+  if (error) throw new Error(`load sections: ${error.message}`);
   return data?.content ?? "";
 }
 

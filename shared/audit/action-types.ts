@@ -1,5 +1,5 @@
 /**
- * The set of meaningful actions recorded in audit_log (roadmap §3, §8). Append-only.
+ * The set of meaningful actions recorded in audit_log. Append-only.
  *
  * PURE and client-safe on purpose: the audit viewer's display labels are keyed by this
  * union (`features/audit/domain/labels.ts`), so the compiler forces a new action to get a

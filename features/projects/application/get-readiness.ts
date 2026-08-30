@@ -7,18 +7,24 @@ import "server-only";
  * pure `computeReadiness` to decide what they mean. That is why the overview can never
  * report a different issue count from Review.
  *
- * Every MPEP pin is validated against the corpus before it reaches the screen (roadmap §11);
- * unresolved pins are dropped, and the CFR reference still shows.
+ * Every MPEP pin is validated against the corpus before it reaches the screen; unresolved
+ * pins are dropped, and the CFR reference still shows. The validator findings and the filing
+ * checks are validated in ONE round trip - the two steps `resolvePins` performs, split so a
+ * section cited by both lists is not looked up twice.
  */
 import { requireViewer } from "@/shared/auth/require-viewer";
-import { resolvePins } from "@/features/mpep/application/validate-citations";
+import { validateCitations } from "@/features/mpep/application/validate-citations";
+import {
+  applyResolvedPins,
+  collectPins,
+} from "@/features/mpep/domain/citations";
 import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
 import { countPriorArtMatches } from "@/features/projects/infrastructure/project-repository";
 import {
   computeReadiness,
   type Readiness,
 } from "@/features/projects/domain/readiness";
-import { hasSignedDeclaration } from "@/features/projects/domain/step-progress";
+import { hasSignedDeclaration } from "@/features/drawings/domain/types";
 import { runDeterministicValidators } from "@/features/review/domain/run-validators";
 import { runFilingChecks } from "@/features/review/domain/filing-checks";
 import { runCrossRefChecks } from "@/features/review/domain/cross-reference";
@@ -28,14 +34,14 @@ export type GetReadinessDeps = {
   requireViewer: typeof requireViewer;
   getProjectSnapshot: typeof getProjectSnapshot;
   countPriorArtMatches: typeof countPriorArtMatches;
-  resolvePins: typeof resolvePins;
+  validateCitations: typeof validateCitations;
 };
 
 const defaultDeps: GetReadinessDeps = {
   requireViewer,
   getProjectSnapshot,
   countPriorArtMatches,
-  resolvePins,
+  validateCitations,
 };
 
 export async function getReadiness(
@@ -61,10 +67,9 @@ export async function getReadiness(
 
   // requireViewer is request-cached, so this reuses the client the snapshot already used.
   const { supabase } = await deps.requireViewer();
-  const [priorArtCount, pinnedFindings, pinnedFiling] = await Promise.all([
+  const [priorArtCount, resolved] = await Promise.all([
     deps.countPriorArtMatches(supabase, projectId),
-    deps.resolvePins(findings),
-    deps.resolvePins(filing),
+    deps.validateCitations(collectPins([...findings, ...filing])),
   ]);
 
   return computeReadiness({
@@ -75,8 +80,8 @@ export async function getReadiness(
     disclosure,
     hasExport: exports.length > 0,
     priorArtCount,
-    findings: pinnedFindings,
-    filing: pinnedFiling,
+    findings: applyResolvedPins(findings, resolved),
+    filing: applyResolvedPins(filing, resolved),
     consistency,
   });
 }

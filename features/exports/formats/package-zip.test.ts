@@ -194,11 +194,15 @@ describe("buildFilingPackageZip", () => {
         mime: "application/pdf",
       }),
     ];
-    // Only the first document's bytes came back from Storage.
+    // Only the first document's bytes came back from Storage; the second still travels with
+    // its assigned name so the cover sheet lists it.
     const zipped = await buildFilingPackageZip(
       context({ attachments: declarations }),
       [],
-      [{ name: "signed_declaration.pdf", bytes: bytes(1) }],
+      [
+        { name: "signed_declaration.pdf", bytes: bytes(1) },
+        { name: "signed_declaration_1.pdf", bytes: null },
+      ],
     );
     const zip = await JSZip.loadAsync(zipped);
     const cover = await zip.file("inventor_declaration.txt")!.async("string");

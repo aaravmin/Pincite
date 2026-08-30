@@ -1,6 +1,6 @@
 /**
- * Tier 3 validator (deterministic part): indefinite relative terms (roadmap §4.3; MPEP
- * 2173.05(b)). These are sometimes fine and sometimes fatal, so they are flagged
+ * Tier 3 validator (deterministic part): indefinite relative terms (MPEP 2173.05(b)).
+ * These are sometimes fine and sometimes fatal, so they are flagged
  * "attention" (verify), never a hard violation. The §101 Alice/Mayo walkthrough is the
  * model-assisted part and lives in features/review/application/analyze-eligibility.ts,
  * labeled as the model's read.

@@ -2,26 +2,11 @@ import "server-only";
 
 /**
  * Persistence for the invention disclosure. One row per project, upserted on `project_id`;
- * RLS scopes both the read and the write to the owner.
+ * RLS scopes the write to the owner. The READ lives with the rest of the per-matter snapshot
+ * (`features/projects/infrastructure/snapshot-repository.ts`), so a screen never issues a
+ * second disclosure query of its own.
  */
 import type { TablesInsert, TypedSupabaseClient } from "@/shared/db/types";
-import {
-  toDisclosure,
-  type Disclosure,
-} from "@/features/disclosure/domain/types";
-
-export async function loadDisclosure(
-  supabase: TypedSupabaseClient,
-  projectId: string,
-): Promise<Disclosure> {
-  const { data, error } = await supabase
-    .from("project_disclosure")
-    .select("*")
-    .eq("project_id", projectId)
-    .maybeSingle();
-  if (error) throw new Error(`load disclosure: ${error.message}`);
-  return toDisclosure(data);
-}
 
 export async function upsertDisclosure(
   supabase: TypedSupabaseClient,

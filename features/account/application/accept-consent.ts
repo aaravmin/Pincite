@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Record the confidentiality consent (roadmap §3). Consent is the gate every protected
+ * Record the confidentiality consent. Consent is the gate every protected
  * screen checks, so the timestamp on the profile row IS the record; the audit entry is the
  * append-only evidence of when it was given.
  *

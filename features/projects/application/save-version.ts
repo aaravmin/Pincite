@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Append an immutable snapshot of the matter (roadmap §8). Saves are append-only: this
+ * Append an immutable snapshot of the matter. Saves are append-only: this
  * always INSERTS a new version, never overwrites an earlier one, so the history is a record
  * rather than a working copy.
  */

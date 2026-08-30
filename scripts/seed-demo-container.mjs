@@ -1,5 +1,5 @@
 /**
- * Seed the Apple "Container" demo matter (docs/demo-pizza-box-fields.md) into an account,
+ * Seed the Apple "Container" demo matter into an account,
  * filled through every step up to and including the drawings, ready to record the demo.
  *
  * What it creates for the target account (role/consent are left as-is):
@@ -48,7 +48,7 @@ const admin = createClient(url, key, { auth: { autoRefreshToken: false, persistS
 const MATTER_NO = "APPL-CONTAINER-2026-001";
 
 // ---------------------------------------------------------------------------
-// Draft content (verbatim from docs/demo-pizza-box-fields.md, defects intact).
+// Draft content (the planted claim defects are intact and deliberate).
 // ---------------------------------------------------------------------------
 const CLAIMS = [
   `1. A molded fiber container suitable for containing a food item, comprising: a base, the base comprising: a plurality of ridges integrated with an interior surface of the base, wherein when the food item is placed on at least some of the plurality of ridges, a gap is formed between the food item and the interior surface of the base, the gap assisting in thermally isolating the food item and allowing moisture expelled from the food item to be transported away from the food item; and a lid, the lid comprising: a plurality of openings arranged in accordance with at least some of the plurality of ridges, and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the plurality of openings and the gap to provide a path by which at least some of the moisture expelled from the food item is transported out of the container and into an external environment.`,
@@ -183,8 +183,8 @@ const INVENTORS = [
   },
 ];
 
-// Figure -> standard drawing view (docs/demo-pizza-box-fields.md step 5; fig08-12 are
-// reasonable defaults the doc leaves open; the flowchart fig12 has no standard view).
+// Figure -> standard drawing view (fig08-12 are reasonable defaults; the flowchart fig12
+// has no standard view).
 const FIG_VIEW = {
   1: "perspective", 2: "perspective", 3: "section", 4: "bottom",
   5: "top", 6: "perspective", 7: "front", 8: "perspective",

@@ -1,4 +1,4 @@
--- Pincite Phase 4: findings (flagged issues in the user's draft, roadmap §3, §4.3).
+-- Pincite Phase 4: findings (flagged issues in the user's draft).
 -- Apply: node --env-file=.env.local scripts/db-apply.mjs supabase/migrations/0005_phase4_findings.sql
 -- then: notify pgrst, 'reload schema'
 

@@ -1,5 +1,5 @@
 /**
- * Feature extraction for prior-art search (roadmap §4.6 step 1): parse the user's claims
+ * Feature extraction for prior-art search: parse the user's claims
  * into individual limitations (with character offsets into the claims section, so the
  * evidence pane can underline the exact element) and pull significant technical terms
  * for query building and overlap scoring.

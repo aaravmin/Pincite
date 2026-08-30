@@ -1,5 +1,5 @@
 /**
- * Tier 2 validator: consistency checks that read within/across claims (roadmap §4.3).
+ * Tier 2 validator: consistency checks that read within/across claims.
  * Deterministic-parse heuristics, so they are flagged "attention" (verify), not hard
  * violations. Two checks now: means-plus-function invocation (35 U.S.C. 112(f); MPEP
  * 2181) and antecedent-basis gaps (35 U.S.C. 112(b); MPEP 2173.05(e)). Terminology

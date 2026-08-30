@@ -1,5 +1,5 @@
 /**
- * Pure locate helpers (roadmap §4.5 "locate"). The ranked corpus lookups themselves live in
+ * Pure locate helpers. The ranked corpus lookups themselves live in
  * the application/infrastructure layers; this module only reads text.
  */
 

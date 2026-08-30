@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The evidence pane (roadmap §2.2): the primary source on a reading surface, with the
+ * The evidence pane: the primary source on a reading surface, with the
  * responsive portion highlighted in place and the rest visible for context. When a passage
  * is highlighted the pane scrolls to it, so opening a rule lands you on the relevant part
  * rather than the top of a long section.

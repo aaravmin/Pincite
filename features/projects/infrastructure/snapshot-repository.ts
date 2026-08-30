@@ -3,9 +3,9 @@ import "server-only";
 /**
  * The reads behind `ProjectSnapshot`: one function per table, each taking the caller's
  * request-scoped Supabase client so the whole snapshot runs on a single authenticated
- * client and RLS scopes every row to the owner. Rows are mapped into domain objects here
- * (the jsonb columns on `project_attachments` in particular), so nothing above this layer
- * has to know the database shape.
+ * client and RLS scopes every row to the owner. Rows are mapped into domain objects through
+ * each feature's own row mapper (`toAttachment`, `toDisclosure`), so the jsonb columns are
+ * narrowed in exactly one place and nothing above this layer has to know the database shape.
  *
  * These functions do no business calculation and no authorization decision of their own -
  * the application layer authenticates first and decides what a missing row means.
@@ -17,10 +17,12 @@ import {
 } from "@/features/projects/domain/sections";
 import type { Project } from "@/features/projects/domain/types";
 import type { Inventor } from "@/features/filing/domain/types";
-import type { Attachment, DrawingAnnotations, DrawingReview } from "@/features/drawings/domain/types";
 import {
-  DISCLOSURE_FIELDS,
-  emptyDisclosure,
+  toAttachment,
+  type Attachment,
+} from "@/features/drawings/domain/types";
+import {
+  toDisclosure,
   type Disclosure,
 } from "@/features/disclosure/domain/types";
 
@@ -58,28 +60,6 @@ function toInventor(row: Tables<"project_inventors">): Inventor {
     citizenship: row.citizenship,
     ord: row.ord,
     created_at: row.created_at,
-  };
-}
-
-/**
- * `analysis` (the persisted vision drawing review) and `annotations` (the label layer) are
- * jsonb columns, so the database type is `Json`. Only this app writes them, and it writes
- * the shapes below; the cast is explicit and lives in exactly one place.
- */
-function toAttachment(row: Tables<"project_attachments">): Attachment {
-  return {
-    id: row.id,
-    project_id: row.project_id,
-    kind: row.kind,
-    view: row.view,
-    storage_path: row.storage_path,
-    filename: row.filename,
-    mime: row.mime,
-    size_bytes: row.size_bytes,
-    created_at: row.created_at,
-    analysis: (row.analysis as unknown as DrawingReview | null) ?? null,
-    annotations: (row.annotations as unknown as DrawingAnnotations | null) ?? null,
-    page_index: row.page_index,
   };
 }
 
@@ -153,16 +133,16 @@ export async function loadDisclosure(
     .eq("project_id", projectId)
     .maybeSingle();
   if (error) throw new Error(`load disclosure: ${error.message}`);
-  const disclosure = emptyDisclosure();
-  if (data) {
-    for (const field of DISCLOSURE_FIELDS) {
-      disclosure[field.key] = data[field.key] ?? "";
-    }
-  }
-  return disclosure;
+  return toDisclosure(data);
 }
 
-/** Every export this matter has produced, newest first. */
+/**
+ * Every export this matter has produced, newest first.
+ *
+ * NON-FATAL, unlike the reads above. The export history only decides whether the Submission
+ * step shows a tick; a failed read must not take down every screen that loads the snapshot.
+ * The failure is logged and the matter reads as having produced nothing yet.
+ */
 export async function loadExports(
   supabase: TypedSupabaseClient,
   projectId: string,
@@ -172,7 +152,10 @@ export async function loadExports(
     .select("id, format, created_at")
     .eq("project_id", projectId)
     .order("created_at", { ascending: false });
-  if (error) throw new Error(`load exports: ${error.message}`);
+  if (error) {
+    console.error(`[snapshot] load exports for ${projectId}:`, error.message);
+    return [];
+  }
   return (data ?? []).map((row) => ({
     id: row.id,
     format: row.format,

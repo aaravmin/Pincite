@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { AuditAction } from "@/shared/audit/actions";
+import type { AuditAction } from "@/shared/audit/action-types";
 import { ACTION_LABELS, actionLabel } from "@/features/audit/domain/labels";
 
 /**

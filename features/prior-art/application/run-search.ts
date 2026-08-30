@@ -1,9 +1,9 @@
 import "server-only";
 
 /**
- * Live prior-art search (roadmap §4.6): discover candidates from claim keywords, then
+ * Live prior-art search: discover candidates from claim keywords, then
  * pinpoint-match each against the user's limitations and persist ranked results. Synthetic
- * data only until vendor zero-retention is confirmed (docs/business-context.md).
+ * data only until vendor zero-retention is confirmed (CLAUDE.md "How we work").
  */
 import type { User } from "@supabase/supabase-js";
 import type { TypedSupabaseClient } from "@/shared/db/types";

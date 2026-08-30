@@ -38,20 +38,6 @@ export async function projectIsVisible(
   return Boolean(data);
 }
 
-export async function listAttachments(
-  supabase: TypedSupabaseClient,
-  projectId: string,
-): Promise<Attachment[]> {
-  const { data, error } = await supabase
-    .from("project_attachments")
-    .select("*")
-    .eq("project_id", projectId)
-    .order("created_at", { ascending: false })
-    .order("page_index", { ascending: true, nullsFirst: true });
-  if (error) throw new Error(`load attachments: ${error.message}`);
-  return (data ?? []).map(toAttachment);
-}
-
 /**
  * The ownership check every drawing operation starts with: the row comes back only when it
  * belongs to a project the caller can see.

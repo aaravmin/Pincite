@@ -3,7 +3,7 @@
 -- Idempotent-ish: IF NOT EXISTS / CREATE OR REPLACE / guarded enum creation.
 
 -- ----------------------------------------------------------------------------
--- Enums (roadmap §3): patent type, declared status, section keys (the §4.1 parts).
+-- Enums: patent type, declared status, section keys (the draft section parts).
 -- ----------------------------------------------------------------------------
 do $$ begin
   create type public.patent_type as enum ('utility', 'design', 'plant');
@@ -112,7 +112,7 @@ create trigger sections_touch_updated_at before update on public.project_section
   for each row execute function public.touch_updated_at();
 
 -- ----------------------------------------------------------------------------
--- project_versions: immutable snapshot on every save (roadmap §8). Append-only:
+-- project_versions: immutable snapshot on every save. Append-only:
 -- insert + select policies only, so the client can never overwrite history.
 -- Restore opens an old snapshot into a NEW row; branch via parent_version_id.
 -- ----------------------------------------------------------------------------

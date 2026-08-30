@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * The audit entries for one matter (roadmap §8). Append-only history, newest first.
+ * The audit entries for one matter. Append-only history, newest first.
  *
  * Visibility comes from the request-cached project snapshot: `null` means the matter is not
  * the viewer's and the caller answers notFound(). RLS then scopes audit_log to the signed-in

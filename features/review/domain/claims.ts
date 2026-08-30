@@ -1,6 +1,6 @@
 /**
  * Minimal claim parser: split the claims section into numbered claims, each into
- * preamble / transitional phrase / body (roadmap §4.1). Phase 1 needs only a robust
+ * preamble / transitional phrase / body. Phase 1 needs only a robust
  * split for display as numbered rows; the deeper validation (antecedent basis,
  * single-sentence, dependency) lands in Phases 4–5. Operates on the raw plain-text
  * string so offsets remain meaningful.

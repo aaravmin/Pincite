@@ -1,5 +1,5 @@
 /**
- * Stage detection (roadmap §4.2): a transparent rules engine over which sections are
+ * Stage detection: a transparent rules engine over which sections are
  * filled plus the user's declared status. It returns the stage, the signals that produced
  * it (so the user can always see why), and what is missing to advance. Not a black box.
  */

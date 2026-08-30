@@ -1,8 +1,8 @@
 import "server-only";
 import type { Json, TypedSupabaseClient } from "@/shared/db/types";
-import type { AuditAction } from "@/shared/audit/actions";
+import type { AuditAction } from "@/shared/audit/action-types";
 
-export type { AuditAction } from "@/shared/audit/actions";
+export type { AuditAction } from "@/shared/audit/action-types";
 
 export async function logAudit(
   supabase: TypedSupabaseClient,

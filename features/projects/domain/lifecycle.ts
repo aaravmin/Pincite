@@ -1,5 +1,5 @@
 /**
- * Lifecycle "what to do now" actions keyed to the declared status (roadmap §4.2 extended).
+ * Lifecycle "what to do now" actions keyed to the declared status.
  * A patent goes well beyond "filed" - there are required, deadline-bound actions after a
  * rejection, after allowance, and after grant. Each action carries a CFR reference
  * (display-only) and an MPEP pin. PURE: the pin is only a section number here; it is

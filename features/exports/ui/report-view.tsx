@@ -1,5 +1,5 @@
 /**
- * Print-friendly review report (roadmap §9). Severity is shown with a filled vs outline
+ * Print-friendly review report. Severity is shown with a filled vs outline
  * marker plus a text label, so the color coding survives a grayscale print.
  */
 import type { Report } from "@/features/exports/formats/txt";

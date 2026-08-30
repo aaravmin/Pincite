@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Deterministic comparison against one supplied patent text (roadmap §4.6). No provider
+ * Deterministic comparison against one supplied patent text. No provider
  * call and no BigQuery cost, which also makes it the repeatable verification-gate path.
  */
 import type { User } from "@supabase/supabase-js";

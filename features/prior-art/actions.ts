@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * Prior-art server actions (roadmap §4.6). Each one authenticates, calls exactly one
+ * Prior-art server actions. Each one authenticates, calls exactly one
  * application operation, revalidates the results screen, and returns a serializable result.
  */
 import { revalidatePath } from "next/cache";

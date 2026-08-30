@@ -1,5 +1,5 @@
 /**
- * Pinpoint matching + transparent scoring (roadmap §4.6 steps 4-5). For each user claim
+ * Pinpoint matching + transparent scoring. For each user claim
  * limitation, find the candidate-patent passage with the strongest term overlap and
  * record it as a span. The overall score is a transparent composite of how many
  * limitations have a strong overlap and how strong those overlaps are - never a verdict.

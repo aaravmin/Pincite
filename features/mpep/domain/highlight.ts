@@ -1,6 +1,6 @@
 /**
- * Compute the responsive span to highlight inside a section's full_text (roadmap §4.5
- * "highlight" step). selectResponsivePassage does deterministic keyword-overlap passage
+ * Compute the responsive span to highlight inside a section's full_text (the "highlight"
+ * step). selectResponsivePassage does deterministic keyword-overlap passage
  * selection and returns character offsets into full_text so the evidence pane can wrap the
  * span in place.
  */

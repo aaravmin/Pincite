@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Load a full MPEP section from the local corpus (roadmap §4.5 "load" step). The evidence
+ * Load a full MPEP section from the local corpus (the "load" step). The evidence
  * pane renders full_text and highlights offsets into it. No live USPTO fetching at request
  * time - the corpus is the versioned local copy.
  */

@@ -1,11 +1,11 @@
 /**
- * Google Patents on BigQuery (`patents-public-data`) - candidate discovery (roadmap §4.6
- * step 2). SERVER ONLY. Privacy: we query by keywords/CPC derived from the claims, never
- * the full claim text, so invention text stays local.
+ * Google Patents on BigQuery (`patents-public-data`) - the candidate-discovery step of
+ * prior-art search. SERVER ONLY. Privacy: we query by keywords/CPC derived from the claims,
+ * never the full claim text, so invention text stays local.
  *
  * Cost: patent text columns are large, so every query carries a hard maximumBytesBilled
  * cap and reports bytesProcessed. If a query would exceed the cap it fails loudly rather
- * than silently burning the free tier. One query per search (roadmap guardrail).
+ * than silently burning the free tier. One query per search.
  */
 import "server-only";
 import { BigQuery } from "@google-cloud/bigquery";

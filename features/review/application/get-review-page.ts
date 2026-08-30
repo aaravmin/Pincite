@@ -16,6 +16,7 @@ import { runCrossRefChecks } from "@/features/review/domain/cross-reference";
 import type { FilingFinding } from "@/features/review/domain/filing-checks";
 import { runFilingChecks } from "@/features/review/domain/filing-checks";
 import type { FindingRow } from "@/features/review/domain/finding";
+import { hasSignedDeclaration } from "@/features/drawings/domain/types";
 import { resolveFilingPins } from "@/features/review/application/resolve-pins";
 import { loadFindings } from "@/features/review/infrastructure/findings-repository";
 
@@ -45,9 +46,7 @@ export async function getReviewPage(
     runFilingChecks({
       project: snapshot.project,
       inventors: snapshot.inventors,
-      hasSignedDeclaration: snapshot.attachments.some(
-        (a) => a.kind === "declaration",
-      ),
+      hasSignedDeclaration: hasSignedDeclaration(snapshot.attachments),
       role: viewer.profile.role ?? null,
       title: snapshot.sections["title"] ?? "",
     }),

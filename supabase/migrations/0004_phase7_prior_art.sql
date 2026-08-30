@@ -1,4 +1,4 @@
--- Pincite Phase 7: prior-art matches + pinpoint overlap spans (roadmap §3, §4.6).
+-- Pincite Phase 7: prior-art matches + pinpoint overlap spans.
 -- Apply: node --env-file=.env.local scripts/db-apply.mjs supabase/migrations/0004_phase7_prior_art.sql
 -- then: notify pgrst, 'reload schema'
 

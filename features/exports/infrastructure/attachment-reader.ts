@@ -12,8 +12,14 @@ import "server-only";
  * A file that cannot be read is skipped rather than failing the whole export: a single broken
  * upload must not stop the user downloading their application. The caller detects a skipped
  * file by its path being absent from the returned map.
+ *
+ * The downloads are independent, so they overlap - but only CONCURRENCY at a time. A matter
+ * with dozens of figures would otherwise open one Storage connection per file and hold every
+ * decoded file in memory at once, on a serverless function sized for one request.
  */
 import { createAdminClient } from "@/shared/db/admin";
+
+const CONCURRENCY = 4;
 
 export async function readAttachmentBytes(
   paths: string[],
@@ -23,20 +29,25 @@ export async function readAttachmentBytes(
 
   const admin = createAdminClient();
   const bucket = admin.storage.from("project-files");
-  // The downloads are independent of each other, so they run together.
-  const results = await Promise.all(
-    unique.map(async (path) => {
+  const bytes = new Map<string, Uint8Array>();
+
+  // A fixed pool of workers pulling from one shared cursor, so a slow file delays only its
+  // own worker and the pool stays full until every path has been attempted.
+  let next = 0;
+  const worker = async () => {
+    while (next < unique.length) {
+      const path = unique[next++];
       try {
         const { data: blob } = await bucket.download(path);
-        if (!blob) return null;
-        return [path, new Uint8Array(await blob.arrayBuffer())] as const;
+        if (blob) bytes.set(path, new Uint8Array(await blob.arrayBuffer()));
       } catch {
-        return null;
+        // Skipped: the caller sees the path missing from the map.
       }
-    }),
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, unique.length) }, worker),
   );
 
-  const bytes = new Map<string, Uint8Array>();
-  for (const entry of results) if (entry) bytes.set(entry[0], entry[1]);
   return bytes;
 }

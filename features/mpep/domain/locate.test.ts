@@ -6,7 +6,7 @@ describe("extractSectionNumbers", () => {
     expect(extractSectionNumbers("What does MPEP 2111.03 say?")).toEqual(["2111.03"]);
   });
 
-  it("keeps a subsection suffix", () => {
+  it("drops the parenthetical subsection, keeping the section it belongs to", () => {
     expect(extractSectionNumbers("see 2173.05(b) and 608.01(m)")).toEqual([
       "2173.05",
       "608.01",

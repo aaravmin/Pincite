@@ -1,5 +1,5 @@
 /**
- * Rule surfacing (roadmap §4.4): two lists. "Applies now" - the rules that govern the
+ * Rule surfacing: two lists. "Applies now" - the rules that govern the
  * current work, each pinned. "May apply next" - "if X then rule Y" items, each carrying
  * both a `trigger` ("If you add a 4th claim...") for when it has NOT happened yet and a
  * present-tense `met` ("Your claims include a 4th claim...") for when it HAS. `triggered`

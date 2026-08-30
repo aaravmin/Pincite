@@ -168,7 +168,7 @@ const eslintConfig = [
       "shared/utils.ts",
       "shared/auth/types.ts",
       "shared/auth/access.ts",
-      "shared/audit/actions.ts",
+      "shared/audit/action-types.ts",
     ],
     rules: restrict(NO_LIB, PURE_LAYER),
   },

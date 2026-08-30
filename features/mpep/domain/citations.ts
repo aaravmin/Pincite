@@ -1,6 +1,6 @@
 /**
- * Pure citation-pin handling - the display half of the anti-hallucination spine (roadmap
- * §10, §11). Which section numbers actually exist is a corpus question answered in
+ * Pure citation-pin handling - the display half of the anti-hallucination spine. Which
+ * section numbers actually exist is a corpus question answered in
  * infrastructure; deciding what to do with the answer is this pure step: any pin that did
  * not resolve is nulled out, so no citation reaches the screen without real text behind it.
  */

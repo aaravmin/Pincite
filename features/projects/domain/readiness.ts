@@ -20,13 +20,15 @@ import { detectStage } from "@/features/projects/domain/stage";
 import { lifecycleActions } from "@/features/projects/domain/lifecycle";
 import {
   REQUIRED_SECTION_KEYS,
-  drawingCount as countDrawings,
-  hasSignedDeclaration as someSignedDeclaration,
   stepProgress,
 } from "@/features/projects/domain/step-progress";
 import type { Finding } from "@/features/review/domain/finding";
 import type { FilingFinding } from "@/features/review/domain/filing-checks";
-import type { AttachmentKind } from "@/features/drawings/domain/types";
+import {
+  drawingCount as countDrawings,
+  hasSignedDeclaration as someSignedDeclaration,
+  type AttachmentKind,
+} from "@/features/drawings/domain/types";
 import type { Disclosure } from "@/features/disclosure/domain/types";
 
 export type GateStatus = "done" | "violation" | "attention" | "todo";

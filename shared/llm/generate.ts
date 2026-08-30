@@ -7,7 +7,7 @@
  * CONFIDENTIALITY: real invention text requires zero-data-retention on every vendor. xAI
  * exposes ZDR via the `x-zero-data-retention` RESPONSE header; do NOT send it as a request
  * header (xAI 400s unless the team has ZDR enabled). It currently reads "false", so use
- * synthetic / non-confidential text until ZDR is on. See docs/business-context.md.
+ * synthetic / non-confidential text until ZDR is on. See CLAUDE.md "How we work".
  */
 import "server-only";
 import { sanitizeOutputText } from "@/shared/text/sanitize";

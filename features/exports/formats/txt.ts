@@ -1,5 +1,5 @@
 /**
- * The review report (roadmap §9) and its TXT serializer. `Report` is the shape the /report
+ * The review report and its TXT serializer. `Report` is the shape the /report
  * screen renders and `toText` writes; it is assembled by
  * `features/exports/application/get-report.ts`. This module is pure - it takes a finished
  * Report and returns a string - so the serializer is testable without a database.

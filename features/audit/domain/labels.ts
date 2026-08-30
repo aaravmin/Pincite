@@ -1,12 +1,12 @@
 /**
- * Display labels for the audit-log viewer (roadmap §8). PURE and client-safe: no server
+ * Display labels for the audit-log viewer. PURE and client-safe: no server
  * imports, so the client viewer and the server page share one map.
  *
  * Typed as Record<AuditAction, string> deliberately - the two lists used to drift, and the
  * viewer rendered raw snake_case for the actions nobody had labelled. Adding an action to
- * `shared/audit/actions.ts` now fails the build until it has a human label here.
+ * `shared/audit/action-types.ts` now fails the build until it has a human label here.
  */
-import type { AuditAction } from "@/shared/audit/actions";
+import type { AuditAction } from "@/shared/audit/action-types";
 
 export type AuditEntry = {
   id: number;

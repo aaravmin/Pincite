@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * The page model for the rules screen (roadmap §4.4): surface the rules that apply now and
+ * The page model for the rules screen: surface the rules that apply now and
  * the ones that may apply next, then drop every MPEP pin that does not resolve to real
  * corpus text (the anti-hallucination spine), so nothing is cited that cannot be opened.
  *

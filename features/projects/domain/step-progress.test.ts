@@ -2,8 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   NO_STEPS_DONE,
   REQUIRED_SECTION_KEYS,
-  drawingCount,
-  hasSignedDeclaration,
   stepProgress,
   type StepProgressInput,
 } from "@/features/projects/domain/step-progress";
@@ -25,26 +23,6 @@ const input = (over: Partial<StepProgressInput> = {}): StepProgressInput => ({
   disclosure: {},
   hasExport: false,
   ...over,
-});
-
-describe("attachment predicates", () => {
-  it("reads 'signed' as an uploaded declaration document", () => {
-    expect(hasSignedDeclaration([{ kind: "drawing" }])).toBe(false);
-    expect(
-      hasSignedDeclaration([{ kind: "drawing" }, { kind: "declaration" }]),
-    ).toBe(true);
-  });
-
-  it("counts only the figures", () => {
-    expect(
-      drawingCount([
-        { kind: "drawing" },
-        { kind: "drawing" },
-        { kind: "supporting" },
-        { kind: "declaration" },
-      ]),
-    ).toBe(2);
-  });
 });
 
 describe("stepProgress", () => {

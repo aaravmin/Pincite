@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Locate the responsive MPEP section(s) for a question or finding (roadmap §4.5 "locate").
+ * Locate the responsive MPEP section(s) for a question or finding.
  * Order of preference: an explicit, corpus-resolved section number; then semantic search
  * over the embedded chunks (Voyage + pgvector); then keyword full-text search as a
  * resilient fallback when embeddings are unavailable or throttled.
