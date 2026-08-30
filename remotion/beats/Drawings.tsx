@@ -46,7 +46,7 @@ const G = COLORS.mutedForeground;
 
 // Beat 3 - the drawing check. A patent figure with several reference numerals the
 // specification never introduces, each circled in red. It reads your drawings too.
-export function Drawings({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Drawings({}: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -146,7 +146,7 @@ export function Drawings({ width = 1920, height = 1080 }: { width?: number; heig
                 They appear in the drawing but are never described
               </p>
               <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {FLAGGED.map((f, i) => {
+                {FLAGGED.map((f) => {
                   const sp = spring({ frame: frame - (f.delay + 16), fps, config: { damping: 200 } });
                   return (
                     <span

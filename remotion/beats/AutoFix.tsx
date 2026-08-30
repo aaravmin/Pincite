@@ -35,7 +35,7 @@ function DiffLine({ sign, text, token, color, bg }: { sign: string; text: string
 
 // Beat 3 - the auto fix. Pincite proposes the exact before and after, and you
 // accept it. Review and apply, never a silent rewrite.
-export function AutoFix({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function AutoFix({}: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 

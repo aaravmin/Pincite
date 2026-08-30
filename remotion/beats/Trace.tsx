@@ -27,7 +27,7 @@ const HL_END = MPEP_TEXT.indexOf("same application.") + "same application.".leng
 
 // Beat 2 - the receipts (hero beat, landscape three columns). The flag, the real
 // MPEP text, and the Law/Rule/Guidance stack, side by side. Nothing is guessed.
-export function Trace({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Trace({}: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const f = CLAIM6_FINDING;
 

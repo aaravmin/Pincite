@@ -54,7 +54,7 @@ const FINDINGS = [
 
 // Beat 1 - the catch (landscape, filled frame). The two real red violations slide
 // in beside a large draft, a big counter ticks the issues. Pincite finds them first.
-export function Review({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Review({}: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const count = Math.round(

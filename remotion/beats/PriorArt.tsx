@@ -39,7 +39,7 @@ const MATCHES = [
 // Beat 4 - the prior art. Your limitation stacked over the prior patent that
 // already discloses it, the overlap highlighted, then a plain-language reason it
 // matters (no vague pill). A ranked list shows where else you overlap.
-export function PriorArt({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function PriorArt({}: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
 
   const leftIn = interpolate(frame, [18, 62], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });

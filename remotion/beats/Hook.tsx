@@ -42,7 +42,7 @@ const isGreen = (r: number, c: number) => (r * COLS + c + r * 3) % 10 === 4;
 // most are rejected (red), about one in ten accepted (green), and ours is the hole
 // in the middle. The camera pushes in as ours grows, rounds, and whitens into the
 // draft, then the field flies out - the draft is left floating with its flag.
-export function Hook({ width = 1920, height = 1080 }: { width?: number; height?: number }) {
+export function Hook({ width = 1920 }: { width?: number; height?: number }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
