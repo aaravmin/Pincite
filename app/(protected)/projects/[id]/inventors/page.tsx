@@ -1,11 +1,8 @@
 import { Fragment } from "react";
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
-import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getInventors } from "@/lib/filing/queries";
-import { buildAds } from "@/lib/filing/ads";
-import { InventorsForm } from "@/components/filing/inventors-form";
+import { HeaderActions } from "@/components/projects/header-actions";
+import { getInventorsPage } from "@/features/filing/application/get-inventors-page";
+import { InventorsForm } from "@/features/filing/ui/inventors-form";
 
 export default async function InventorsPage({
   params,
@@ -13,16 +10,9 @@ export default async function InventorsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  await requireViewer();
-
-  const project = await getProject(id);
-  if (!project) notFound();
-  const [inventors, sections] = await Promise.all([
-    getInventors(id),
-    getSectionContent(id),
-  ]);
-  const ads = buildAds(project, inventors, sections["title"] ?? "");
+  const model = await getInventorsPage(id);
+  if (!model) notFound();
+  const { project, inventors, ads } = model;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

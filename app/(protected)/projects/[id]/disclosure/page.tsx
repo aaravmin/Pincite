@@ -1,10 +1,7 @@
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
-import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject, getSectionContent } from "@/lib/projects/queries";
-import { getDisclosure } from "@/lib/disclosure/queries";
-import { runCrossRefChecks, resolveCrossRefPins } from "@/lib/validators/crossref";
-import { DisclosureWorkspace } from "@/components/disclosure/disclosure-workspace";
+import { HeaderActions } from "@/components/projects/header-actions";
+import { getDisclosurePage } from "@/features/disclosure/application/get-disclosure-page";
+import { DisclosureWorkspace } from "@/features/disclosure/ui/disclosure-workspace";
 
 export default async function DisclosurePage({
   params,
@@ -12,18 +9,8 @@ export default async function DisclosurePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  await requireViewer();
-
-  const project = await getProject(id);
-  if (!project) notFound();
-  const [disclosure, sections] = await Promise.all([
-    getDisclosure(id),
-    getSectionContent(id),
-  ]);
-  const consistency = await resolveCrossRefPins(
-    runCrossRefChecks(disclosure, sections),
-  );
+  const model = await getDisclosurePage(id);
+  if (!model) notFound();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -38,8 +25,8 @@ export default async function DisclosurePage({
 
       <DisclosureWorkspace
         projectId={id}
-        initial={disclosure}
-        consistency={consistency}
+        initial={model.disclosure}
+        consistency={model.consistency}
       />
     </div>
   );

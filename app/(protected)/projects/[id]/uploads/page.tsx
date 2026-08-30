@@ -1,9 +1,7 @@
-import { HeaderActions } from "@/components/projects/header-actions";
 import { notFound } from "next/navigation";
-import { requireViewer } from "@/shared/auth/require-viewer";
-import { getProject } from "@/lib/projects/queries";
-import { getAttachments } from "@/lib/filing/queries";
-import { UploadsPanel } from "@/components/uploads/uploads-panel";
+import { HeaderActions } from "@/components/projects/header-actions";
+import { getProjectSnapshot } from "@/features/projects/application/get-project-snapshot";
+import { UploadsPanel } from "@/features/drawings/ui/uploads-panel";
 
 export default async function UploadsPage({
   params,
@@ -11,12 +9,8 @@ export default async function UploadsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  await requireViewer();
-
-  const project = await getProject(id);
-  if (!project) notFound();
-  const attachments = await getAttachments(id);
+  const snapshot = await getProjectSnapshot(id);
+  if (!snapshot) notFound();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -34,7 +28,7 @@ export default async function UploadsPage({
           Figures go into the filing package.
         </p>
         <div className="mt-6">
-          <UploadsPanel projectId={id} initial={attachments} />
+          <UploadsPanel projectId={id} initial={snapshot.attachments} />
         </div>
       </main>
     </div>

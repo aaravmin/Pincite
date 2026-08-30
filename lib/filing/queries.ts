@@ -1,26 +1,20 @@
-/** Read-side loaders for the filing domain. RLS scopes every query to the owner. */
+/**
+ * Split across two features' repositories, which now take the caller's request-scoped client
+ * instead of creating their own:
+ *   getInventors  -> features/filing/infrastructure/inventors-repository:listInventors
+ *   getAttachments -> features/drawings/infrastructure/attachment-repository:listAttachments
+ * Shim kept for importers not yet remapped; RLS still scopes every query to the owner.
+ */
 import { createClient } from "@/shared/db/server";
-import type { Inventor, Attachment } from "@/lib/filing/types";
+import { listInventors } from "@/features/filing/infrastructure/inventors-repository";
+import { listAttachments } from "@/features/drawings/infrastructure/attachment-repository";
+import type { Inventor } from "@/features/filing/domain/types";
+import type { Attachment } from "@/features/drawings/domain/types";
 
 export async function getInventors(projectId: string): Promise<Inventor[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("project_inventors")
-    .select("*")
-    .eq("project_id", projectId)
-    .order("ord", { ascending: true });
-  if (error) throw new Error(`load inventors: ${error.message}`);
-  return (data as Inventor[]) ?? [];
+  return listInventors(await createClient(), projectId);
 }
 
 export async function getAttachments(projectId: string): Promise<Attachment[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("project_attachments")
-    .select("*")
-    .eq("project_id", projectId)
-    .order("created_at", { ascending: false })
-    .order("page_index", { ascending: true, nullsFirst: true });
-  if (error) throw new Error(`load attachments: ${error.message}`);
-  return (data as Attachment[]) ?? [];
+  return listAttachments(await createClient(), projectId);
 }
