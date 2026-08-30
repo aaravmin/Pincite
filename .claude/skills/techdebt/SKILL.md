@@ -21,8 +21,8 @@ only fix when the user explicitly asks. Fan out to roster subagents where it hel
 
 ## Conventions to respect (don't flag intentional choices)
 Plain-text editors (offset stability), append-only history, strict color tokens, the
-dev-only `/api/dev-login`, and the confidentiality posture are deliberate — see CLAUDE.md
-and docs/. Note them as intentional, not debt.
+dev-only `/api/dev-login`, and the confidentiality posture are deliberate - see CLAUDE.md
+and the Architecture section of README.md. Note them as intentional, not debt.
 
 ## Output
 A prioritized table: `item | location (file:line) | dimension | severity | est. effort |

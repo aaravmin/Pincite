@@ -44,11 +44,12 @@ All four must hold:
 4. If it fails: read the captured errors, **fix the app**, re-run from step 3. Do not
    edit the ignore-list to make a real error disappear.
 5. Open the screenshot and confirm layout + color discipline by eye.
-6. Append one line to `screenshots/VERIFICATION-LOG.md`:
-   `YYYY-MM-DD | phase-<n> <feature> | PASS | notes`
+6. Record the result (spec name, PASS/FAIL, what was verified) in the commit message or the
+   PR description. There is no separate log file.
 
 ## Conventions
-- Screenshots: `screenshots/phase-<n>-<feature>.png`, kept in-repo (auditable history).
+- Screenshots: `screenshots/<feature>.png`; only the README case-study images (`case-*.png`)
+  are tracked, the rest stay local (gitignored).
 - One spec file per feature, named for the feature.
 - Specs run serially (`workers: 1`) so screenshots and server state are deterministic.
 - The ignore-lists in `e2e/helpers.ts` are intentionally tiny; expand only for proven
