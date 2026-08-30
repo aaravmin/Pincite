@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
-import { buildSpecDocx } from "@/lib/export/docx";
+import { buildSpecDocx } from "@/features/exports/formats/docx";
 
 /** The visible text of the generated document, in order. */
 async function documentText(buffer: Buffer): Promise<string> {

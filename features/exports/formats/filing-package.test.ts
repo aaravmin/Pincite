@@ -5,7 +5,7 @@ import {
   buildDeclarationText,
   buildReadme,
   buildTransmittalAndFeesText,
-} from "@/lib/export/filing-package";
+} from "@/features/exports/formats/filing-package";
 import type { Project } from "@/lib/projects/types";
 import type { Inventor } from "@/lib/filing/types";
 

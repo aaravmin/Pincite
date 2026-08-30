@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildLatexReadme, buildPatentLatex, figureDescription } from "@/lib/export/latex";
+import { buildLatexReadme, buildPatentLatex, figureDescription } from "@/features/exports/formats/latex";
 
 const build = (opts: Partial<Parameters<typeof buildPatentLatex>[0]> = {}) =>
   buildPatentLatex({

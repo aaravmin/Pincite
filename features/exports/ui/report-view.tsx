@@ -2,7 +2,7 @@
  * Print-friendly review report (roadmap §9). Severity is shown with a filled vs outline
  * marker plus a text label, so the color coding survives a grayscale print.
  */
-import type { Report } from "@/lib/export/report";
+import type { Report } from "@/features/exports/formats/txt";
 
 const pin = (cfr: string | null, mpep: string | null) =>
   [cfr, mpep ? `MPEP ${mpep}` : null].filter(Boolean).join(" · ");

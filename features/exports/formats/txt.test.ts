@@ -4,11 +4,11 @@
  * here - these tests hand-build the Report it would have produced.
  */
 import { describe, expect, it } from "vitest";
-import { toText, type Report } from "@/lib/export/report";
+import { toText, type Report } from "@/features/exports/formats/txt";
 import type { Project } from "@/lib/projects/types";
-import type { FindingRow } from "@/lib/validators/results";
-import type { ResultMatch } from "@/lib/patents/results";
-import type { ConditionalRule, SurfacedRule } from "@/lib/rules/surface";
+import type { FindingRow } from "@/features/review/domain/finding";
+import type { ResultMatch } from "@/features/prior-art/domain/types";
+import type { ConditionalRule, SurfacedRule } from "@/features/rules/domain/surface";
 
 const project: Project = {
   id: "p1",
