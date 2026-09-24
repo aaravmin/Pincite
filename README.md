@@ -21,9 +21,13 @@
 
 ### Overview
 
-Pincite is a web app for drafting a US patent application. You write each section, run the checks, and every issue it raises opens the exact passage of the USPTO's Manual of Patent Examining Procedure (MPEP) that governs it, beside your draft. It also compares your claims against public patents and exports a filing ready document set. It is not legal advice and not a filing service.
+Pincite is a web app for drafting a US patent application. You write each section and run the checks. Every issue it raises opens the section of the USPTO's Manual of Patent Examining Procedure (MPEP) that governs it, beside your draft. It also compares your claims against public patents and exports a filing ready document set. It is not legal advice and not a filing service.
 
 ### How to run it
+
+It is hosted at [pincite.net](https://pincite.net). Sign in with Google or create an account with email and password, then click New project and paste in a draft.
+
+The screenshots below use the Apple case study. It is preloaded, with no login, when you run the app locally without an `.env.local` file:
 
 ```bash
 corepack enable   # gets you pnpm if you only have npm
@@ -31,22 +35,22 @@ pnpm install
 pnpm dev          # http://localhost:3100
 ```
 
-With no `.env.local` present the app starts in demo mode. There is no login, the Apple case study below is preloaded, and the features that call paid APIs (the §101 walkthrough, the drawing vision check, live prior art search) show precomputed results. To run against your own database and model keys, see [Full setup with your own keys](#full-setup-with-your-own-keys).
-
 ### Your contribution
 
 Solo project. I built all of it, using Claude Code and Codex for implementation with the conventions in `CLAUDE.md`.
 
-The interaction to try is on the Review step. Click a finding and its MPEP rule opens beside the list.
+The interaction to look at is on the Review step. Click a finding and its MPEP rule opens beside the list.
 
 - `features/review/ui/review-client.tsx` owns the state. `selectedId` is the open finding and `rule` is the loaded MPEP section. `selectFinding` toggles `selectedId` and calls the `getRuleSection` server action to fetch the section text.
 - `FindingGroups` receives `findings`, `selectedId`, and `onSelect` as props. `EvidencePane` receives `section` and `span`.
-- `features/mpep/ui/evidence-pane.tsx` renders the section. When a caller passes a span, as the Ask screen does, it wraps that passage in a highlight and scrolls it into view in a `useEffect`. The Review step passes no span, so the rule opens from the top.
-- When the checks run, `features/review/application/run-review.ts` validates every MPEP pin with `validateCitations` before the findings are stored. Before the page renders, `features/review/application/get-review-page.ts` runs the filing readiness checks through `resolvePins` the same way, so a finding only shows an MPEP pin that exists in the corpus.
+- `features/mpep/ui/evidence-pane.tsx` renders the section text. It takes an optional span, and when one is passed (the Ask screen does this) it highlights that passage and scrolls to it in a `useEffect`. The Review step passes no span, so the rule opens at the top.
+- Every MPEP section number on a finding was checked against the database before the finding was saved. `features/review/application/run-review.ts` does this with `validateCitations`. So the number the click sends to `getRuleSection` always exists.
 
 ### What you learned
 
-The model kept citing MPEP sections that do not exist. A patent tool that invents rule numbers is worse than no tool, so I ingested the full MPEP into Postgres and made citation validation a hard gate. `validateCitations` in `features/mpep/application/validate-citations.ts` looks up every section number before it reaches the screen. `resolvePins` nulls the pin and keeps the finding, so the user still sees the problem and the CFR reference, just without a citation that cannot be opened. The same reasoning is why prior art results lead with matched spans instead of a single novelty score.
+The model kept citing MPEP sections that do not exist. The fix was to stop trusting the model on this point. I loaded every section of the MPEP into a Postgres table keyed by section number. `validateCitations` in `features/mpep/application/validate-citations.ts` takes the section numbers a check produced and runs one query that returns the ones that exist. `resolvePins` then clears the section number on any finding that failed the lookup. The finding still shows with its explanation, it just has no Open MPEP link. Each Check for issues run also counts how many findings lost their number and writes that count to the audit log.
+
+I now treat any fact the model states as unverified until code has checked it against real data. The prior art step follows the same rule. Each result pins the overlapping passages of the other patent to your claim elements, so you can read the overlap yourself.
 
 ### References
 
@@ -84,7 +88,7 @@ Upload as many figures as you need, images or PDFs, and Pincite checks each unde
 
 ### 5. Review
 
-Run the checks and the findings come back grouped by area. Two real violations sit at the top, a dependent claim that points at a claim that does not exist and a multiple dependent claim written cumulatively instead of in the alternative.
+Run the checks and the findings come back grouped by area. Two real violations sit at the top. Claim 4 refers to claim 6, which does not exist, and claim 5 says "claims 1 and 2" where the rule requires "claim 1 or 2".
 
 ![Error handling](screenshots/case-review.png)
 
