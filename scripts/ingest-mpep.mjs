@@ -1,7 +1,9 @@
 // Ingest MPEP section TEXT into mpep_sections + mpep_chunks (content only, no
 // embeddings). Embeddings are added separately by scripts/embed-mpep.mjs once the
 // Voyage account is off the throttled free tier. Source: official USPTO per-section
-// HTML (Ninth Edition, Revision 01.2024).
+// HTML (Ninth Edition, Revision 01.2024). Fetching and parsing live in
+// scripts/lib/mpep-html.mjs, shared with scripts/build-demo-fixture.mjs so the demo
+// corpus is parsed exactly the same way.
 //
 // Usage:
 //   node --env-file=.env.local scripts/ingest-mpep.mjs --subset [--truncate]
@@ -9,16 +11,19 @@
 //   node --env-file=.env.local scripts/ingest-mpep.mjs s2111 s608
 import pg from "pg";
 import { parse } from "node-html-parser";
+import {
+  BASE,
+  EDITION,
+  FETCH_DELAY_MS,
+  chapterOf,
+  fetchText,
+  parseSectionFile,
+  sleep,
+} from "./lib/mpep-html.mjs";
 
-const EDITION = "Ninth Edition, Revision 01.2024";
-const BASE = "https://www.uspto.gov/web/offices/pac/mpep";
-const UA = "Mozilla/5.0 (Pincite MPEP ingest; legal research aid)";
-const FETCH_DELAY_MS = 400;
 const CHUNK_CHARS = 6000;
 
 const SUBSET = ["s608", "s2111", "s2161", "s2163", "s2173", "s2181", "s2106"];
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function dbConfig() {
   const url = process.env.SUPABASE_DB_URL;
@@ -37,12 +42,6 @@ function dbConfig() {
   return { connectionString: url, ssl: { rejectUnauthorized: false } };
 }
 
-async function fetchText(url) {
-  const r = await fetch(url, { headers: { "User-Agent": UA } });
-  if (!r.ok) throw new Error(`${url} -> ${r.status}`);
-  return r.text();
-}
-
 async function enumerateSectionFiles() {
   const files = new Set();
   for (let n = 100; n <= 2900; n += 100) {
@@ -56,38 +55,11 @@ async function enumerateSectionFiles() {
       process.stdout.write(`  chapter ${ch}: ${files.size} files so far\r`);
       await sleep(FETCH_DELAY_MS);
     } catch {
-      /* reserved chapter — skip */
+      /* reserved chapter - skip */
     }
   }
   process.stdout.write("\n");
   return [...files];
-}
-
-function parseSectionFile(html) {
-  const parts = html.split(/(?=<h1\b[^>]*class="[^"]*page-title)/i);
-  const sections = [];
-  for (const part of parts) {
-    if (!/^<h1\b[^>]*page-title/i.test(part)) continue;
-    const headMatch = part.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
-    if (!headMatch) continue;
-    const headText = parse(`<x>${headMatch[1]}</x>`).text.replace(/\s+/g, " ").trim();
-    const m = headText.match(
-      /^([0-9]+(?:\.[0-9]+)?(?:\([a-z0-9]+\))?)\s+(.*?)(?:\s*\[R-([0-9.]+)\])?\s*$/i,
-    );
-    if (!m) continue;
-    const bodyHtml = part.slice(headMatch.index + headMatch[0].length);
-    const full_text = parse(bodyHtml)
-      .structuredText.replace(/\n{3,}/g, "\n\n")
-      .trim();
-    if (!full_text) continue;
-    sections.push({
-      section_number: m[1],
-      title: m[2].trim() || null,
-      revision_tag: m[3] ? `[R-${m[3]}]` : null,
-      full_text,
-    });
-  }
-  return sections;
 }
 
 function chunkText(text) {
@@ -117,10 +89,7 @@ function chunkText(text) {
 }
 
 async function storeSection(client, file, sec) {
-  const chapterNum = sec.section_number.match(/^\d+/)?.[0];
-  const chapter = chapterNum
-    ? String(Math.ceil(Number(chapterNum) / 100) * 100)
-    : null;
+  const chapter = chapterOf(sec.section_number);
   const { rows } = await client.query(
     `insert into public.mpep_sections
        (section_number, title, chapter, revision_tag, edition, source_url, full_text, fetched_at)

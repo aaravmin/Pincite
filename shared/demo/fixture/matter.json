@@ -1,0 +1,419 @@
+{
+  "audit_log": [
+    {
+      "action": "project_created",
+      "created_at": "2026-09-14T15:00:00.000Z",
+      "detail": {
+        "client_name": null,
+        "matter_no": null,
+        "name": "Apple molded fiber food container",
+        "patent_type": "utility"
+      },
+      "id": 1,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": null
+    },
+    {
+      "action": "disclosure_saved",
+      "created_at": "2026-09-14T15:25:00.000Z",
+      "detail": null,
+      "id": 2,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": null
+    },
+    {
+      "action": "inventors_saved",
+      "created_at": "2026-09-14T15:30:00.000Z",
+      "detail": {
+        "count": 2
+      },
+      "id": 3,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": null
+    },
+    {
+      "action": "version_saved",
+      "created_at": "2026-09-14T15:35:00.000Z",
+      "detail": {
+        "label": "Full draft"
+      },
+      "id": 4,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": "00000000-0000-4000-8000-000000000030"
+    },
+    {
+      "action": "attachment_uploaded",
+      "created_at": "2026-09-14T15:40:00.000Z",
+      "detail": {
+        "filename": "apple-container-fig01.png",
+        "kind": "drawing",
+        "mime": "image/png",
+        "view": "perspective"
+      },
+      "id": 5,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": null
+    },
+    {
+      "action": "findings_run",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "detail": {
+        "count": 8,
+        "dropped": 0
+      },
+      "id": 6,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": null
+    },
+    {
+      "action": "prior_art_searched",
+      "created_at": "2026-09-14T15:50:00.000Z",
+      "detail": {
+        "candidate": "US20060213916A1",
+        "source": "manual"
+      },
+      "id": 7,
+      "ip": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "version_id": null
+    }
+  ],
+  "exports": [],
+  "findings": [
+    {
+      "actionable": true,
+      "cfr_ref": "37 CFR 1.75(c)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Refer to an existing, earlier claim.",
+      "id": "00000000-0000-4000-8000-000000000101",
+      "kind": "structural",
+      "mpep_section": "608.01(n)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "violation",
+      "span_end": 1230,
+      "span_start": 1140,
+      "title": "Claim 4 refers to claim 6, which does not exist",
+      "version_id": null
+    },
+    {
+      "actionable": false,
+      "cfr_ref": "37 CFR 1.16(j)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Incurs a fee under 37 CFR 1.16(j).",
+      "id": "00000000-0000-4000-8000-000000000102",
+      "kind": "structural",
+      "mpep_section": "608.01(n)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "attention",
+      "span_end": 1339,
+      "span_start": 1234,
+      "title": "Claim 5 is a multiple dependent claim (fee applies)",
+      "version_id": null
+    },
+    {
+      "actionable": true,
+      "cfr_ref": "37 CFR 1.75(c)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Refer to the claims in the alternative (\"1 or 2\"), not with \"and\".",
+      "id": "00000000-0000-4000-8000-000000000103",
+      "kind": "structural",
+      "mpep_section": "608.01(n)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "violation",
+      "span_end": 1339,
+      "span_start": 1234,
+      "title": "Claim 5 multiple dependent claim must be in the alternative",
+      "version_id": null
+    },
+    {
+      "actionable": true,
+      "cfr_ref": "35 U.S.C. 112(b)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Introduce it with \"a\"/\"an\" before \"the\"/\"said\".",
+      "id": "00000000-0000-4000-8000-000000000104",
+      "kind": "consistency",
+      "mpep_section": "2173.05(e)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "attention",
+      "span_end": 1156,
+      "span_start": 1140,
+      "title": "Claim 4: \"The container of\" may lack antecedent basis",
+      "version_id": null
+    },
+    {
+      "actionable": true,
+      "cfr_ref": "35 U.S.C. 112(b)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Introduce it with \"a\"/\"an\" before \"the\"/\"said\".",
+      "id": "00000000-0000-4000-8000-000000000105",
+      "kind": "consistency",
+      "mpep_section": "2173.05(e)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "attention",
+      "span_end": 1287,
+      "span_start": 1275,
+      "title": "Claim 5: \"the base and\" may lack antecedent basis",
+      "version_id": null
+    },
+    {
+      "actionable": true,
+      "cfr_ref": "35 U.S.C. 112(b)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Introduce it with \"a\"/\"an\" before \"the\"/\"said\".",
+      "id": "00000000-0000-4000-8000-000000000106",
+      "kind": "consistency",
+      "mpep_section": "2173.05(e)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "attention",
+      "span_end": 1299,
+      "span_start": 1288,
+      "title": "Claim 5: \"the lid are\" may lack antecedent basis",
+      "version_id": null
+    },
+    {
+      "actionable": true,
+      "cfr_ref": "35 U.S.C. 112(b)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Indefinite unless the draft gives a standard to measure it.",
+      "id": "00000000-0000-4000-8000-000000000107",
+      "kind": "substantive",
+      "mpep_section": "2173.05(b)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "attention",
+      "span_end": 1093,
+      "span_start": 1080,
+      "title": "Claim 3 uses the relative term \"substantially\"",
+      "version_id": null
+    },
+    {
+      "actionable": true,
+      "cfr_ref": "35 U.S.C. 112(b)",
+      "created_at": "2026-09-14T15:45:00.000Z",
+      "explanation": "Indefinite unless the draft gives a standard to measure it.",
+      "id": "00000000-0000-4000-8000-000000000108",
+      "kind": "substantive",
+      "mpep_section": "2173.05(b)",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "severity": "attention",
+      "span_end": 1114,
+      "span_start": 1109,
+      "title": "Claim 3 uses the relative term \"about\"",
+      "version_id": null
+    }
+  ],
+  "match_spans": [
+    {
+      "created_at": "2026-09-14T15:50:00.000Z",
+      "element_confidence": 0.55,
+      "id": "00000000-0000-4000-8000-000000000401",
+      "match_id": "00000000-0000-4000-8000-000000000040",
+      "overlap_type": "lexical",
+      "patent_span_text": "A container lid formed of molded cellulose fiber for mating with a base container to hold food items.",
+      "user_section_key": "claims",
+      "user_span_end": 1005,
+      "user_span_start": 871
+    },
+    {
+      "created_at": "2026-09-14T15:50:00.000Z",
+      "element_confidence": 0.5,
+      "id": "00000000-0000-4000-8000-000000000402",
+      "match_id": "00000000-0000-4000-8000-000000000040",
+      "overlap_type": "lexical",
+      "patent_span_text": "A container lid formed of molded cellulose fiber for mating with a base container to hold food items.",
+      "user_section_key": "claims",
+      "user_span_end": 1339,
+      "user_span_start": 1234
+    }
+  ],
+  "prior_art_matches": [
+    {
+      "created_at": "2026-09-14T15:50:00.000Z",
+      "id": "00000000-0000-4000-8000-000000000040",
+      "overall_score": 0.41,
+      "patent_number": "US20060213916A1",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "source": "google_patents",
+      "source_url": "https://patents.google.com/patent/US20060213916A1/en",
+      "title": "Molded fiber lid for a container",
+      "version_id": null
+    }
+  ],
+  "profiles": [
+    {
+      "consented_at": "2026-09-14T15:00:00.000Z",
+      "created_at": "2026-09-14T15:00:00.000Z",
+      "email": "demo@pincite.local",
+      "id": "00000000-0000-4000-8000-000000000001",
+      "role": "inventor"
+    }
+  ],
+  "project_attachments": [
+    {
+      "analysis": null,
+      "annotations": null,
+      "created_at": "2026-09-14T15:40:00.000Z",
+      "filename": "apple-container-fig01.png",
+      "id": "00000000-0000-4000-8000-000000000020",
+      "kind": "drawing",
+      "mime": "image/png",
+      "page_index": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "size_bytes": 452132,
+      "storage_path": "demo/apple-container-fig01.png",
+      "vector_scene_meta": null,
+      "view": "perspective"
+    }
+  ],
+  "project_disclosure": [
+    {
+      "advantages": "Less soggy food. Nesting saves storage space. Made from recycled molded fiber.",
+      "alternatives": "The ridges can be concentric or radial. The openings can be holes or slots.",
+      "components": "molded fiber base\nintegrated ridges\nhinged lid\nlid openings\nmoisture channeling feature\ncarrying handle",
+      "field_industry": "Food packaging and containers.",
+      "how_it_works": "A single piece of molded fiber forms a ridged base and a hinged lid. The ridges lift the food and create a gap. Openings and a moisture channeling feature in the lid carry the steam out.",
+      "known_prior_art": "Square corrugated pizza boxes. Vented plastic clamshell containers.",
+      "problem_solved": "Hot food in a closed container traps steam and gets soggy. Empty boxes also waste storage space.",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "updated_at": "2026-09-14T15:25:00.000Z"
+    }
+  ],
+  "project_inventors": [
+    {
+      "citizenship": "",
+      "created_at": "2026-09-14T15:30:00.000Z",
+      "id": "00000000-0000-4000-8000-000000000301",
+      "legal_name": "Francesco Longoni",
+      "mailing_address": "1 Apple Park Way, Cupertino, CA 95014",
+      "ord": 0,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "residence": "Cupertino, CA"
+    },
+    {
+      "citizenship": "",
+      "created_at": "2026-09-14T15:30:00.000Z",
+      "id": "00000000-0000-4000-8000-000000000302",
+      "legal_name": "Mark E. Doutt",
+      "mailing_address": "1 Apple Park Way, Cupertino, CA 95014",
+      "ord": 1,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "residence": "Cupertino, CA"
+    }
+  ],
+  "project_sections": [
+    {
+      "content": "Container",
+      "id": "00000000-0000-4000-8000-000000000201",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "title",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "word_count": 1
+    },
+    {
+      "content": "Food is often delivered in closed containers that trap steam and make the food soggy. These containers also take up storage space when they are empty.",
+      "id": "00000000-0000-4000-8000-000000000202",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "background",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "word_count": 26
+    },
+    {
+      "content": "A single piece molded fiber container has a ridged base and a vented lid that carry steam away from the food, and the containers nest to save space.",
+      "id": "00000000-0000-4000-8000-000000000203",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "summary",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "word_count": 28
+    },
+    {
+      "content": "The container 10 comprises a lid 12 and a base 24 joined by a hinge 38. The lid 12 carries concentric ridges 14, 18, 20, and 22, an outer rim 26, and a sidewall 28. The base 24 has an interior surface 30, a plurality of vent openings 32, a central hub 34, support recesses 36, and a moisture channeling feature 40 cooperating with channels 42 and a drain 48. A closure tab 50 and a catch 52 hold the lid 12 to the base 24.",
+      "id": "00000000-0000-4000-8000-000000000204",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "detailed_description",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "word_count": 86
+    },
+    {
+      "content": "A container is constructed in a preformed manner so no assembly is required. A lid is coupled to the base through a hinge so the container is made from a single piece of material. The base and lid nest with a second container to save storage space. The container can be made from molded fiber. Ridges in the base lift the food and a vented lid carries moisture away to keep the food from getting soggy.",
+      "id": "00000000-0000-4000-8000-000000000205",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "abstract",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "word_count": 76
+    },
+    {
+      "content": "1. A molded fiber container suitable for containing a food item, comprising: a base, the base comprising a plurality of ridges integrated with an interior surface of the base, wherein when the food item is placed on at least some of the plurality of ridges, a gap is formed between the food item and the interior surface of the base, the gap assisting in thermally isolating the food item and allowing moisture expelled from the food item to be transported away from the food item; and a lid, the lid comprising a plurality of openings arranged in accordance with at least some of the plurality of ridges, and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the plurality of openings and the gap to provide a path by which at least some of the moisture is transported out of the container.\n2. The container of claim 1, wherein the base and the lid are integrally formed from a single piece of molded fiber connected by a hinge.\n3. The container of claim 1, wherein the plurality of ridges are arranged substantially concentrically about a center of the base.\n4. The container of claim 6, wherein the plurality of openings comprise a plurality of slots.\n5. The container of claims 1 and 2, wherein the base and the lid are shaped to nest with a second container.",
+      "id": "00000000-0000-4000-8000-000000000206",
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "section_key": "claims",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "word_count": 237
+    }
+  ],
+  "project_versions": [
+    {
+      "created_at": "2026-09-14T15:35:00.000Z",
+      "id": "00000000-0000-4000-8000-000000000030",
+      "label": "Full draft",
+      "parent_version_id": null,
+      "project_id": "00000000-0000-4000-8000-000000000010",
+      "snapshot": {
+        "project": {
+          "application_number": null,
+          "declared_status": "drafting",
+          "filing_date": null,
+          "name": "Apple molded fiber food container",
+          "patent_type": "utility"
+        },
+        "sections": {
+          "abstract": "A container is constructed in a preformed manner so no assembly is required. A lid is coupled to the base through a hinge so the container is made from a single piece of material. The base and lid nest with a second container to save storage space. The container can be made from molded fiber. Ridges in the base lift the food and a vented lid carries moisture away to keep the food from getting soggy.",
+          "background": "Food is often delivered in closed containers that trap steam and make the food soggy. These containers also take up storage space when they are empty.",
+          "claims": "1. A molded fiber container suitable for containing a food item, comprising: a base, the base comprising a plurality of ridges integrated with an interior surface of the base, wherein when the food item is placed on at least some of the plurality of ridges, a gap is formed between the food item and the interior surface of the base, the gap assisting in thermally isolating the food item and allowing moisture expelled from the food item to be transported away from the food item; and a lid, the lid comprising a plurality of openings arranged in accordance with at least some of the plurality of ridges, and a moisture channeling feature integrally formed in the lid, the moisture channeling feature cooperating with at least some of the plurality of openings and the gap to provide a path by which at least some of the moisture is transported out of the container.\n2. The container of claim 1, wherein the base and the lid are integrally formed from a single piece of molded fiber connected by a hinge.\n3. The container of claim 1, wherein the plurality of ridges are arranged substantially concentrically about a center of the base.\n4. The container of claim 6, wherein the plurality of openings comprise a plurality of slots.\n5. The container of claims 1 and 2, wherein the base and the lid are shaped to nest with a second container.",
+          "detailed_description": "The container 10 comprises a lid 12 and a base 24 joined by a hinge 38. The lid 12 carries concentric ridges 14, 18, 20, and 22, an outer rim 26, and a sidewall 28. The base 24 has an interior surface 30, a plurality of vent openings 32, a central hub 34, support recesses 36, and a moisture channeling feature 40 cooperating with channels 42 and a drain 48. A closure tab 50 and a catch 52 hold the lid 12 to the base 24.",
+          "summary": "A single piece molded fiber container has a ridged base and a vented lid that carry steam away from the food, and the containers nest to save space.",
+          "title": "Container"
+        }
+      },
+      "user_id": "00000000-0000-4000-8000-000000000001"
+    }
+  ],
+  "projects": [
+    {
+      "applicant_is_inventor": false,
+      "applicant_is_juristic": true,
+      "applicant_name": "Apple Inc.",
+      "application_number": null,
+      "client_name": null,
+      "created_at": "2026-09-14T15:00:00.000Z",
+      "declared_status": "drafting",
+      "entity_status": "large",
+      "filing_date": null,
+      "id": "00000000-0000-4000-8000-000000000010",
+      "matter_no": null,
+      "name": "Apple molded fiber food container",
+      "patent_type": "utility",
+      "updated_at": "2026-09-14T15:20:00.000Z",
+      "user_id": "00000000-0000-4000-8000-000000000001"
+    }
+  ]
+}
