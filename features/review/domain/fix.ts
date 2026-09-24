@@ -6,6 +6,7 @@
  * No I/O, so the tricky parts (which occurrence to replace, what a malformed model answer
  * means) are directly testable.
  */
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 /** The markers wrapped around the flagged span so the model fixes the right occurrence. */
 export const SPAN_OPEN = "⟦";
@@ -79,6 +80,10 @@ Rules:
  * Read the model's answer: take the first JSON object in the text, strip any span markers the
  * model copied into `before`, and cap the note. Returns null when there is nothing usable -
  * unparsable output, or an empty `before` - so the caller can say so instead of guessing.
+ *
+ * `before` and `after` stay verbatim: `before` has to match the section text exactly, and
+ * `after` is the text the user accepts into their draft, punctuation included. Only the note,
+ * which is display text, goes through the output sanitizer.
  */
 export function parseFixResponse(text: string): ProposedFix | null {
   const match = text.match(/\{[\s\S]*\}/);
@@ -93,7 +98,7 @@ export function parseFixResponse(text: string): ProposedFix | null {
     "",
   );
   const after = String(raw.after ?? "");
-  const note = String(raw.note ?? "").slice(0, NOTE_MAX);
+  const note = sanitizeOutputText(String(raw.note ?? "")).slice(0, NOTE_MAX);
   if (!before) return null;
   return { before, after, note };
 }

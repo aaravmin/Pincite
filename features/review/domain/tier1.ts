@@ -122,7 +122,7 @@ export function runTier1(
     };
 
     if (patentType === "design") {
-      // Design: exactly one claim, in the prescribed form (37 CFR 1.153; MPEP 1503.03).
+      // Design: exactly one claim, in the prescribed form (37 CFR 1.153; MPEP 1503.01, which carries the rule).
       if (claims.length > 1) {
         out.push({
           section_key: "claims",
@@ -133,7 +133,7 @@ export function runTier1(
           actionable: true,
           title: `A design application must have exactly one claim (found ${claims.length})`,
           explanation: "A design application allows only one claim.",
-          mpep_section: "1503.03",
+          mpep_section: "1503.01",
           cfr_ref: "37 CFR 1.153",
         });
       }
@@ -156,7 +156,7 @@ export function runTier1(
             title: "Design claim is not in the required form",
             explanation:
               'Must read "The ornamental design for [article] as shown".',
-            mpep_section: "1503.03",
+            mpep_section: "1503.01",
             cfr_ref: "37 CFR 1.153",
           });
         }
@@ -178,7 +178,7 @@ export function runTier1(
             actionable: true,
             title: "Design claim article does not match the title",
             explanation: "Name the same article as the title.",
-            mpep_section: "1503.03",
+            mpep_section: "1503.01",
             cfr_ref: "37 CFR 1.153",
           });
         }

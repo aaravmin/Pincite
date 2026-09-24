@@ -67,6 +67,16 @@ describe("parseEligibilityResponse", () => {
     });
   });
 
+  it("sanitizes the display fields after reading the JSON", () => {
+    // The JSON's own colons must not be touched before parsing; the values follow the
+    // output discipline once read.
+    const analysis = parseEligibilityResponse(
+      '{"category":"Manufacture: a container; ok","prong_one":"a-b"}',
+    );
+    expect(analysis.category).toBe("Manufacture a container ok");
+    expect(analysis.prong_one).toBe("a b");
+  });
+
   it("defaults missing framework keys to empty strings", () => {
     const analysis = parseEligibilityResponse('{"category":"machine"}');
     expect(analysis.prong_one).toBe("");
@@ -74,9 +84,9 @@ describe("parseEligibilityResponse", () => {
     expect(analysis.step_2b).toBe("");
   });
 
-  it("falls back to the raw answer for a missing summary", () => {
+  it("falls back to the raw answer for a missing summary, sanitized for display", () => {
     const analysis = parseEligibilityResponse('prose before {"category":"machine"}');
-    expect(analysis.summary).toBe('prose before {"category":"machine"}');
+    expect(analysis.summary).toBe('prose before {"category" "machine"}');
   });
 
   it("throws on malformed JSON so the caller can report a model error", () => {

@@ -7,6 +7,7 @@
  */
 import type { ParsedClaim } from "@/features/review/domain/claims";
 import type { EligibilityAnalysis } from "@/features/review/domain/finding";
+import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 /**
  * The claim to walk. Eligibility is argued on the broadest claim, so we take the first claim
@@ -41,16 +42,18 @@ Return JSON with these string keys:
  * Read the walkthrough out of the model's answer. Throws if the embedded JSON is malformed -
  * the caller reports that as a model error rather than showing an empty framework. A missing
  * key reads as "", and a missing summary falls back to the raw answer so the user still sees
- * what the model said.
+ * what the model said. Every field is display text, so each goes through the output
+ * sanitizer here, after the JSON has been read.
  */
 export function parseEligibilityResponse(text: string): EligibilityAnalysis {
   const json = text.match(/\{[\s\S]*\}/);
   const parsed = json ? JSON.parse(json[0]) : {};
+  const field = (value: unknown): string => sanitizeOutputText(String(value ?? ""));
   return {
-    category: String(parsed.category ?? ""),
-    prong_one: String(parsed.prong_one ?? ""),
-    prong_two: String(parsed.prong_two ?? ""),
-    step_2b: String(parsed.step_2b ?? ""),
-    summary: String(parsed.summary ?? text.slice(0, 300)),
+    category: field(parsed.category),
+    prong_one: field(parsed.prong_one),
+    prong_two: field(parsed.prong_two),
+    step_2b: field(parsed.step_2b),
+    summary: field(parsed.summary ?? text.slice(0, 300)),
   };
 }

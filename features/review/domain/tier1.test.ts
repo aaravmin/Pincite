@@ -309,7 +309,7 @@ describe("runTier1 - design applications", () => {
       severity: "violation",
       actionable: true,
       title: "A design application must have exactly one claim (found 2)",
-      mpep_section: "1503.03",
+      mpep_section: "1503.01",
       cfr_ref: "37 CFR 1.153",
     });
   });
@@ -320,7 +320,7 @@ describe("runTier1 - design applications", () => {
     const [f] = titled(found, "not in the required form");
     expect(f).toMatchObject({
       severity: "violation",
-      mpep_section: "1503.03",
+      mpep_section: "1503.01",
       cfr_ref: "37 CFR 1.153",
     });
     expect(claims.slice(f.span_start, f.span_end)).toBe(claims);

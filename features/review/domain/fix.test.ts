@@ -86,6 +86,20 @@ describe("parseFixResponse", () => {
     );
   });
 
+  it("keeps before and after verbatim and sanitizes only the note", () => {
+    // The colon in the claim text must survive so the edit still matches and reads as the
+    // user wrote it; the note is display text and follows the output discipline.
+    expect(
+      parseFixResponse(
+        '{"before":"comprising: a base","after":"comprising: a base.","note":"Added a period - done; ok"}',
+      ),
+    ).toEqual({
+      before: "comprising: a base",
+      after: "comprising: a base.",
+      note: "Added a period done ok",
+    });
+  });
+
   it("caps the note at 200 characters", () => {
     const parsed = parseFixResponse(
       JSON.stringify({ before: "x", after: "y", note: "n".repeat(500) }),

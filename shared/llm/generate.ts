@@ -10,7 +10,8 @@
  * synthetic / non-confidential text until ZDR is on. See the README.
  */
 import "server-only";
-import { sanitizeOutputText } from "@/shared/text/sanitize";
+import { demoGenerateText } from "@/shared/demo/canned";
+import { isDemoMode } from "@/shared/demo/mode";
 
 export type GenerateParams = {
   system?: string;
@@ -102,9 +103,23 @@ async function generateWithGemini(
   );
 }
 
+/**
+ * The raw answer, NOT passed through the output sanitizer: every caller asks for JSON and
+ * parses it, and the sanitizer would strip the colons out of that JSON before it could be
+ * read. The parsers (features/review/domain/fix.ts, eligibility.ts) sanitize the fields
+ * they display and keep the ones that must stay verbatim.
+ */
 export async function generateText(
   params: GenerateParams,
 ): Promise<GenerateResult> {
+  // Demo mode: the precomputed case study answer (shared/demo/canned.ts).
+  if (isDemoMode()) {
+    return {
+      text: demoGenerateText(params.system, params.prompt),
+      provider: "grok",
+      model: "demo",
+    };
+  }
   const provider = (process.env.GENERATION_PROVIDER ?? "grok").toLowerCase();
   const grokModel = params.fast
     ? (process.env.GROK_FAST_MODEL ?? process.env.GROK_MODEL ?? "grok-4.3")
@@ -113,7 +128,7 @@ export async function generateText(
 
   if (provider === "gemini") {
     return {
-      text: sanitizeOutputText(await generateWithGemini(params, geminiModel)),
+      text: await generateWithGemini(params, geminiModel),
       provider: "gemini",
       model: geminiModel,
     };
@@ -121,7 +136,7 @@ export async function generateText(
 
   try {
     return {
-      text: sanitizeOutputText(await generateWithGrok(params, grokModel)),
+      text: await generateWithGrok(params, grokModel),
       provider: "grok",
       model: grokModel,
     };
@@ -132,7 +147,7 @@ export async function generateText(
         (err as Error).message,
       );
       return {
-        text: sanitizeOutputText(await generateWithGemini(params, geminiModel)),
+        text: await generateWithGemini(params, geminiModel),
         provider: "gemini",
         model: geminiModel,
       };
