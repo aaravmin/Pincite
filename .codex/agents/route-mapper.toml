@@ -13,7 +13,7 @@ Map the app's routes and endpoints. Do not modify anything. Return a structured 
 3. **Pages that guard auth:** `app/**/page.tsx` that redirect on no user/consent.
 4. **Outbound APIs:** `fetch(...)` / SDK calls to external services (api.x.ai,
    generativelanguage.googleapis.com, Voyage, BigQuery, Supabase). Note which handle
-   invention text (confidentiality-relevant per docs/business-context.md).
+   invention text (confidentiality-relevant per .claude/CLAUDE.md "How we work").
 
 ## Output
 A table: `method | path/name | file:line | auth? | purpose`, then a short list of
