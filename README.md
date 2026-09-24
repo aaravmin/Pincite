@@ -37,7 +37,7 @@ pnpm dev          # http://localhost:3100
 
 ### Your contribution
 
-Solo project. I built all of it, using Claude Code and Codex for implementation with the conventions in `CLAUDE.md`.
+Solo project. I built all of it, using Claude Code and Codex for implementation with the conventions in `.claude/CLAUDE.md`.
 
 The interaction to look at is on the Review step. Click a finding and its MPEP rule opens beside the list.
 
