@@ -1,7 +1,9 @@
 import "server-only";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { createDemoClient } from "@/shared/db/demo/client";
 import type { TypedSupabaseClient } from "@/shared/db/types";
+import { isDemoMode } from "@/shared/demo/mode";
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
@@ -17,6 +19,9 @@ type CookieToSet = { name: string; value: string; options: CookieOptions };
  * directly once @supabase/ssr is upgraded to a line that matches supabase-js 2.10x.
  */
 export async function createClient(): Promise<TypedSupabaseClient> {
+  // Demo mode: no Supabase project, so the in-memory case study store answers instead.
+  if (isDemoMode()) return createDemoClient();
+
   const cookieStore = await cookies();
 
   return createServerClient(

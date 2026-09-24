@@ -1,6 +1,8 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/shared/db/database.types";
+import { createDemoClient } from "@/shared/db/demo/client";
+import { isDemoMode } from "@/shared/demo/mode";
 
 /**
  * Service-role Supabase client. SERVER ONLY - bypasses RLS, so every caller MUST verify
@@ -10,6 +12,9 @@ import type { Database } from "@/shared/db/database.types";
  * user client so RLS stays the boundary there.
  */
 export function createAdminClient() {
+  // Demo mode: the same in-memory store the user client uses; Storage is in memory too.
+  if (isDemoMode()) return createDemoClient();
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error("Supabase admin env not configured");

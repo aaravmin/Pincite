@@ -1,7 +1,11 @@
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/shared/db/middleware";
+import { isDemoMode } from "@/shared/demo/mode";
 
 export async function middleware(request: NextRequest) {
+  // Demo mode: no session to refresh and nothing to protect; every screen is the demo
+  // viewer's (shared/demo/mode.ts).
+  if (isDemoMode()) return NextResponse.next();
   return await updateSession(request);
 }
 

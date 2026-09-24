@@ -30,5 +30,7 @@ export async function GET(
       },
     });
   }
-  return NextResponse.redirect(result.url);
+  // Resolved against the request so a relative signed URL (demo mode's "?raw=1") lands on
+  // this same route; an absolute Supabase URL is unchanged by the resolution.
+  return NextResponse.redirect(new URL(result.url, request.url));
 }
