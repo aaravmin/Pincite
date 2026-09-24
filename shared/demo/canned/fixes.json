@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Claim 4 refers to claim 6, which does not exist",
+    "before": "The container of claim 6",
+    "after": "The container of claim 1",
+    "note": "Points claim 4 back to claim 1, which introduces the plurality of openings it narrows."
+  },
+  {
+    "title": "Claim 5 multiple dependent claim must be in the alternative",
+    "before": "claims 1 and 2",
+    "after": "claim 1 or claim 2",
+    "note": "Writes the multiple dependency in the alternative, as 37 CFR 1.75(c) requires."
+  },
+  {
+    "title": "Claim 3 uses the relative term \"substantially\"",
+    "before": "substantially concentrically",
+    "after": "concentrically",
+    "note": "Removes the relative term so the arrangement is stated exactly."
+  },
+  {
+    "title": "Claim 3 uses the relative term \"about\"",
+    "before": "about a center of the base",
+    "after": "around a center of the base",
+    "note": "Replaces the word the check read as a relative term with a plain preposition."
+  }
+]

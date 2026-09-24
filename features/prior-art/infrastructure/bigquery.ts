@@ -11,6 +11,7 @@ import "server-only";
 import { BigQuery } from "@google-cloud/bigquery";
 import { existsSync } from "node:fs";
 import type { Candidate } from "@/features/prior-art/domain/types";
+import { isDemoMode } from "@/shared/demo/mode";
 
 /**
  * Whether BigQuery can actually run here. True only if inline JSON creds are set
@@ -19,6 +20,8 @@ import type { Candidate } from "@/features/prior-art/domain/types";
  * caller degrades to the keyless source instead of throwing on a missing file.
  */
 export function bigQueryConfigured(): boolean {
+  // Demo mode: never bill a scan; the search takes the keyless path, which is canned too.
+  if (isDemoMode()) return false;
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) return true;
   const path = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   return !!(path && existsSync(path));

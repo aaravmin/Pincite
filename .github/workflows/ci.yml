@@ -23,10 +23,10 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
+      # No version here: the action reads the packageManager field in package.json, and
+      # naming a version in both places is an error.
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       - name: Set up Node
         uses: actions/setup-node@v4

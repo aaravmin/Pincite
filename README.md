@@ -251,6 +251,9 @@ Row level security scopes every table to its owner. Saves never overwrite histor
 
 ## Running it locally
 
+Node 24 ships corepack, and `corepack enable` installs the pinned pnpm, so there is nothing else to install.
+With no `.env.local` the app boots in demo mode on the public Apple case study, so `pnpm install` and `pnpm dev` are enough to look around.
+
 ```bash
 pnpm install
 

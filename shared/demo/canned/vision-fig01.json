@@ -1,0 +1,40 @@
+{
+  "summary": "A perspective view of a round molded fiber food container in an open configuration, showing the lid with concentric ridges and an outer rim, the base with a plurality of vent openings and a central moisture channeling feature, and the hinge and latch that join the lid and the base.",
+  "figureLabel": "FIG. 1",
+  "numerals": [
+    { "numeral": "54", "x": 0.129, "y": 0.114 },
+    { "numeral": "46", "x": 0.189, "y": 0.102 },
+    { "numeral": "12", "x": 0.246, "y": 0.094 },
+    { "numeral": "22", "x": 0.339, "y": 0.126 },
+    { "numeral": "20", "x": 0.391, "y": 0.16 },
+    { "numeral": "22", "x": 0.444, "y": 0.169 },
+    { "numeral": "10", "x": 0.55, "y": 0.108 },
+    { "numeral": "48", "x": 0.061, "y": 0.25 },
+    { "numeral": "18", "x": 0.191, "y": 0.261 },
+    { "numeral": "16", "x": 0.464, "y": 0.282 },
+    { "numeral": "14", "x": 0.151, "y": 0.353 },
+    { "numeral": "44", "x": 0.563, "y": 0.28 },
+    { "numeral": "38", "x": 0.586, "y": 0.327 },
+    { "numeral": "24", "x": 0.691, "y": 0.22 },
+    { "numeral": "34", "x": 0.651, "y": 0.319 },
+    { "numeral": "28", "x": 0.721, "y": 0.36 },
+    { "numeral": "26", "x": 0.884, "y": 0.403 },
+    { "numeral": "40", "x": 0.363, "y": 0.505 },
+    { "numeral": "16", "x": 0.262, "y": 0.573 },
+    { "numeral": "42", "x": 0.386, "y": 0.595 },
+    { "numeral": "36", "x": 0.659, "y": 0.537 },
+    { "numeral": "30", "x": 0.495, "y": 0.624 },
+    { "numeral": "32", "x": 0.639, "y": 0.624 },
+    { "numeral": "46", "x": 0.943, "y": 0.598 },
+    { "numeral": "50", "x": 0.823, "y": 0.771 },
+    { "numeral": "52", "x": 0.904, "y": 0.778 }
+  ],
+  "issues": [
+    {
+      "title": "Solid black shading on the lid rim",
+      "detail": "The lower edge of the lid is filled solid black, and solid black shading is not permitted except for bar graphs or color (37 CFR 1.84(m)).",
+      "x": 0.3,
+      "y": 0.47
+    }
+  ]
+}

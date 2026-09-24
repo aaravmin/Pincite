@@ -7,9 +7,15 @@ import "server-only";
  * sent out, never the user's invention text. Rate limited per user.
  */
 import type { TypedSupabaseClient } from "@/shared/db/types";
+import demoPatent from "@/shared/demo/canned/patent-US20060213916A1.json";
+import { CASE_STUDY_COMPARISON } from "@/shared/demo/fixture/case-study";
+import { isDemoMode } from "@/shared/demo/mode";
 import { checkRateLimit } from "@/shared/rate-limit/check";
 import { parsePatentPage } from "@/features/prior-art/domain/patent-page";
 import type { PatentDetails } from "@/features/prior-art/domain/types";
+
+/** The case study's compared patent, parsed from its public page once (demo mode). */
+const DEMO_PATENT: PatentDetails = demoPatent;
 
 export async function lookupPatent(
   supabase: TypedSupabaseClient,
@@ -31,6 +37,14 @@ export async function lookupPatent(
     inventors: [],
     url,
   };
+
+  // Demo mode: the captured page for the compared patent; any other number reads as blank.
+  if (isDemoMode()) {
+    return {
+      ok: true,
+      details: slug === CASE_STUDY_COMPARISON.patentNumber ? DEMO_PATENT : blank,
+    };
+  }
 
   try {
     const res = await fetch(url, {

@@ -8,6 +8,11 @@
  */
 import "server-only";
 import type { Candidate } from "@/features/prior-art/domain/types";
+import demoCandidates from "@/shared/demo/canned/prior-art-candidates.json";
+import { isDemoMode } from "@/shared/demo/mode";
+
+/** What this endpoint returned for the case study claims, captured once (demo mode). */
+const DEMO_CANDIDATES: Candidate[] = demoCandidates;
 
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
@@ -24,6 +29,8 @@ export async function searchCandidatesKeyless(params: {
   limit?: number;
 }): Promise<{ candidates: Candidate[] }> {
   const limit = Math.min(Math.max(params.limit ?? 15, 1), 30);
+  // Demo mode: the captured case study candidates instead of a live Google Patents query.
+  if (isDemoMode()) return { candidates: DEMO_CANDIDATES.slice(0, limit) };
   const kws = [
     ...new Set(
       params.keywords.map((k) => k.toLowerCase().trim()).filter((k) => k.length > 2),

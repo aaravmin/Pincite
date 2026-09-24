@@ -81,7 +81,9 @@
   --violation-foreground: oklch(0.985 0 0);
   --violation-bg: oklch(0.27 0.07 22);
   --attention: oklch(0.852 0.16 91.5);
-  --attention-foreground: oklch(0.27 0.05 80);
+  /* Light on the dark tint and the dark page: the attention foreground is only ever text on
+     those surfaces (never on the solid attention color, which carries no text). */
+  --attention-foreground: oklch(0.9 0.12 92);
   --attention-bg: oklch(0.32 0.06 90);
   --pass: oklch(0.696 0.17 149.2);
   --pass-foreground: oklch(0.205 0 0);
@@ -152,5 +154,29 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Demo mode: app/layout.tsx marks <html data-demo> and pins components/demo-banner.tsx on top.
+   Unlayered, so these beat the utilities: full-height screens and sticky rails start below it. */
+html[data-demo] {
+  --demo-banner-h: 2.25rem;
+}
+html[data-demo] .h-screen {
+  height: calc(100vh - var(--demo-banner-h));
+}
+html[data-demo] .min-h-screen {
+  min-height: calc(100vh - var(--demo-banner-h));
+}
+html[data-demo] .sticky.top-0 {
+  top: var(--demo-banner-h);
+}
+/* The same for the prior-art results sidebar, which is sticky from the md breakpoint. */
+@media (width >= 48rem) {
+  html[data-demo] .md\:sticky.md\:top-0 {
+    top: var(--demo-banner-h);
+  }
+  html[data-demo] .md\:max-h-screen {
+    max-height: calc(100vh - var(--demo-banner-h));
   }
 }

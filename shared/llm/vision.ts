@@ -4,6 +4,8 @@
  * so use only public or synthetic figures until ZDR is on (see the README).
  */
 import "server-only";
+import { demoDrawingView, demoDrawingVision } from "@/shared/demo/canned";
+import { isDemoMode } from "@/shared/demo/mode";
 import { sanitizeOutputText } from "@/shared/text/sanitize";
 
 const GROK_BASE = "https://api.x.ai/v1";
@@ -115,7 +117,10 @@ export async function classifyDrawingView(
   base64: string,
   mimeType: string,
 ): Promise<{ view: string; confidence: number }> {
-  const text = await grokVision(VIEW_PROMPT, base64, mimeType, 120);
+  // Demo mode: the canned read of FIG. 1, validated below exactly like a model answer.
+  const text = isDemoMode()
+    ? JSON.stringify(demoDrawingView())
+    : await grokVision(VIEW_PROMPT, base64, mimeType, 120);
   const match = text.match(/\{[\s\S]*\}/);
   let raw: Record<string, unknown> = {};
   try {
@@ -132,7 +137,10 @@ export async function analyzeDrawingVision(
   base64: string,
   mimeType: string,
 ): Promise<DrawingVision> {
-  const text = await grokVision(ANALYZE_PROMPT, base64, mimeType, 1400);
+  // Demo mode: the canned read of FIG. 1, run through the same sanitizing mappers below.
+  const text = isDemoMode()
+    ? JSON.stringify(demoDrawingVision())
+    : await grokVision(ANALYZE_PROMPT, base64, mimeType, 1400);
   const match = text.match(/\{[\s\S]*\}/);
   let raw: Record<string, unknown> = {};
   try {

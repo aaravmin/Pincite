@@ -5,6 +5,7 @@
  * across vendors, embed only synthetic / non-confidential text. See the README.
  */
 import "server-only";
+import { isDemoMode } from "@/shared/demo/mode";
 
 const VOYAGE_URL = "https://api.voyageai.com/v1/embeddings";
 const MODEL = process.env.EMBEDDING_MODEL ?? "voyage-law-2";
@@ -17,6 +18,8 @@ export async function embed(
   texts: string[],
   inputType: EmbedInputType = "document",
 ): Promise<number[][]> {
+  // Demo mode: no vectors, so MPEP locate falls back to keywords and prior art stays lexical.
+  if (isDemoMode()) return [];
   if (texts.length === 0) return [];
   const key = process.env.VOYAGE_API_KEY;
   if (!key) throw new Error("VOYAGE_API_KEY is not set");

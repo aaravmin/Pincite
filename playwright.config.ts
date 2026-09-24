@@ -12,6 +12,8 @@ loadEnvConfig(process.cwd());
  */
 export default defineConfig({
   testDir: "./e2e",
+  // The no-credentials demo spec runs only under playwright.demo.config.ts (pnpm verify:demo).
+  testIgnore: ["**/demo.spec.ts"],
   globalSetup: "./e2e/global-setup.ts",
   fullyParallel: false,
   workers: 1,

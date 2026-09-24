@@ -2,16 +2,24 @@
   "name": "pincite",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "dev": "next dev --turbopack --port 3100",
+    "dev:demo": "NEXT_PUBLIC_SUPABASE_URL= next dev --turbopack --port 3100",
     "build": "next build",
     "start": "next start --port 3100",
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "verify": "playwright test",
+    "verify:demo": "playwright test --config playwright.demo.config.ts",
     "reset:account": "node --env-file=.env.local scripts/reset-account.mjs",
     "seed:demo": "node --env-file=.env.local scripts/seed-demo-container.mjs",
+    "demo:fixture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/lib/alias-loader.mjs scripts/build-demo-fixture.mjs",
     "remotion:studio": "remotion studio remotion/index.ts",
     "remotion:render": "remotion render remotion/index.ts PinciteDemo out/pincite-demo-16x9.mp4"
   },

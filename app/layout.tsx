@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces, Baloo_2 } from "next/font/google";
+import { DemoBanner } from "@/components/demo-banner";
 import { OutputSanitizer } from "@/components/output-sanitizer";
 import { Toaster } from "@/components/ui/sonner";
+import { isDemoMode } from "@/shared/demo/mode";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,13 +46,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Demo mode (no Supabase configured): a persistent banner, and a data-demo marker that
+  // lets app/globals.css shift full-height screens and sticky rails below it.
+  const demo = isDemoMode();
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${baloo.variable} h-full antialiased`}
+      data-demo={demo ? "" : undefined}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        {demo && <DemoBanner />}
         {/* Apply the saved (or system) theme before paint to avoid a flash. */}
         <script
           dangerouslySetInnerHTML={{
